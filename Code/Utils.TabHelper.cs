@@ -25,7 +25,7 @@ namespace Cultivation_Way.Utils
 
 			//计算位置
 			Buttons++;
-			float x = startX+((Buttons-1)/2)*addX;
+			float x = startX+ (((Buttons - 1) >> 1) << 1) * addX;
 			float y = Buttons % 2 == 1 ? upY : downY;
 
 			
@@ -42,9 +42,10 @@ namespace Cultivation_Way.Utils
 			GameObject addLine = GameObject.Instantiate(line, powersTab.transform);
 
 			//计算位置
-			float x = startX + lineStep + ((Buttons - 1) / 2) * addX;
+			float x = startX + lineStep + (((Buttons - 1)>>1)<<1) * addX;
 			addLine.transform.localPosition = new Vector2(x, addLine.transform.localPosition.y);
 
+			startX += (lineStep - addX) * 2;
             //如果按钮数是奇数，则加一
             if (Buttons % 2 == 1)
             {

@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿
+using CultivationWay;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,12 @@ namespace Cultivation_Way
 
         public static void addAsset()
         {
+            Main.MoreGodPowers.init();
+            Main.MoreActors.init();
+            Main.MoreRaces.init();
+            Main.MoreKingdoms.init();
+            Main.MoreBuildings.init();
+
             ChineseNameLibrary chineseNameGenerator = new ChineseNameLibrary();
             ChineseElementLibrary chineseElementLibrary = new ChineseElementLibrary();
             add(chineseNameGenerator, "chineseNameGenerator");

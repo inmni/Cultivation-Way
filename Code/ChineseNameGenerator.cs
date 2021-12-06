@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using HarmonyLib;
 using UnityEngine;
+using ReflectionUtility;
 
 namespace Cultivation_Way
 {
@@ -34,9 +35,9 @@ namespace Cultivation_Way
 
             return false;
         }
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         [HarmonyPatch(typeof(Culture),"create")]
-        public static void create_Postfix(Race pRace,City pCity,ref Culture __instance)
+        public static bool create_Prefix(Race pRace,City pCity,ref Culture __instance)
         {
             //原代码 
             /*this.race = pRace.id;
@@ -55,11 +56,25 @@ namespace Cultivation_Way
             this.year = MapBox.instance.mapStats.year;
             this.prepare();
             */
-            ChineseNameGenerator instance = new ChineseNameGenerator();
+            
+            __instance.race = pRace.id;
+            __instance.list_tech_ids = new List<string>();
+            __instance.id = MapBox.instance.mapStats.getNextId("culture");
 
             ChineseNameAsset chineseNameAsset = ((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).get(pRace.name_template_culture);
 
             __instance.name = instance.getNameFromTemplate(chineseNameAsset);
+            if (pCity != null)
+            {
+                __instance.village_origin = ((CityData)Reflection.GetField(typeof(City), pCity, "data")).cityName;
+            }
+            else
+            {
+                __instance.village_origin = "??";
+            }
+            __instance.year = MapBox.instance.mapStats.year;
+            Reflection.CallMethod(__instance, "prepare");
+            return false;
         }
         public string getNameFromTemplate(ChineseNameAsset pAsset)
         {

@@ -9,14 +9,33 @@ using UnityEngine;
 using HarmonyLib;
 
 using Cultivation_Way;
+using Cultivation_Way.Utils;
+using System.Linq;
+using System.IO;
+/*
+MonoBehaviour.print("[修真之路Cultivation Way]:测试点n");//测试用测试点格式
 
-
-namespace CultivationWay{
+*/
+namespace CultivationWay
+{
     [ModEntry]
     class Main : MonoBehaviour{
+        //注意：职业头部贴图加载存在一定问题
         //注意：Culture.create()已在ChineseNameGenerator添加后置补丁
         //需要在Actor死亡后删除MoreStats
+        public static MoreActors MoreActors = new MoreActors();
+        public static MoreRaces MoreRaces = new MoreRaces();
+        public static MoreKingdoms MoreKingdoms = new MoreKingdoms();
+        public static MoreBuildings MoreBuildings = new MoreBuildings();
+        public static MoreGodPowers MoreGodPowers = new MoreGodPowers();
+
+
         public static Dictionary<Actor,MoreStats> actorToMoreStats = new Dictionary<Actor, MoreStats>();//单位与更多属性映射词典
+
+        public static List<string> moreActors = new List<string>();
+        public static List<string> moreRaces = new List<string>();
+
+        public static ModDeclaration.Info Info;
 
         private bool initiated = false;
         void Awake(){
@@ -25,7 +44,6 @@ namespace CultivationWay{
         }
         void Start()
         {
-            
         }
         void Update()
         {
@@ -36,9 +54,10 @@ namespace CultivationWay{
             if (!initiated)
             {
                 initiated = true;
-                //初始化
-                #region
+                
+                #region 初始化
                 MonoBehaviour.print("[修真之路Cultivation Way]:初始化");
+                
                 AddInitLibs.initMyLibs();
                 MonoBehaviour.print("[修真之路Cultivation Way]:初始化库成功");
                 initWindows();
@@ -63,6 +82,11 @@ namespace CultivationWay{
                 MonoBehaviour.print("[修真之路Cultivation Way]:加载按钮");
                 MorePowers.createButtons();
                 MonoBehaviour.print("[修真之路Cultivation Way]:加载按钮成功");
+                //添加其他
+                MonoBehaviour.print("[修真之路Cultivation Way]:添加其他");
+                sfx_MusicMan_racesAdd();
+                MoreRaces.kingdomColorsDataInit();
+                MonoBehaviour.print("[修真之路Cultivation Way]:添加其他成功");
                 #endregion
                 MonoBehaviour.print("[修真之路Cultivation Way]:加载成功");
             }
@@ -75,33 +99,36 @@ namespace CultivationWay{
             Harmony.CreateAndPatchAll(typeof(AddAssetManager));
             Harmony.CreateAndPatchAll(typeof(ChineseNameGenerator));
             Harmony.CreateAndPatchAll(typeof(Main));
+            Harmony.CreateAndPatchAll(typeof(MoreRaces));
         }
         void addForLocalization()
         {
             Localization.addLocalization("Button_Cultivation_Way", "修真之路");
-            Localization.addLocalization("tab_cw", "简简单单的修真");
+            string[] temp = new string[] { "QQ群总部：602184962", "混沌轮回天地间，人生道尽又一年。\n路走人间似神仙，观望百态红尘间。","道可道，非恒道;\n名可名，非恒名", "魔前一叩三千年，回首凡尘不作仙" };
+            Localization.addLocalization("tab_cw", temp.GetRandom());
         }
         void initWindows()
         {
             WindowAboutThis.init();
         }
 
-        //一些不知道放哪的拦截
+        #region 一些不知道放哪的拦截
+        //绑定人物和更多属性
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox),"createNewUnit")]
-
-        //绑定人物和更多属性
         public static void bindActorToMoreStats(Actor __result)
         {
             MoreStats moreStats = new MoreStats(__result);
             actorToMoreStats.Add(__result,moreStats);
         }
+        //解除绑定
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox), "destroyActor",new Type[] { typeof(Actor) })]
         public static void unBindActorToMoreStats(Actor pActor)
         {
             actorToMoreStats.Remove(pActor);
         }
+        //额外窗口
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ScrollWindow), "showWindow", new Type[] { typeof(string) })]
         public static void showWindow_Postfix(string pWindowID)
@@ -112,7 +139,35 @@ namespace CultivationWay{
                     WindowMoreStats.init();
                     break;
             }
-
         }
+        
+        //测试
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Building), "getColor")]
+        public static bool setBuilding_Prefix(Building __instance)
+        {
+            BuildingAsset stats = Reflection.GetField(typeof(Building), __instance, "stats") as BuildingAsset;
+            if (stats.sprites == null)
+            {
+                MonoBehaviour.print("[修真之路Cultivation Way]:sprites为空");
+                return true;
+            }
+            if (stats.sprites.mapIcon == null)
+            {
+                MonoBehaviour.print("[修真之路Cultivation Way]:mapIcon为空");
+            }
+            return true;
+        }
+        #endregion
+
+        #region 乱七八糟的初始化
+        public static void sfx_MusicMan_racesAdd()
+        {
+            foreach (string race in moreRaces)
+            {
+                sfx.MusicMan.races.Add(race, new sfx.MusicRaceContainer());
+            }
+        }
+        #endregion
     }
 }

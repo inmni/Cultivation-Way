@@ -12,10 +12,10 @@ namespace Cultivation_Way
         public override void init()
         {
             base.init();
-            //国家名
-            #region
-            //人类
-            this.add(new ChineseNameAsset
+			
+			#region 国家名
+			//人类
+			this.add(new ChineseNameAsset
 			{
 				id = "human_kingdom",
 				onlyByTemplate = false,
@@ -107,9 +107,13 @@ namespace Cultivation_Way
 			this.clone("elf_kingdom", "human_kingdom");
 			//矮人，直接复制人类
 			this.clone("dwarf_kingdom", "human_kingdom");
+			//天族，直接复制人类
+			this.clone("Tian_kingdom", "human_kingdom");
+			//冥族，直接复制人类
+			this.clone("Ming_kingdom", "human_kingdom");
 			#endregion
-			//城市名
-			#region
+
+			#region 城市名
 			//人类城市，直接复制国家命名
 			this.clone("human_city", "human_kingdom");
 			this.t.addition_endList = new List<string> { "城", "镇", "村", "域","州","府" };
@@ -121,9 +125,13 @@ namespace Cultivation_Way
 			this.clone("elf_city", "human_city");
 			//矮人，直接复制人类
 			this.clone("dwarf_city", "human_city");
+			//天族，直接复制人类
+			this.clone("Tian_city", "human_city");
+			//冥族，直接复制人类
+			this.clone("Ming_city", "human_city");
 			#endregion
-			//文化名
-			#region
+
+			#region 文化名
 			//人类文化，直接复制城市
 			this.clone("human_culture", "human_city");
 			this.t.addition_endList = new List<string> { "文化" ,"氏"};
@@ -135,10 +143,14 @@ namespace Cultivation_Way
 			this.clone("elf_culture", "human_culture");
 			//矮人，直接复制人类
 			this.clone("dwarf_culture", "human_culture");
-            #endregion
-            //国家格言
-            #region
-            this.add(new ChineseNameAsset
+			//天族，直接复制人类
+			this.clone("Tian_culture", "human_culture");
+			//冥族，直接复制人类
+			this.clone("Ming_culture", "human_culture");
+			#endregion
+
+			#region 国家格言
+			this.add(new ChineseNameAsset
 			{
 				id = "kingdom_mottos",
 				onlyByTemplate = false,
@@ -228,10 +240,10 @@ namespace Cultivation_Way
 				"悠悠万国，吾为正统。",
 				"预祝新年快乐！"
 			};
-            #endregion
-            //人名
-            #region
-            this.add(new ChineseNameAsset
+			#endregion
+			
+			#region 人名
+			this.add(new ChineseNameAsset
 			{
 				id = "human_name",
 				onlyByTemplate = true
@@ -323,10 +335,14 @@ namespace Cultivation_Way
 			this.clone("elf_name", "human_name");
 			//矮人，直接复制人类
 			this.clone("dwarf_name", "human_name");
-            #endregion
-            //其他生物名
-            #region
-            this.add(new ChineseNameAsset
+			//天族，直接复制人类
+			this.clone("Tian_name", "human_name");
+			//冥族，直接复制人类
+			this.clone("Ming_name", "human_name");
+			#endregion
+
+			#region 其他生物名
+			this.add(new ChineseNameAsset
 			{
 				id = "sheep_name",
 				onlyByTemplate = true

@@ -16,8 +16,8 @@ namespace Cultivation_Way
             window_AboutThis.transform.Find("Background").Find("Scroll View").gameObject.SetActive(true);
 
             GameObject aboutThisContent = GameObject.Find("/Canvas/CanvasWindows/windows/AboutThis/Background/Scroll View/Viewport/Content");
-            //内容设置
-            #region
+
+            #region 内容设置
             string content =
                 "模组介绍：\n" +
                 "这是一个简简单单的修真模组\n" +

@@ -20,7 +20,7 @@ namespace Cultivation_Way
                 newTabButton.transform.SetParent(copyTabButton.transform.parent);
                 newTabButton.transform.localScale = new Vector3(1f, 1f);
                 newTabButton.transform.localPosition = new Vector3(-150f, 49.62f);//x轴待调整
-                newTabButton.transform.Find("Icon").GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/iconTab.png");
+                newTabButton.transform.Find("Icon").GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconTab.png");
 
                 //设置栏内元素
 
@@ -30,6 +30,7 @@ namespace Cultivation_Way
                 {
                     transform.gameObject.SetActive(false);
                 }
+
                 newTab = GameObject.Instantiate(copyTab);
                 //删除复制来的无用元素
                 foreach (Transform transform in newTab.transform)
@@ -67,17 +68,36 @@ namespace Cultivation_Way
         }
         public static void createButtons()
         {
+            #region 总体
             PowerButton button = PowerButtons.CreateButton("AboutThis", Resources.Load<Sprite>("ui/icons/iconabout"),
                 "关于", "修真之路模组介绍", Vector3.zero, ButtonType.Click, null, clickForWindow_AboutThis);
 
             Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("+10", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/iconClock+10.png"),
+            Utils.TabHelper.AddLine();
+            #endregion
+
+            #region 小功能
+            button = PowerButtons.CreateButton("+10", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconClock+10.png"),
                 "增加十倍速", "只增不减", Vector3.zero, ButtonType.Click, null, changeTimeScale);
 
             Utils.TabHelper.AddButtonToTab(button);
 
             Utils.TabHelper.AddLine();
+            #endregion
+
+            #region 生物
+            button = PowerButtons.CreateButton("spawnTian", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconTian.png"),
+                "天族", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("spawnMing", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconMing.png"),
+                "冥族", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
+            
+            Utils.TabHelper.AddButtonToTab(button);
+
+            #endregion
         }
 
         public static void tabButtonClick()

@@ -34,7 +34,7 @@
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\StreamingAssets\Mods\NCMS\Core\Assemblies\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\worldbox_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NCMS">
@@ -59,7 +59,7 @@
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\worldbox_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ClothModule">
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
@@ -69,6 +69,9 @@
     </Reference>
     <Reference Include="UnityEngine.GridModule">
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\UnityEngine.GridModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>..\..\worldbox_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule">
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
@@ -97,8 +100,6 @@
     <Content Include="EmbededResources\backButtonLeft.png" />
     <Content Include="EmbededResources\backButtonRight.png" />
     <Content Include="EmbededResources\background.png" />
-    <Content Include="EmbededResources\iconClock+10.png" />
-    <Content Include="EmbededResources\iconTab.png" />
     <Content Include="icon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -130,8 +131,6 @@
     <None Include=".vs\Cultivation-Way\v16\.suo" />
     <None Include=".vs\slnx.sqlite" />
     <None Include=".vs\VSWorkspaceState.json" />
-    <None Include="Code\.gitattributes" />
-    <None Include="Code\.gitignore" />
     <None Include="Code\obj\Debug\Cultivation Way.csproj.AssemblyReference.cache" />
     <None Include="Code\obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
     <None Include="Code\obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
@@ -150,8 +149,14 @@
     <Compile Include="Code\ElementBaseType.cs" />
     <Compile Include="Code\ElementRootType.cs" />
     <Compile Include="Code\Main.cs" />
+    <Compile Include="Code\MoreActors.cs" />
+    <Compile Include="Code\MoreBuildings.cs" />
+    <Compile Include="Code\MoreGodPowers.cs" />
+    <Compile Include="Code\MoreKingdoms.cs" />
     <Compile Include="Code\MorePowers.cs" />
+    <Compile Include="Code\MoreRaces.cs" />
     <Compile Include="Code\MoreStats.cs" />
+    <Compile Include="Code\Utils.ResourcesHelper.cs" />
     <Compile Include="Code\Utils.TabHelper.cs" />
     <Compile Include="Code\WindowAboutThis.cs" />
     <Compile Include="Code\WindowMoreStats.cs" />

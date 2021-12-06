@@ -29,6 +29,7 @@ namespace Cultivation_Way
         {
             if (!initiated)
             {
+                initiated = true;
                 //添加进入窗口的按钮
                 PowerButton checkMoreStats = PowerButtons.CreateButton("CheckMoreStats", Resources.Load<Sprite>("ui/icons/iconInspect"),
                     "查看详细信息",
@@ -37,8 +38,8 @@ namespace Cultivation_Way
                     ButtonType.Click,
                     inspect_unitContent,
                     clickForWindow_MoreStats);
-                checkMoreStats.GetComponent<RectTransform>().sizeDelta = new Vector2(20f, 20f);
-                checkMoreStats.transform.Find("Icon").GetComponent<RectTransform>().sizeDelta = new Vector2(12f, 12f);
+                checkMoreStats.GetComponent<RectTransform>().sizeDelta = new Vector2(30f, 30f);
+                checkMoreStats.transform.Find("Icon").GetComponent<RectTransform>().sizeDelta = new Vector2(18f, 18f);
                 checkMoreStats.GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/backButtonRight.png");
 
 
