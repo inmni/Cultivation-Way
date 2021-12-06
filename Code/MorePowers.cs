@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NCMS.Utils;
+﻿using NCMS.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,19 +20,19 @@ namespace Cultivation_Way
                 newTabButton.transform.SetParent(copyTabButton.transform.parent);
                 newTabButton.transform.localScale = new Vector3(1f, 1f);
                 newTabButton.transform.localPosition = new Vector3(-150f, 49.62f);//x轴待调整
-                newTabButton.transform.Find("Icon").GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation Way/EmbededResources/iconTab.png");
+                newTabButton.transform.Find("Icon").GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/iconTab.png");
 
-             //设置栏内元素
+                //设置栏内元素
 
                 GameObject copyTab = GameObjects.FindEvenInactive("Tab_Other");
                 //暂时禁用copyTab内元素
-                foreach(Transform transform in copyTab.transform)
+                foreach (Transform transform in copyTab.transform)
                 {
                     transform.gameObject.SetActive(false);
                 }
                 newTab = GameObject.Instantiate(copyTab);
                 //删除复制来的无用元素
-                foreach(Transform transform in newTab.transform)
+                foreach (Transform transform in newTab.transform)
                 {
                     if (transform.gameObject.name == "tabBackButton" || transform.gameObject.name == "-space")
                     {
@@ -65,7 +61,6 @@ namespace Cultivation_Way
                 tabComponent.tipKey = "tab_cw";
                 ReflectionUtility.Reflection.SetField<GameObject>(tabComponent, "parentObj", copyTab.transform.parent.parent.gameObject);
 
-                newTab.transform.Find("Background").gameObject.GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation Way/EmbededResources/iconClock+10.png");
 
                 newTab.SetActive(true);
             }
@@ -77,7 +72,7 @@ namespace Cultivation_Way
 
             Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("+10",Sprites.LoadSprite($"Mods/Cultivation Way/EmbededResources/iconClock+10.png"),
+            button = PowerButtons.CreateButton("+10", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/iconClock+10.png"),
                 "增加十倍速", "只增不减", Vector3.zero, ButtonType.Click, null, changeTimeScale);
 
             Utils.TabHelper.AddButtonToTab(button);
