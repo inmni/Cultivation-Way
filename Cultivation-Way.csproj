@@ -130,8 +130,6 @@
     <None Include=".vs\Cultivation-Way\v16\.suo" />
     <None Include=".vs\slnx.sqlite" />
     <None Include=".vs\VSWorkspaceState.json" />
-    <None Include="Code\.gitattributes" />
-    <None Include="Code\.gitignore" />
     <None Include="Code\obj\Debug\Cultivation Way.csproj.AssemblyReference.cache" />
     <None Include="Code\obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
     <None Include="Code\obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
