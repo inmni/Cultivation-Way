@@ -24,6 +24,7 @@ namespace Cultivation_Way
             TianAsset.nameLocale = "Tians";
             TianAsset.nameTemplate = "Tian_name";
             TianAsset.shadowTexture = "unitShadow_5";
+            TianAsset.useSkinColors = false;
             TianAsset.texture_path = "t_Tian";
             TianAsset.texture_heads = "";
             TianAsset.heads = 2;
@@ -39,6 +40,7 @@ namespace Cultivation_Way
             MingAsset.nameLocale = "Mings";
             MingAsset.nameTemplate = "Ming_name";
             MingAsset.shadowTexture = "unitShadow_5";
+            MingAsset.useSkinColors = false;
             MingAsset.texture_path = "t_Ming";
             MingAsset.texture_heads = "";
             MingAsset.heads = 2;

@@ -1811,7 +1811,7 @@
                 },
                 {
                     "id": 1,
-                    "name": "purple",
+                    "name": "lightblue",
                     "colorBorderInside": {
                         "r": 0.4413023293018341,
                         "g": 0.3083837628364563,
@@ -1833,7 +1833,7 @@
                 },
                 {
                     "id": 2,
-                    "name": "black",
+                    "name": "coolgray",
                     "colorBorderInside": {
                         "r": 0.24083302915096284,
                         "g": 0.2843983471393585,
@@ -1855,7 +1855,7 @@
                 },
                 {
                     "id": 3,
-                    "name": "lightblue",
+                    "name": "purple",
                     "colorBorderInside": {
                         "r": 0.4365432560443878,
                         "g": 0.6084238290786743,
@@ -1877,7 +1877,7 @@
                 },
                 {
                     "id": 4,
-                    "name": "coolgray",
+                    "name": "black",
                     "colorBorderInside": {
                         "r": 0.5004894733428955,
                         "g": 0.5213720202445984,
@@ -2278,7 +2278,7 @@
                 },
                 {
                     "id": 2,
-                    "name": "blue",
+                    "name": "coolgray",
                     "colorBorderInside": {
                         "r": 0.24083302915096284,
                         "g": 0.2843983471393585,
@@ -2322,7 +2322,7 @@
                 },
                 {
                     "id": 4,
-                    "name": "coolgray",
+                    "name": "blue",
                     "colorBorderInside": {
                         "r": 0.5004894733428955,
                         "g": 0.5213720202445984,
@@ -2344,7 +2344,7 @@
                 },
                 {
                     "id": 5,
-                    "name": "white",
+                    "name": "teal",
                     "colorBorderInside": {
                         "r": 0.7817729115486145,
                         "g": 0.8806979656219482,
@@ -2388,7 +2388,7 @@
                 },
                 {
                     "id": 7,
-                    "name": "teal",
+                    "name": "white",
                     "colorBorderInside": {
                         "r": 0.10484158247709274,
                         "g": 0.7169811725616455,

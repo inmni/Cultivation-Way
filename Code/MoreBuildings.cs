@@ -54,6 +54,7 @@ namespace Cultivation_Way
 				string[] array2 = sprite.name.Split(new char[] { '_' });
 				string text = array2[0];
 				int num = int.Parse(array2[1]);
+				
 				if (array2.Length == 3)
 				{
 					int.Parse(array2[2]);

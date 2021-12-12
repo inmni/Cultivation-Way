@@ -106,6 +106,8 @@ namespace CultivationWay
             Localization.addLocalization("Button_Cultivation_Way", "修真之路");
             string[] temp = new string[] { "QQ群总部：602184962", "混沌轮回天地间，人生道尽又一年。\n路走人间似神仙，观望百态红尘间。","道可道，非恒道;\n名可名，非恒名", "魔前一叩三千年，回首凡尘不作仙" };
             Localization.addLocalization("tab_cw", temp.GetRandom());
+            Localization.addLocalization("Tians", "天族");
+            Localization.addLocalization("Mings", "冥族");
         }
         void initWindows()
         {
@@ -141,7 +143,7 @@ namespace CultivationWay
             }
         }
         
-        //测试
+        //测试1（暂存
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Building), "getColor")]
         public static bool setBuilding_Prefix(Building __instance)

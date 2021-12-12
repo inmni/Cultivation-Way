@@ -9,6 +9,7 @@ using CultivationWay;
 using Cultivation_Way.Utils;
 using static Config;
 using System;
+using System.Reflection;
 
 namespace Cultivation_Way
 {
@@ -58,7 +59,7 @@ namespace Cultivation_Way
             Ming.color = Toolbox.makeColor("#FFFFFF");
             Ming.icon = "iconMing";
             Ming.nameLocale = "Mings";
-            Ming.bannerId = "human";
+            Ming.bannerId = "dwarf";
             Ming.hateRaces = "orc,dwarf,elf,human,Tian";
             Ming.preferred_weapons.Clear();
             Ming.production = new string[] { "metals", "bread", "jam", "sushi", "cider" };
@@ -122,7 +123,6 @@ namespace Cultivation_Way
         public static void kingdomColorsDataInit()
         {
             KingdomColorsData kingdomColorsData = JsonUtility.FromJson<KingdomColorsData>(ResourcesHelper.LoadTextAsset("colors/kingdom_colors.json"));
-
             KingdomColors.dict = new Dictionary<string, KingdomColorContainer>();
             foreach (KingdomColorContainer kingdomColorContainer in kingdomColorsData.colors)
             {
@@ -142,6 +142,10 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(CityWindow),"showInfo")]
         public static void showInfo_Postfix(ref CityWindow __instance)
         {
+            if (__instance == null||selectedCity==null|| (Race)Reflection.GetField(typeof(City), selectedCity, "race")==null)
+            {
+                return;
+            }
             if (Main.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
             {
                 __instance.icon.sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon+".png");
@@ -162,9 +166,8 @@ namespace Cultivation_Way
                 string[] names = new string[8] { "swim_0", "swim_1", "swim_2", "swim_3", "walk_0", "walk_1", "walk_2", "walk_3" };
                 foreach (string name in names)
                 {
-                    Sprite sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/{pSheetPath}/{name}.png");
+                    Sprite sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/{pSheetPath}/{name}.png",0.55f);
                     sprite.name = name;
-
                     sprites.Add(name, sprite);
                 }
 
@@ -198,7 +201,7 @@ namespace Cultivation_Way
             }
             return true;
         }
-        //寻找头部贴图
+        //取消头部贴图
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ActorBase), "findHeadSprite")]
         public static bool findHeadSprite_Prefix(ActorBase __instance)
@@ -209,72 +212,10 @@ namespace Cultivation_Way
             }
             return true;
         }
-        //头部贴图加载
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ActorAnimationLoader), "getHead")]
-        public static bool getHead_Prefix(string pPath, int pHeadIndex, ref Sprite __result, ActorAnimationLoader __instance)
-        {
-
-            if (Main.moreActors.Any(x => pPath.Contains(x)))
-            {
-                return false;
-                string key = pPath + "_head_" + pHeadIndex.ToString();
-                Sprite sprite = null;
-                Dictionary<string, Sprite> dictCivHeads = Reflection.GetField(typeof(ActorAnimationLoader), __instance, "dictCivHeads") as Dictionary<string, Sprite>;
-                dictCivHeads.TryGetValue(key, out sprite);
-                if (sprite == null)
-                {
-                    Sprite[] sprites = ResourcesHelper.loadAllSprite(pPath);
-                    int temp = 0;
-                    foreach (Sprite sprite1 in sprites)
-                    {
-                        sprite1.name = "head_" + temp.ToString();
-                        temp++;
-                        dictCivHeads.Add(pPath + "_" + sprite1.name, sprite1);
-                    }
-                    sprite = dictCivHeads[key];
-                }
-                __result = sprite;
-                return false;
-            }
-            return true;
-        }
-        //特殊职业头部贴图加载
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ActorAnimationLoader), "getHeadSpecial")]
-        public static bool getHeadSpecial_Prefix(string pPath, string pName, ref Sprite __result, ActorAnimationLoader __instance)
-        {
-            if (Main.moreActors.Any(x => pPath.Contains(x)))
-            {
-                string key = pPath + pName;
-                Sprite sprite = null;
-                Dictionary<string, Sprite> dictCivHeads = Reflection.GetField(typeof(ActorAnimationLoader), __instance, "dictCivHeads") as Dictionary<string, Sprite>;
-                dictCivHeads.TryGetValue(key, out sprite);
-                if (sprite == null)
-                {
-                    string path = $"Mods/Cultivation-Way/EmbededResources/{pPath}";
-                    DirectoryInfo folder = new DirectoryInfo(path);
-
-                    int temp = 0;
-                    foreach (FileInfo file in folder.GetFiles("*.png"))
-                    {
-                        Sprite sprite2 = Sprites.LoadSprite($"{file.FullName}");
-                        sprite2.name = file.Name;
-                        MonoBehaviour.print("[修真之路Cultivation Way]:fileName:" + file.Name);
-                        temp++;
-                        dictCivHeads.Add(pPath + "_" + sprite2.name, sprite2);
-                    }
-                    sprite = dictCivHeads[key];
-                }
-                __result = sprite;
-                return false;
-            }
-            return true;
-        }
         //船只贴图加载
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ActorAnimationLoader),"loadAnimationBoat")]
-        public static bool loadAnimationBoat_Prefix(ref string pTexturePath)
+        public static bool loadAnimationBoat_Prefix(ref string pTexturePath,ActorAnimationLoader __instance)
         {
             if (pTexturePath.EndsWith("_"))
             {
@@ -285,7 +226,7 @@ namespace Cultivation_Way
             {
                 if (pTexturePath.Contains(race))
                 {
-                    pTexturePath.Replace(race, "human");
+                    pTexturePath=pTexturePath.Replace(race, "human");
                     return true;
                 }
             }
