@@ -1,7 +1,8 @@
 ﻿using NCMS.Utils;
 using UnityEngine;
 using UnityEngine.UI;
-
+using CultivationWay;
+using System.Linq;
 
 namespace Cultivation_Way
 {
@@ -79,7 +80,17 @@ namespace Cultivation_Way
 
             #region 小功能
             button = PowerButtons.CreateButton("+10", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconClock+10.png"),
-                "增加十倍速", "只增不减", Vector3.zero, ButtonType.Click, null, changeTimeScale);
+                "增加十倍速", "呼~", Vector3.zero, ButtonType.Click, null, addTimeScale);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("-1", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconClock-1.png"),
+                "减少一倍速", "强迫症福音", Vector3.zero, ButtonType.Click, null, minusTimeScale);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("exp", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconExp.png"),
+                "帝流浆", "万道金丝，纍纍贯串。", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
 
@@ -88,15 +99,35 @@ namespace Cultivation_Way
 
             #region 生物
             button = PowerButtons.CreateButton("spawnTian", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconTian.png"),
-                "天族", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
+                "天族", "天，颠也。颠者，人之顶也。", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
 
             button = PowerButtons.CreateButton("spawnMing", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconMing.png"),
-                "冥族", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
-            
+                "冥族", "冥者，明之藏也。", Vector3.zero, ButtonType.GodPower, null, null);
+
             Utils.TabHelper.AddButtonToTab(button);
 
+            Utils.TabHelper.AddLine();
+            #endregion
+
+            #region BOSS
+            button = PowerButtons.CreateButton("spawnJiaoDragon", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconJiaoDragon.png"),
+                "蛟龙", "蛟，龙之属也。", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            //button = PowerButtons.CreateButton("spawnXieDragon", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/iconXieDragon.png"),
+            //    "邪龙", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
+
+            //Utils.TabHelper.AddButtonToTab(button);
+            #endregion
+
+            #region 彩蛋
+            button = PowerButtons.CreateButton("spawnMengZhu", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/icon盟主.png"),
+                "盟主", "変態盟主", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
             #endregion
         }
 
@@ -106,9 +137,30 @@ namespace Cultivation_Way
             PowersTab powersTab = tab.GetComponent<PowersTab>();
             powersTab.showTab(powersTab.powerButton);
         }
-        public static void changeTimeScale()
+        public static void addTimeScale()
         {
             Config.timeScale += 10;
+            WorldTip.showNow("当前时间流速为" + Config.timeScale + "倍", false, "top");
+            
+        }
+        public static void minusTimeScale()
+        {
+            Config.timeScale -= 1;
+            WorldTip.showNow("当前时间流速为" + Config.timeScale + "倍", false, "top");
+            //测试时显示
+            foreach (string key in Main.dsa.Keys)
+            {
+                MonoBehaviour.print(key + "灵根人数：" + Main.dsa[key]);
+            }
+            //测试时显示用
+            int chunkID = Main.instance.chunkToElement.Keys.ToList().GetRandom();
+            MonoBehaviour.print("**************************");
+            MonoBehaviour.print("[修真之路Cultivation Way]:某区块五行元素含量依次为:");
+            for (int i = 0; i < 5; i++)
+            {
+                MonoBehaviour.print(Main.instance.chunkToElement[chunkID].baseElementContainer[i]);
+            }
+            MonoBehaviour.print("**************************");
         }
         public static void clickForWindow_AboutThis()
         {

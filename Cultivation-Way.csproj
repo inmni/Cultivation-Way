@@ -1,4 +1,4 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -6,8 +6,9 @@
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>ClassLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -17,6 +18,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -25,6 +28,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>Cultivation_Way</RootNamespace>
@@ -36,12 +41,20 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\worldbox_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\worldbox_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NCMS">
-      <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\StreamingAssets\Mods\NCMS.dll</HintPath>
+      <HintPath>..\..\worldbox_Data\StreamingAssets\Mods\NCMS.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\netstandard.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\worldbox_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -81,6 +94,9 @@
     </Reference>
     <Reference Include="UnityEngine.SpriteShapeModule">
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\UnityEngine.SpriteShapeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\worldbox_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TilemapModule">
       <HintPath>E:\Game\wbsadas\worldbox\worldbox_Data\Managed\UnityEngine.TilemapModule.dll</HintPath>
@@ -146,20 +162,37 @@
     <Compile Include="Code\ChineseNameAsset.cs" />
     <Compile Include="Code\ChineseNameGenerator.cs" />
     <Compile Include="Code\ChineseNameLibrary.cs" />
+    <Compile Include="Code\CultisystemAsset.cs" />
+    <Compile Include="Code\CultisystemLibrary.cs" />
+    <Compile Include="Code\CultivationBook.cs" />
     <Compile Include="Code\ElementBaseType.cs" />
-    <Compile Include="Code\ElementRootType.cs" />
+    <Compile Include="Code\ExtensionSpellAsset.cs" />
+    <Compile Include="Code\ExtensionSpellLibrary.cs" />
+    <Compile Include="Code\ExtensionSpellType.cs" />
+    <Compile Include="Code\Family.cs" />
+    <Compile Include="Code\SaveAndLoadManager.cs" />
     <Compile Include="Code\Main.cs" />
+    <Compile Include="Code\MoreActorData.cs" />
     <Compile Include="Code\MoreActors.cs" />
     <Compile Include="Code\MoreBuildings.cs" />
+    <Compile Include="Code\MoreCultureTech.cs" />
+    <Compile Include="Code\MoreDrops.cs" />
     <Compile Include="Code\MoreGodPowers.cs" />
     <Compile Include="Code\MoreKingdoms.cs" />
     <Compile Include="Code\MorePowers.cs" />
+    <Compile Include="Code\MoreProjectiles.cs" />
     <Compile Include="Code\MoreRaces.cs" />
     <Compile Include="Code\MoreStats.cs" />
+    <Compile Include="Code\MoreTraits.cs" />
+    <Compile Include="Code\SavedModData.cs" />
+    <Compile Include="Code\SpellAction.cs" />
+    <Compile Include="Code\Utils.OthersHelper.cs" />
     <Compile Include="Code\Utils.ResourcesHelper.cs" />
     <Compile Include="Code\Utils.TabHelper.cs" />
     <Compile Include="Code\WindowAboutThis.cs" />
     <Compile Include="Code\WindowMoreStats.cs" />
+    <Compile Include="Code\ExtensionSpell.cs" />
+    <Compile Include="Code\DirectionType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\objects\info\" />

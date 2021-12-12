@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using ReflectionUtility;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cultivation_Way
 {
@@ -51,32 +48,79 @@ namespace Cultivation_Way
         //public int warfare;			军事
         //public int zones;				土地限制
         #endregion
-        public string[] spells;     //法术
-		public float spellRange;	//法术距离
-		public int magic;			//蓝量
-		public float vampire;       //吸血
-		public float antiInjury;	//反伤
-		public float spellRelief;   //法伤减免
-		public string cultisystem;  //修炼体系
-		public int talent;			//天赋
+        public BaseStats baseStats;
+        public List<ExtensionSpell> spells { get; set; }      //法术
+        public float spellRange { get; set; }   //法术距离
+        public int magic { get; set; }          //蓝量
+        public float vampire { get; set; }      //吸血
+        public float antiInjury { get; set; }   //反伤
+        public float spellRelief { get; set; }  //法伤减免
+        public string cultisystem { get; set; } //修炼体系
+        public int talent { get; set; }         //天赋
 
+        public int soul { get; set; }           //元神
 
-		public MoreStats(BaseSimObject pObject)
+        public int maxAge;                      //最大寿命
+
+        public Family family;                   //家族
+
+        public ChineseElement element;          //元素
+
+        private ChineseElement GetElementRandomly()
         {
-			spells = new string[] { };
-			spellRange = 5f;
-			magic = 10;
-			vampire = 0f;
-			antiInjury = 0f;
-			spellRelief = 0f;
-			cultisystem = "";
-			talent = 0;
-
+            int[] content = new int[5] { 20, 20, 20, 20, 20 };
+            return new ChineseElement(content).getRandom();
+        }
+        public void addAnotherStats(MoreStats another)
+        {
+            baseStats.CallMethod("addStats", another.baseStats);
+            this.spells.AddRange(another.spells);//待修改
+            this.spellRange += another.spellRange;
+            this.magic += another.magic;
+            this.vampire += another.vampire;
+            this.antiInjury += another.antiInjury;
+            this.spellRelief += another.spellRelief;
+            this.talent += another.talent;
+            this.soul += another.soul;
+            this.maxAge += another.maxAge;
+        }
+        public void setBasicStats(int health, int damage, int speed, int armor, int magic = 0)
+        {
+            this.baseStats.health = health;
+            this.baseStats.damage = damage;
+            this.baseStats.speed = speed;
+            this.baseStats.armor = armor;
+            this.magic = magic;
+        }
+        public void setSpecialStats(int maxAge, int soul, int talent)
+        {
+            this.maxAge = maxAge;
+            this.soul = soul;
+            this.talent = talent;
+        }
+        public MoreStats(BaseSimObject pObject)
+        {
+            baseStats = new BaseStats();
+            spells = new List<ExtensionSpell>();
+            spellRange = 0;
+            magic = 0;
+            vampire = 0f;
+            antiInjury = 0f;
+            spellRelief = 0f;
+            soul = 0;
+            cultisystem = "default";
+            element = GetElementRandomly();
+            talent = 0;
+            maxAge = 0;
             if (pObject.objectType == MapObjectType.Actor)
             {
-				talent = 1;
-				cultisystem = "Xian";
+                spellRange = 5f;
+                magic = 10;
+                soul = 10;
+                talent = 1;
+                
             }
         }
+        public MoreStats() { }
     }
 }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using HarmonyLib;
-using UnityEngine;
+﻿using HarmonyLib;
 using ReflectionUtility;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Cultivation_Way
 {
@@ -18,8 +15,8 @@ namespace Cultivation_Way
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(NameGenerator),"getName")]
-        public static bool getChineseName(string pAssetID,ref string __result)
+        [HarmonyPatch(typeof(NameGenerator), "getName")]
+        public static bool getChineseName(string pAssetID, ref string __result)
         {
             ChineseNameAsset chineseNameAsset;
             if (((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).dict.ContainsKey(pAssetID))
@@ -36,8 +33,8 @@ namespace Cultivation_Way
             return false;
         }
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(Culture),"create")]
-        public static bool create_Prefix(Race pRace,City pCity,ref Culture __instance)
+        [HarmonyPatch(typeof(Culture), "create")]
+        public static bool create_Prefix(Race pRace, City pCity, ref Culture __instance)
         {
             //原代码 
             /*this.race = pRace.id;
@@ -56,7 +53,7 @@ namespace Cultivation_Way
             this.year = MapBox.instance.mapStats.year;
             this.prepare();
             */
-            
+
             __instance.race = pRace.id;
             __instance.list_tech_ids = new List<string>();
             __instance.id = MapBox.instance.mapStats.getNextId("culture");
@@ -93,16 +90,16 @@ namespace Cultivation_Way
              * 外置函数的参数为：
              *      概率(float)，类型(string)
              */
-            for(int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
-                addPartsByTemplate(nameBuilder, template[i],pAsset);
+                addPartsByTemplate(nameBuilder, template[i], pAsset);
             }
             return nameBuilder.ToString();
         }
         //根据模板内元素确定概率
         private void addPartsByTemplate(StringBuilder nameBuilder, string partTemplate, ChineseNameAsset pAsset)
         {
-            
+
             if (partTemplate.StartsWith("R."))
             {
                 float chance = 0;
@@ -110,24 +107,24 @@ namespace Cultivation_Way
                 while (partTemplate[pos] != 'F')
                 {
                     float k = 1f;
-                    for(int i = 0; i < pos - 1; i++)
+                    for (int i = 0; i < pos - 1; i++)
                     {
                         k *= 0.1f;
                     }
                     chance += (partTemplate[pos] - '0') * k;
                     pos++;
                 }
-                addPartsByChance(nameBuilder, partTemplate, pAsset,chance, true);
+                addPartsByChance(nameBuilder, partTemplate, pAsset, chance, true);
             }
             else
             {
-                addPartsByChance(nameBuilder, partTemplate, pAsset,1, false);
+                addPartsByChance(nameBuilder, partTemplate, pAsset, 1, false);
             }
             //再使用上述外置函数
         }
-        
+
         //按照概率添加文本
-        private void addPartsByChance(StringBuilder nameBuilder,string partTemplate, ChineseNameAsset pAsset,double chance = 1,bool random = false)
+        private void addPartsByChance(StringBuilder nameBuilder, string partTemplate, ChineseNameAsset pAsset, double chance = 1, bool random = false)
         {
             if (random)
             {

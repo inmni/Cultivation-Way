@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    class ChineseElementAsset:Asset
+    class ChineseElementAsset : Asset
     {
         /*
          * 组成灵根，
@@ -19,7 +14,6 @@ namespace Cultivation_Way
         public string[] promoteElementId;//加成元素的id
 
         public string name;//直接用于显示的名字
-
 
         public ChineseElementAsset()
         {

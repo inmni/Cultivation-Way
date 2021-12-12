@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Cultivation_Way
 {
-    class AddInitLibs:MonoBehaviour
+    class AddInitLibs : MonoBehaviour
     {
         public static bool initiated = false;
         public static void initMyLibs()
