@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using NCMS;
+using CultivationWay;
 namespace Cultivation_Way
 {
     class WindowAboutThis
@@ -45,19 +46,19 @@ namespace Cultivation_Way
                 .Find("Viewport")
                 .Find("Content"));
             //添加图片
-            PowerButton button = PowerButtons.CreateButton("Coder1", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/icon人间.png"),
+            PowerButton button = PowerButtons.CreateButton("Coder1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconRenJian.png"),
                 "人间", "代码", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(-20f, -160f);
-            button = PowerButtons.CreateButton("Coder2", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/icon一米.png"),
+            button = PowerButtons.CreateButton("Coder2", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconINMNI.png"),
                 "一米", "代码", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(20f, -160f);
-            button = PowerButtons.CreateButton("Coder3", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/icon棋盘.png"),
+            button = PowerButtons.CreateButton("Coder3", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconQiPan.png"),
                 "星棋盘", "代码", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(60f, -160f);
-            button = PowerButtons.CreateButton("Propagandist", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/icon盟主.png"),
+            button = PowerButtons.CreateButton("Propagandist", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconMengZhu.png"),
                 "変態盟主", "美工、宣传\nB站关注71563146", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(0f, -180f);
-            button = PowerButtons.CreateButton("Planner1", Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/icon青丝.png"),
+            button = PowerButtons.CreateButton("Planner1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconQingSi.png"),
                 "青丝", "策划", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(40f, -180f);
             contentComponent.SetActive(true);

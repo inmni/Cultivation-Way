@@ -244,6 +244,8 @@ namespace Cultivation_Way
                 id = "human_name",
                 onlyByTemplate = true
             });
+
+
             //姓氏
             this.t.addition_startList = new List<string>
             {
@@ -443,7 +445,7 @@ namespace Cultivation_Way
             this.add(new ChineseNameAsset
             {
                 id = "book_name",
-                fixedNameChance = 0.001f,
+                fixedNameChance = 0.0001f,
                 onlyByTemplate = false,
                 templates = new string[] { "part1","part2", "addition_end" }
             });
@@ -454,8 +456,20 @@ namespace Cultivation_Way
             this.t.partsList2 = new List<string> { "水", "火", "金", "土", "木", "元", "灵", "微", "风", "雷", "取", "文", "德" };
             this.t.fixedList = new List<string> { "道心种魔大法", "混沌九转灭神霸决", "降妖伏魔弑神诛仙破天裂地纵横四海横扫八荒唯我独尊圣典" };
             #endregion
+
+            #region 体质名
+            this.add(new ChineseNameAsset
+            {
+                id = "specialBody_name",
+                fixedNameChance = 0.0001f,
+                onlyByTemplate = false,
+                templates = new string[] { "part1", "part2" }
+            });
+            //这个还是不要按照字随机吧？
+            this.t.partsList = new List<string> { "青", "荒", "雷", "天", "元","地" };
+            this.t.partsList2 = new List<string> {"阴","阳","初","九"};
+            this.t.fixedList = new List<string> { "破灭", "混沌", "纵横" };
+            #endregion
         }
-
-
     }
 }

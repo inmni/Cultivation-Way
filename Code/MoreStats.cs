@@ -49,18 +49,21 @@ namespace Cultivation_Way
         //public int zones;				土地限制
         #endregion
         public BaseStats baseStats;
-        public List<ExtensionSpell> spells { get; set; }      //法术
-        public float spellRange { get; set; }   //法术距离
-        public int magic { get; set; }          //蓝量
-        public float vampire { get; set; }      //吸血
-        public float antiInjury { get; set; }   //反伤
-        public float spellRelief { get; set; }  //法伤减免
-        public string cultisystem { get; set; } //修炼体系
-        public int talent { get; set; }         //天赋
+        public List<ExtensionSpell> spells;     //法术
+        public float spellRange;   //法术距离
+        public int magic;         //蓝量
+        public float vampire;      //吸血
+        public float antiInjury;   //反伤
+        public float spellRelief; //法伤减免
+        public string cultisystem; //修炼体系
 
-        public int soul { get; set; }           //元神
+        public int talent;        //天赋
+
+        public int soul;          //元神
 
         public int maxAge;                      //最大寿命
+
+        public SpecialBody specialBody;                //体质
 
         public Family family;                   //家族
 
@@ -68,13 +71,13 @@ namespace Cultivation_Way
 
         private ChineseElement GetElementRandomly()
         {
-            int[] content = new int[5] { 20, 20, 20, 20, 20 };
-            return new ChineseElement(content).getRandom();
+            return new ChineseElement().getRandom();
         }
         public void addAnotherStats(MoreStats another)
         {
             baseStats.CallMethod("addStats", another.baseStats);
-            this.spells.AddRange(another.spells);//待修改
+
+            this.spells.AddRange(another.spells);//待修改，减少重复？目前是存在重复的
             this.spellRange += another.spellRange;
             this.magic += another.magic;
             this.vampire += another.vampire;
@@ -83,6 +86,22 @@ namespace Cultivation_Way
             this.talent += another.talent;
             this.soul += another.soul;
             this.maxAge += another.maxAge;
+        }
+        public void deleteAnotherStats(MoreStats another)
+        {
+            this.spellRange -= another.spellRange;
+            this.magic -= another.magic;
+            this.vampire -= another.vampire;
+            this.antiInjury -= another.antiInjury;
+            this.spellRelief -= another.spellRelief;
+            this.talent -= another.talent;
+            this.soul -= another.soul;
+            this.maxAge -= another.maxAge;
+            baseStats.mod_attackSpeed -= another.baseStats.mod_attackSpeed;
+            baseStats.mod_damage -= another.baseStats.mod_damage;
+            baseStats.mod_health -= another.baseStats.mod_health;
+            baseStats.mod_speed -= another.baseStats.mod_speed;
+            //其他属性待补充
         }
         public void setBasicStats(int health, int damage, int speed, int armor, int magic = 0)
         {
@@ -98,12 +117,37 @@ namespace Cultivation_Way
             this.soul = soul;
             this.talent = talent;
         }
-        public MoreStats(BaseSimObject pObject)
+        public void clear()
         {
             baseStats = new BaseStats();
             spells = new List<ExtensionSpell>();
             spellRange = 0;
-            magic = 0;
+            magic = 5;
+            vampire = 0f;
+            antiInjury = 0f;
+            spellRelief = 0f;
+            soul = 0;
+            talent = 0;
+            maxAge = 0;
+        }
+        public static MoreStats operator* (float num,MoreStats moreStats)
+        {
+            MoreStats result = new MoreStats();
+            result.vampire=moreStats.vampire* num;
+            result.antiInjury=moreStats.antiInjury * num;
+            result.spellRange=moreStats.spellRange *num;
+            result.spellRelief = moreStats.spellRelief * num;
+            result.magic = (int)(moreStats.magic * num);
+            result.soul = (int)(moreStats.soul * num);
+            result.talent = (int)(moreStats.talent * num);
+            return result;
+        }
+        public MoreStats()
+        {
+            baseStats = new BaseStats();
+            spells = new List<ExtensionSpell>();
+            spellRange = 0;
+            magic = 5;
             vampire = 0f;
             antiInjury = 0f;
             spellRelief = 0f;
@@ -112,15 +156,6 @@ namespace Cultivation_Way
             element = GetElementRandomly();
             talent = 0;
             maxAge = 0;
-            if (pObject.objectType == MapObjectType.Actor)
-            {
-                spellRange = 5f;
-                magic = 10;
-                soul = 10;
-                talent = 1;
-                
-            }
         }
-        public MoreStats() { }
     }
 }

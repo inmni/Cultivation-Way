@@ -18,22 +18,35 @@ namespace Cultivation_Way
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "lightning_orb",
-                speed = 15f,
-                texture = "pr_freeze_orb",
-                parabolic = true,
+                speed = 10f,
+                texture = "lightning_orb",//无作用
+                parabolic = false,
                 hitShake = true,
-                startScale = 0.5f,
-                targetScale = 0.01f,
+                startScale = 0.03f,
+                targetScale = 0.03f,
                 playImpactSound = true,
-                world_actions = (WorldAction)Delegate.Combine(new WorldAction(ActionLibrary.castLightning), new WorldAction(ActionLibrary.castLightning)),
+                world_actions = new WorldAction(ExtensionSpellActionLibrary.bLightningSpell),
                 impactSoundID = "explosion medium",
-            }) ;
-            //Main.instance.moreProjectiles.Add("lightning_orb");
+            });
+            Main.instance.moreProjectiles.Add("lightning_orb");
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "lightningFire_orb",
+                speed = 15f,
+                parabolic = false,
+                hitShake = true,
+                startScale = 0.02f,
+                targetScale = 0.02f,
+                animation_speed = 0.1f,
+                playImpactSound = true,
+                impactSoundID = "explosion medium",
+            });
+            Main.instance.moreProjectiles.Add("lightningFire_orb");
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Projectile),"start")]
-        public static bool start_Prefix(Projectile __instance,string pAssetID)
+        public static bool start_Prefix(Projectile __instance,ref Vector3 pStart,string pAssetID)
         {
             if (!Main.instance.moreProjectiles.Contains(pAssetID))
             {
@@ -48,7 +61,21 @@ namespace Cultivation_Way
             Sprite[] _frames = (Sprite[])Reflection.GetField(typeof(ProjectileAsset), asset, "_frames");
             if (_frames == null || _frames.Length == 0)
             {
-                _frames = ResourcesHelper.loadAllSprite("projectiles/"+asset.id,-0.5f);
+                Reflection.SetField(asset,"_frames",ResourcesHelper.loadAllSprite("projectiles/"+asset.id,0.8f));
+            }
+            pStart.y += 7f;
+            return true;
+        }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Projectile),"targetReached")]
+        public static bool targetReached_Prefix(Projectile __instance)
+        {
+            ProjectileAsset p = (ProjectileAsset)Reflection.GetField(typeof(Projectile), __instance, "asset");
+            Vector3 pos = (Vector3)Reflection.GetField(typeof(Projectile), __instance, "vecTarget");
+            WorldTile targetTile = MapBox.instance.GetTile((int)pos.x, (int)pos.y);
+            if (p.world_actions != null&& targetTile != null)
+            {
+                p.world_actions((BaseSimObject)Reflection.GetField(typeof(Projectile), __instance, "byWho"),targetTile);
             }
             return true;
         }

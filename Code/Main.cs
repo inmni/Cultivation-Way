@@ -20,28 +20,51 @@ namespace CultivationWay
     {
         //注意：武器贴图加载存在一定问题
         //注意：Culture.create()已在ChineseNameGenerator添加完全拦截
+        //注意：下一个优化点使用dynamic关键字
 
-        public static Dictionary<string, int> dsa = new Dictionary<string, int>();
+        public const string mainPath = "Mods/Cultivation-Way";//主路径
+        //另一条"worldbox_Data/StreamingAssets/Mods/NCMS/Core/Temp/Mods/修真之路"
+
+        public static int count = 0;
 
         public static Main instance;
 
-        private static int flag = 0;
+        public StackSpellEffects spellEffects;
+
+        public List<BonusStatsManager> bonusStatsManagers = new List<BonusStatsManager>();
+
+        public string addMapMode = "";
+
+        private bool flag = false;
+        private float controlDeltTime = 5f;
+
+        internal int SpecialBodyLimit = 100;
+        internal int summonTian1Limit = 1;
 
         #region 映射词典
-        public Dictionary<string, MoreStats> actorToMoreStats = new Dictionary<string, MoreStats>();//单位与更多属性映射词典
+        public List<MapChunk> chunks = new List<MapChunk>();//方便获取区块
 
-        public Dictionary<Actor, string> actorToID = new Dictionary<Actor, string>();//单位与编号映射词典
+        public Dictionary<string, MoreStats> actorToMoreStats = new Dictionary<string, MoreStats>();//单位编号与更多属性映射词典
 
-        public Dictionary<Actor, MoreActorData> actorToMoreData = new Dictionary<Actor, MoreActorData>();//单位与更多数据映射词典
+        //public Dictionary<Actor, string> actorToID = new Dictionary<Actor, string>();//单位与编号映射词典
+
+        public Dictionary<int, ActorStatus> actorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
+
+        public Dictionary<int, BaseStats> actorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
+
+        public Dictionary<string, MoreActorData> actorToMoreData = new Dictionary<string, MoreActorData>();//单位编号与更多数据映射词典
 
         public Dictionary<Building, MoreStats> buildingToMoreStats = new Dictionary<Building, MoreStats>();//建筑与更多属性映射词典
 
         public Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
 
         public Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族映射表
+
+        public Dictionary<string, RaceFeature> raceFeatures = new Dictionary<string, RaceFeature>();//种族id与种族特色对照
         #endregion
 
         #region 更多玩意
+        public MoreItem MoreItem = new MoreItem();
         public MoreTraits MoreTraits = new MoreTraits();
         public MoreActors MoreActors = new MoreActors();
         public MoreProjectiles MoreProjectiles = new MoreProjectiles();
@@ -51,7 +74,9 @@ namespace CultivationWay
         public MoreGodPowers MoreGodPowers = new MoreGodPowers();
         public MoreDrops MoreDrops = new MoreDrops();
         public MoreCultureTech MoreCultureTech = new MoreCultureTech();
+        public MoreMapModes MoreMapModes = new MoreMapModes();
         public List<string> moreActors = new List<string>();
+        public List<string> moreItems = new List<string>();
         public List<string> moreRaces = new List<string>();
         public List<string> moreProjectiles = new List<string>();
         #endregion
@@ -66,6 +91,8 @@ namespace CultivationWay
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截");
             patchHarmony();
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
+            spellEffects = this.transform.gameObject.AddComponent<StackSpellEffects>();
+            spellEffects.Awake();
         }
         void Start()
         {
@@ -105,30 +132,92 @@ namespace CultivationWay
                 MonoBehaviour.print("[修真之路Cultivation Way]:添加其他");
                 sfx_MusicMan_racesAdd();
                 MoreRaces.kingdomColorsDataInit();
+                initChunkElement();
+                MoreMapModes.add();
+                createOrResetFamily();
+                addRaceFeature();
                 MonoBehaviour.print("[修真之路Cultivation Way]:添加其他成功");
                 #endregion
                 MonoBehaviour.print("[修真之路Cultivation Way]:加载成功");
-                initChunkElement();
-                createOrResetFamily();
+                
             }
-            if (instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6) ;
+            if (instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6)
             {
                 initChunkElement();
+            }
+            
+            if (controlDeltTime > 0)
+            {
+                controlDeltTime -= Time.deltaTime;
+            }
+            updateControl();
+        }
+        void updateControl()
+        {
+            if (instance.addMapMode == "")
+            {
+                return;
+            }
+            if (MapBox.instance.isGameplayControlsLocked())
+            {
+                return;
+            }
+            if (MapBox.instance.isOverUI())
+            {
+                return;
+            }
+            if (ScrollWindow.isWindowActive())
+            {
+                return;
+            }
+            if(!(bool)Reflection.GetField(typeof(MapBox),MapBox.instance,"alreadyUsedZoom") && ((bool)MapBox.instance.CallMethod("canInspectWithMainTouch") || (bool)MapBox.instance.CallMethod("canInspectWithRightClick")) 
+                && ((float)Reflection.GetField(typeof(MapBox), MapBox.instance, "inspectTimerClick") < 0.2f) && !MapBox.instance.isActionHappening() && !MoveCamera.cameraDragActivated)
+            {
+                WorldTile mouseTilePos = MapBox.instance.getMouseTilePos();
+                
+                if (mouseTilePos != null)
+                {
+                    if (MapBox.instance.showElementZones())
+                    {
+                        if (controlDeltTime <= 0f)
+                        {
+                            PowerActionLibrary.inspectChunk(mouseTilePos);
+                        }
+                    }
+                }
             }
         }
         void patchHarmony()
         {
             //new Harmony("me.xiaoye97.plugin.Tutorial").PatchAll();
             Harmony.CreateAndPatchAll(typeof(AddAssetManager));
+            MonoBehaviour.print("Create and patch all:AddAssetManager");
             Harmony.CreateAndPatchAll(typeof(ChineseNameGenerator));
+            MonoBehaviour.print("Create and patch all:ChineseNameGenerator");
             Harmony.CreateAndPatchAll(typeof(Main));
+            MonoBehaviour.print("Create and patch all:Main");
             Harmony.CreateAndPatchAll(typeof(MoreActors));
+            MonoBehaviour.print("Create and patch all:MoreActors");
             Harmony.CreateAndPatchAll(typeof(MoreBuildings));
+            MonoBehaviour.print("Create and patch all:MoreBuildings");
+            Harmony.CreateAndPatchAll(typeof(MoreItem));
+            MonoBehaviour.print("Create and patch all:MoreItem");
+            Harmony.CreateAndPatchAll(typeof(MoreMapModes));
+            MonoBehaviour.print("Create and patch all:MoreMapModes");
             Harmony.CreateAndPatchAll(typeof(MoreRaces));
+            MonoBehaviour.print("Create and patch all:MoreRaces");
             Harmony.CreateAndPatchAll(typeof(MoreTraits));
+            MonoBehaviour.print("Create and patch all:MoreTraits");
             Harmony.CreateAndPatchAll(typeof(MoreCultureTech));
+            MonoBehaviour.print("Create and patch all:MoreCultureTech");
+            Harmony.CreateAndPatchAll(typeof(MoreKingdoms));
+            MonoBehaviour.print("Create and patch all:MoreKingdoms");
             Harmony.CreateAndPatchAll(typeof(MoreProjectiles));
+            MonoBehaviour.print("Create and patch all:MoreProjectiles");
             Harmony.CreateAndPatchAll(typeof(SaveAndLoadManager));
+            MonoBehaviour.print("Create and patch all:SaveAndLoadManager");
+            Harmony.CreateAndPatchAll(typeof(WindowCreatureInfoHelper));
+            MonoBehaviour.print("Create and patch all:WindowCreatureInfoHelper");
         }
         void addForLocalization()
         {
@@ -143,11 +232,14 @@ namespace CultivationWay
             Localization.addLocalization("Tians", "天族");
             Localization.addLocalization("Mings", "冥族");
             Localization.addLocalization("JiaoDragons", "蛟龙");
-
+            Localization.addLocalization("FairyFox", "仙狐");
             #region 属性
+            Localization.addLocalization("specialBody", "体质");
+            Localization.addLocalization("origin", "起源体质");
+            Localization.addLocalization("madeBy", "血脉源头");
             Localization.addLocalization("spells", "法术");
             Localization.addLocalization("spellRange", "施法距离");
-            Localization.addLocalization("magic", "灵气值");
+            Localization.addLocalization("magic", "灵力");
             Localization.addLocalization("vampire", "吸血");
             Localization.addLocalization("antiInjury", "反伤");
             Localization.addLocalization("spellRelief", "法伤赦免");
@@ -162,26 +254,60 @@ namespace CultivationWay
             Localization.addLocalization("Water", "水");
             Localization.setLocalization("Fire", "火");
             Localization.addLocalization("Ground", "土");
+            Localization.setLocalization("creature_statistics_age", "年龄/寿元");
+            
             #endregion
 
             #region 特质
             Localization.addLocalization("trait_cursed_immune", "诅咒免疫");
+            Localization.addLocalization("trait_asylum", "天道眷顾");
+            Localization.addLocalization("trai_asylum_info", "真正的永恒");
+            Localization.addLocalization("trait_race", "种族");
+            Localization.addLocalization("trait_realm", "境界");
+            Localization.addLocalization("trait_element", "灵根");
+            Localization.addLocalization("trait_cultivationBook", "家族功法");
+            Localization.addLocalization("trait_realm_info", "境界信息");
+            Localization.addLocalization("trait_element_info", "灵根信息");
+            Localization.addLocalization("trait_cultivationBook_info","功法信息");
             #endregion
 
             #region 文化科技
             Localization.addLocalization("tech_culti_normal", "仙路");
             Localization.addLocalization("tech_culti_bodying", "炼体");
+            Localization.addLocalization("tech_culti_bushido", "武道");
+            #endregion
+            #region 装备
+            Localization.addLocalization("item_summonTian1", "哈？没名字");
             #endregion
         }
         void initWindows()
         {
             WindowAboutThis.init();
+            WindowChunkInfo.init();
             WindowMoreStats.init();
+            WindowTops.init();
+        }
+        void addRaceFeature()
+        {
+            foreach(ActorStats stats in AssetManager.unitStats.list)
+            {
+                if (raceFeatures.ContainsKey(stats.race))
+                {
+                    continue;
+                }
+                RaceFeature feature = new RaceFeature();
+                feature.raceID = stats.race;
+                feature.raceSpells = new List<ExtensionSpell>();
+                this.raceFeatures.Add(stats.race, feature);
+            }
+            MoreRaces.setIntelligentRaceFeature();
+            MoreRaces.setOtherRaceFeature();
         }
         public void initChunkElement()
         {
             instance.chunkToElement.Clear();
-            foreach (MapChunk chunk in ((MapChunkManager)Reflection.GetField(typeof(MapBox), MapBox.instance, "mapChunkManager")).list)
+            instance.chunks = ((MapChunkManager)Reflection.GetField(typeof(MapBox), MapBox.instance, "mapChunkManager")).list;
+            foreach (MapChunk chunk in chunks)
             {
                 instance.chunkToElement.Add(chunk.id, new ChineseElement(new int[] { 20, 20, 20, 20, 20 }).getRandom());
             }
@@ -197,34 +323,38 @@ namespace CultivationWay
                 }
             }
         }
-        public void resetActorMoreStats()
+        public void resetActorMore()
         {
             instance.actorToMoreStats.Clear();
-            foreach(Actor actor in MapBox.instance.units)
+            instance.actorToMoreData.Clear();
+            foreach (Actor actor in MapBox.instance.units)
             {
-                    MoreStats moreStats = new MoreStats(actor);
-                string id = ((ActorStatus)Reflection.GetField(typeof(Actor), actor, "data")).actorID;
-                instance.actorToID.Add(actor, id);
-                    Main.instance.actorToMoreStats.Add(id, moreStats);
-                    string name = ((ActorStatus)Reflection.GetField(typeof(Actor), actor, "data")).firstName;
-                    foreach (string fn in ChineseNameAsset.familyNameTotal)
-                    {
+                MoreStats moreStats = new MoreStats();
+                MoreActorData moreData = new MoreActorData();
+                //ActorStatus data = (ActorStatus)Reflection.GetField(typeof(Actor), actor, "data");
+                ActorStatus data = actor.GetData();
+                
+                string id = data.actorID;
+                instance.actorToMoreData.Add(id, moreData);
+                instance.actorToMoreStats.Add(id, moreStats);
+                string name = data.firstName;
+                foreach (string fn in ChineseNameAsset.familyNameTotal)
+                {
                         if (name.StartsWith(fn))
                         {
-                            moreStats.family = Main.instance.familys[fn];
+                            moreStats.family = instance.familys[fn];
                             break;
                         }
-                    }
-
-                    ChineseElementLibrary elementLibrary = (ChineseElementLibrary)AssetManager.instance.dict["element"];
-                    if (Main.dsa.ContainsKey(elementLibrary.dict[moreStats.element.element.id].name))
-                    {
-                        Main.dsa[elementLibrary.dict[moreStats.element.element.id].name]++;
-                    }
-                    else
-                    {
-                        Main.dsa.Add(elementLibrary.dict[moreStats.element.element.id].name, 1);
-                    }
+                }
+                if (moreStats.family == null)
+                {
+                    moreStats.family = Main.instance.familys["甲"];
+                }
+                moreData.cultisystem = moreStats.cultisystem;
+                moreData.element = moreStats.element;
+                moreData.bonusStats = new MoreStats();
+                moreData.coolDown = new Dictionary<string, int>();
+                moreData.familyID = moreStats.family.id;
             }
         }
         void updateChunkElement()
@@ -259,9 +389,9 @@ namespace CultivationWay
                     for (int type = 0; type < 5; type++)
                     {
                         instance.chunkToElement[chunk.id].baseElementContainer[type] +=
-                            (instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBePromotedBy(type)] % 1024) << 4;
+                            (instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBePromotedBy(type)] % 1024) >> 4;
                         instance.chunkToElement[chunk.id].baseElementContainer[type] -=
-                            (instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBeOppsitedBy(type)] % 1024) << 4;
+                            (instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBeOppsitedBy(type)] % 1024) >> 4;
                     }
                 }
             }
@@ -272,85 +402,173 @@ namespace CultivationWay
                 for (int i = 0; i < 5; i++)
                 {
                     instance.chunkToElement[chunkID].baseElementContainer[i] >>= 10;
-                    if (instance.chunkToElement[chunkID].baseElementContainer[i] > 100) { instance.chunkToElement[chunkID].baseElementContainer[i] = Toolbox.randomInt(0, 31); }
-                    if (instance.chunkToElement[chunkID].baseElementContainer[i] < 0) { instance.chunkToElement[chunkID].baseElementContainer[i] = Toolbox.randomInt(0, 31); }
+                    if (instance.chunkToElement[chunkID].baseElementContainer[i] > 100) { instance.chunkToElement[chunkID].baseElementContainer[i] = 100; }
+                    if (instance.chunkToElement[chunkID].baseElementContainer[i] < 0) { instance.chunkToElement[chunkID].baseElementContainer[i] =0; }
                 }
+                instance.chunkToElement[chunkID].normalize();
             }
             #endregion
+            Thread.CurrentThread.Abort();
+            Thread.CurrentThread.DisableComObjectEagerCleanup();
+        }
+        void clearMemory()
+        {
+            Dictionary<string, MoreStats> TactorToMoreStats = new Dictionary<string, MoreStats>();//单位编号与更多属性映射词典
+            Dictionary<int, ActorStatus> TactorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
+            Dictionary<int, BaseStats> TactorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
+            Dictionary<string, MoreActorData> TactorToMoreData = new Dictionary<string, MoreActorData>();//单位编号与更多数据映射词典
+
+            valueClone<string, MoreStats>(actorToMoreStats,TactorToMoreStats);
+            valueClone<int, ActorStatus>(actorToData, TactorToData);
+            valueClone<int, BaseStats>(actorToCurStats,TactorToCurStats);
+            valueClone<string, MoreActorData>(actorToMoreData, TactorToMoreData);
+
+            actorToMoreStats.Clear();
+            actorToData.Clear();
+            actorToCurStats.Clear();
+            actorToMoreData.Clear();
+
+            actorToMoreStats = TactorToMoreStats;
+            actorToData = TactorToData;
+            actorToCurStats = TactorToCurStats;
+            actorToMoreData = TactorToMoreData;
+
+            Thread.CurrentThread.Abort();
+            Thread.CurrentThread.DisableComObjectEagerCleanup();
+        }
+        void valueClone<T1,T2>(Dictionary<T1,T2> from, Dictionary<T1, T2> to)
+        {
+            foreach(T1 key in from.Keys)
+            {
+                if (key != null)
+                {
+                    to.Add(key, from[key]);
+                }
+            }
         }
         #endregion
 
         #region 一些不知道放哪的拦截
-        //绑定人物和更多属性
+        ////绑定人物和ID
         //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(MapBox),"createNewUnit")]
+        //[HarmonyPatch(typeof(MapBox), "createNewUnit")]
         //public static void bindActorToMoreStats(Actor __result)
         //{
-        //    MoreStats moreStats = new MoreStats(__result);
-        //    instance.actorToMoreStats.Add(__result, moreStats);
+        //    instance.actorToID.Add(__result, ((ActorStatus)Reflection.GetField(typeof(Actor), __result, "data")).actorID);
 
+        //    //if (instance.actorToID.ContainsKey(__result))
+        //    //{
+        //    //    print(__result + "存在");
+        //    //}
+        //    //else
+        //    //{
+        //    //    print("添加失败:" + __result);
+        //    //}
         //}
-        //解除绑定
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(MapBox), "destroyActor", new Type[] { typeof(Actor) })]
-        public static void unBindActorToMoreStats(Actor pActor)
+
+        //解决控制问题
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MapBox), "updateControls")]
+        public static bool updateControls_Prefix()
         {
-            instance.actorToMoreStats.Remove(((ActorStatus)Reflection.GetField(typeof(Actor), pActor, "data")).actorID);
-            
+            if (ScrollWindow.isWindowActive())
+            {
+                instance.controlDeltTime = 0.5f;
+            }
+            return true;
         }
-        //更新区块元素
+
+        //解除绑定
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MapBox), "destroyActor", new Type[] { typeof(Actor) })]
+        public static bool unBindActorToMoreStats(Actor pActor)
+        {
+            //if (!instance.actorToID.ContainsKey(pActor))
+            //{
+            //    print(pActor+"不存在");
+            //}
+            instance.actorToCurStats.Remove(pActor.GetInstanceID());
+            instance.actorToData.Remove(pActor.GetInstanceID());
+            instance.actorToMoreData.Remove(pActor.GetData().actorID);
+            instance.actorToMoreStats.Remove(pActor.GetData().actorID);
+            return true;
+        }
+        //百年事件（更新灵气，清理内存，以及其他
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox), "updateObjectAge")]
         public static void toUpdateChunkElement()
         {
-            if (MapBox.instance.mapStats.year % 10 == 0)
+            List<BonusStatsManager> temp = new List<BonusStatsManager>();
+            foreach (BonusStatsManager bonusStatsManager in instance.bonusStatsManagers)
+            {
+                bonusStatsManager.update();
+                if (bonusStatsManager.leftTime <= 0)
+                {
+                    continue;
+                }
+                temp.Add(bonusStatsManager);
+            }
+            instance.bonusStatsManagers = temp;
+            if (MapBox.instance.mapStats.year % 100 == 0)
             {
                 Thread t = new Thread(new ThreadStart(instance.updateChunkElement));
                 t.Start();
-                
+            }
+            if (MapBox.instance.mapStats.year % 250 == 0)
+            {
+                foreach (Kingdom kingdom in MapBox.instance.kingdoms.list_civs)
+                {
+                    if (kingdom.raceID == "Tian" && kingdom.getPopulationTotal() > 0)
+                    {
+                        Actor User = kingdom.getMaxLevelActor();
+                        if (User.GetMoreData().coolDown["summonTian"] == 1)
+                        {
+                            instance.raceFeatures["Tian"].raceSpells[0].castSpell(User, null);//召唤战舰s
+                        }
+                    }
+                }
+                if (MapBox.instance.mapStats.year % 500 == 0)
+                {
+                    Thread t = new Thread(new ThreadStart(instance.clearMemory));
+                    t.Start();
+                    if (MapBox.instance.mapStats.year % 1000 == 0)
+                    {
+                        foreach (Kingdom kingdom in MapBox.instance.kingdoms.list_civs)
+                        {
+                            if (kingdom.raceID == "Tian" && kingdom.king!=null)
+                            {
+                                if (kingdom.king.GetMoreData().coolDown["summonTian1"] == 1)
+                                {
+                                    instance.raceFeatures["Tian"].raceSpells[1].castSpell(kingdom.king, null);//召唤机甲
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-        //调整语言材质
+        //城市给予物品修复
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(LocalizedTextManager), "setLanguage")]
-        public static bool updateText(ref string pLanguage)
+        [HarmonyPatch(typeof(City),"giveItem")]
+        public static bool giveItem_Prefix(ref bool __result,Actor pActor,ActorEquipmentSlot pSlot,City pCity)
         {
-            if (flag<=5)
+            if (pActor == null||pActor.equipment==null|| pSlot == null || pCity == null)
             {
-                flag++;
-                pLanguage = "cz";
+                __result = false;
+                return false;
             }
             return true;
         }
-        ////额外窗口
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(ScrollWindow), "showWindow", new Type[] { typeof(string) })]
-        //public static void showWindow_Postfix(string pWindowID)
-        //{
-        //    switch (pWindowID)
-        //    {
-        //        case "inspect_unit":
-        //            WindowMoreStats.show();
-        //            break;
-        //    }
-        //}
-
-        //测试1（暂存
+        //城市获取死亡人口的装备修复
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(Building), "getColor")]
-        public static bool setBuilding_Prefix(Building __instance)
+        [HarmonyPatch(typeof(City),"giveItemsToCity")]
+        public static bool giveItemsToCity_Prefix(City pCity,Actor pDeadActor)
         {
-            BuildingAsset stats = Reflection.GetField(typeof(Building), __instance, "stats") as BuildingAsset;
-            if (stats.sprites == null)
+            if (pDeadActor.stats.use_items)
             {
-                MonoBehaviour.print("[修真之路Cultivation Way]:sprites为空");
                 return true;
             }
-            if (stats.sprites.mapIcon == null)
-            {
-                MonoBehaviour.print("[修真之路Cultivation Way]:mapIcon为空");
-            }
-            return true;
+            return false;
         }
         #endregion
 

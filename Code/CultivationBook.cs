@@ -18,6 +18,25 @@ namespace Cultivation_Way
             {
                 stats[i].setBasicStats(i*rank,rank,0,rank/20,i);
             }
+            if (rank % 10 == 0||Toolbox.randomChance(1-rank/110f))
+            {
+                ExtensionSpell gainSpell = new ExtensionSpell(((ExtensionSpellLibrary)AssetManager.instance.dict["extensionSpell"]).spellList.GetRandom());
+                bool isRepeated = false;
+                foreach(ExtensionSpell spell in stats[19].spells)
+                {
+                    if (spell.spellAssetID == gainSpell.spellAssetID)
+                    {
+                        spell.might += gainSpell.might / 100f;
+                        isRepeated = true;
+                    }
+                }
+                //各个境界的法术待设置
+                //目前采用统一处理
+                for (int i = 10; i < 20&&!isRepeated; i++)
+                {
+                    stats[i].spells.Add(gainSpell);
+                }
+            }
             bookName = bookName.Remove(bookName.Length - 4, 4) + "("+ChineseNameAsset.rankName[(rank + 9) / 10] + "阶)";
         }
         public CultivationBook()
@@ -30,7 +49,7 @@ namespace Cultivation_Way
 
             for(int i = 0; i < 20; i++)
             {
-                stats[i] = new MoreStats(new BaseSimObject());
+                stats[i] = new MoreStats();
             }
         }
     }

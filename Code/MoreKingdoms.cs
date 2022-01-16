@@ -1,4 +1,10 @@
-﻿namespace Cultivation_Way
+﻿using ReflectionUtility;
+using HarmonyLib;
+using UnityEngine;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace Cultivation_Way
 {
     class MoreKingdoms
     {
@@ -34,14 +40,17 @@
             KingdomAsset undead = AssetManager.kingdoms.get("undead");
             undead.addTag("undead");
             undead.addFriendlyTag("Ming");
+            KingdomAsset neutral = AssetManager.kingdoms.get("neutral_animals");
+            neutral.addEnemyTag("Ming");
             //主要国家
             KingdomAsset addKingdom3 = AssetManager.kingdoms.clone("Ming", "human");
             addKingdom3.tags.Clear();
             addKingdom3.addTag("civ");
             addKingdom3.addTag("Ming");
             addKingdom3.addFriendlyTag("Ming");
-            addKingdom3.addFriendlyTag("undead");
-
+            addKingdom3.addFriendlyTag("neutral");
+            addKingdom3.addFriendlyTag("good");
+            addKingdom3.addEnemyTag("bandits");
             addKingdom3.civ = true;
             addKingdom3.nomads = true;
             this.newHiddenKingdom(addKingdom3);
@@ -51,8 +60,9 @@
             addKingdom4.addTag("civ");
             addKingdom4.addTag("Ming");
             addKingdom4.addFriendlyTag("Ming");
-            addKingdom4.addFriendlyTag("undead");
-
+            addKingdom4.addFriendlyTag("neutral");
+            addKingdom4.addFriendlyTag("good");
+            addKingdom4.addEnemyTag("bandits");
             addKingdom4.mobs = true;
             addKingdom4.nomads = true;
             this.newHiddenKingdom(addKingdom4);
@@ -78,6 +88,57 @@
             kingdom.name = pAsset.id;
             KingdomManager kingdomManager = MapBox.instance.kingdoms;
             kingdomManager.addKingdom(kingdom, false);
+        }
+        //设置投降条件
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(City), "joinAnotherKingdom")]
+        public static bool joinAnotherKingdom_Prefix(Kingdom pKingdom,City __instance)
+        {
+            Kingdom kingdom = Reflection.GetField(typeof(City), __instance, "kingdom") as Kingdom;
+            if (kingdom.getMaxLevelActor().GetData().level >= pKingdom.getMaxLevelActor().GetData().level)
+            {
+                return false;
+            }
+            return true;
+        }
+        //修改城市覆灭条件
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MapBox),"destroyCity")]
+        public static bool destroyCity_Prefix(City pCity)
+        {
+            if (pCity.getMaxLevelActor() != null)
+            {
+                if (pCity.getMaxLevelActor().GetData().level > 10)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        //修改生育
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ai.behaviours.CityBehProduceUnit),"getRandomParent")]
+        public static bool getRandomParent(ref Actor __result, ai.behaviours.CityBehProduceUnit __instance,List<Actor> pList,Actor pActorIgnore)
+        {
+            FieldInfo parent_index = typeof(ai.behaviours.CityBehProduceUnit).GetField("parent_index", BindingFlags.Static | BindingFlags.NonPublic);
+            int value = (int)parent_index.GetValue(__instance);
+            if ( value>= pList.Count)
+            {
+                Reflection.SetField( __instance, "parent_index",0);
+            }
+            for (int i = value; i < pList.Count; i++)
+            {
+                pList.ShuffleOne(i);
+                Actor actor = pList[i];
+                if (actor.GetData().alive && !(actor == pActorIgnore) && !actor.haveTrait("plague") && actor.GetData().age > 18&&actor.stats.procreate)
+                {
+                    parent_index.SetValue(new ai.behaviours.CityBehProduceUnit(), i);
+                    __result = actor;
+                    return false;
+                }
+            }
+            
+            return false;
         }
     }
 }

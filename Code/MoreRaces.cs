@@ -75,8 +75,30 @@ namespace Cultivation_Way
             #endregion
 
         }
+        internal void setIntelligentRaceFeature()
+        {
+            RaceFeature humanFeature = Main.instance.raceFeatures["human"];
 
+            RaceFeature elfFeature = Main.instance.raceFeatures["elf"];
 
+            RaceFeature dwarfFeature = Main.instance.raceFeatures["dwarf"];
+
+            RaceFeature orcFeature = Main.instance.raceFeatures["orc"];
+
+            RaceFeature TianFeature = Main.instance.raceFeatures["Tian"];
+            TianFeature.raceSpells.Add(new ExtensionSpell("summonTian"));
+            TianFeature.raceSpells.Add(new ExtensionSpell("summonTian1"));
+            RaceFeature MingFeature = Main.instance.raceFeatures["Ming"];
+            MingFeature.raceSpells.Add(new ExtensionSpell("summon") { might = 2f });
+        }
+        internal void setOtherRaceFeature()
+        {
+            RaceFeature JiaoDragonFeature = Main.instance.raceFeatures["JiaoDragon"];
+            JiaoDragonFeature.raceSpells.Add(new ExtensionSpell("JiaoDragon_laser"));
+            RaceFeature MengZhuFeature = Main.instance.raceFeatures["MengZhu"];
+            MengZhuFeature.raceSpells.Add(new ExtensionSpell("lightning"));
+            MengZhuFeature.raceSpells.Add(new ExtensionSpell("summonTian"));
+        }
 
         //国家颜色
         public static void kingdomColorsDataInit()
@@ -148,7 +170,7 @@ namespace Cultivation_Way
             }
             if (Main.instance.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
             {
-                __instance.icon.sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/icons/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
+                __instance.icon.sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
             }
         }
         //主贴图加载
@@ -166,9 +188,23 @@ namespace Cultivation_Way
                 string[] names = new string[8] { "swim_0", "swim_1", "swim_2", "swim_3", "walk_0", "walk_1", "walk_2", "walk_3" };
                 foreach (string name in names)
                 {
-                    Sprite sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/{pSheetPath}/{name}.png", 0.55f);
+                    Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{name}.png",ActorBase.spriteOffset.x);
                     sprite.name = name;
                     sprites.Add(name, sprite);
+                }
+                if (Main.instance.moreRaces.Contains(pStats.race))
+                {
+                    for(int i = 4; i < 8; i++)
+                    {
+                        float extraOffset = 0f;
+                        if (i == 5 || i == 6)
+                        {
+                            extraOffset = 0.5f;
+                        }
+                        Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{names[i]+"_item"}.png", ActorBase.spriteOffset.x, ActorBase.spriteOffset.y*(3.5f+extraOffset));
+                        sprite.name = names[i]+"_item";
+                        sprites.Add(names[i]+"_item", sprite);
+                    }
                 }
 
                 //framedata重新生成
@@ -178,7 +214,6 @@ namespace Cultivation_Way
                 Reflection.CallStaticMethod(typeof(ActorAnimationLoader), "generateFrameData", animationDataUnit, sprites, "walk_0,walk_1,walk_2,walk_3,swim_0,swim_1,swim_2,swim_3");
 
                 Dictionary<string, AnimationDataUnit> _dict_units = Reflection.GetField(typeof(ActorAnimationLoader), __instance, "dict_units") as Dictionary<string, AnimationDataUnit>;
-
                 _dict_units.Add(pSheetPath, animationDataUnit);
 
                 if (pStats.animation_swim != string.Empty)

@@ -5,12 +5,19 @@ namespace Cultivation_Way
 {
     class AddAssetManager
     {
-        ChineseNameLibrary chineseNameGenerator;
+        internal static ChineseNameLibrary chineseNameGenerator;
 
-        ChineseElementLibrary chineseElementLibrary;
+        internal static ChineseElementLibrary chineseElementLibrary;
+
+        internal static CultisystemLibrary cultisystemLibrary;
+
+        internal static ExtensionSpellLibrary extensionSpellLibrary;
+
+        internal static SpecialBodyLibrary specialBodyLibrary;
 
         public static void addAsset()
         {
+            Main.instance.MoreItem.init();
             Main.instance.MoreTraits.init();
             Main.instance.MoreGodPowers.init();
             Main.instance.MoreActors.init();
@@ -20,13 +27,16 @@ namespace Cultivation_Way
             Main.instance.MoreDrops.init();
             Main.instance.MoreProjectiles.init();
 
-            ChineseNameLibrary chineseNameGenerator = new ChineseNameLibrary();
-            ChineseElementLibrary chineseElementLibrary = new ChineseElementLibrary();
-            CultisystemLibrary cultisystemLibrary = new CultisystemLibrary();
+            chineseNameGenerator = new ChineseNameLibrary();
+            chineseElementLibrary = new ChineseElementLibrary();
+            cultisystemLibrary = new CultisystemLibrary();
+            extensionSpellLibrary = new ExtensionSpellLibrary();
+            specialBodyLibrary = new SpecialBodyLibrary();
             add(chineseNameGenerator, "chineseNameGenerator");
             add(chineseElementLibrary, "element");
             add(cultisystemLibrary, "cultisystem");
-
+            add(extensionSpellLibrary, "extensionSpell");
+            add(specialBodyLibrary, "specialBody");
             Main.instance.MoreCultureTech.init();//顺序不可调换
 
         }

@@ -9,6 +9,8 @@
         public MoreStats[] moreStats;//各个境界属性加成
 
         public string[] bannedRace;//禁用种族
+
+
         public CultisystemAsset()
         {
 

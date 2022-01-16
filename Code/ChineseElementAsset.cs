@@ -9,6 +9,8 @@
          */
         public int[] content;//各个基本元素的含量
 
+        public int rarity;//稀有度
+
         public string[] oppositeElementId;//克制元素的id
 
         public string[] promoteElementId;//加成元素的id

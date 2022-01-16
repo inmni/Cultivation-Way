@@ -8,25 +8,36 @@ using CultivationWay;
 using Newtonsoft.Json;
 using UnityEngine;
 
+
 namespace Cultivation_Way
 {
     class SavedModData
     {
-        //public List<Family> familys = new List<Family>();
-        public Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族映射表
+		public int specialBodyLimit = 100;
+		public int summonTian1Limit = 1;
 
-        public Dictionary<string, MoreStats> actorToMoreStats = new Dictionary<string, MoreStats>();//单位与更多属性映射词典
+		public List<SpecialBody> specialBodies = new List<SpecialBody>(150);//特殊体质表
+
+        public List<Family> familys = new List<Family>();//家族表
+
+		public Dictionary<string, MoreActorData> actorToMoreData = new Dictionary<string, MoreActorData>();//单位与更多数据映射词典
 
         public Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
 
         public void create()
         {
-            Main instance = Main.instance;
-            this.familys = instance.familys;
-            this.actorToMoreStats = instance.actorToMoreStats;
-            this.chunkToElement = instance.chunkToElement;
-
-        }
+			familys.Clear();
+			actorToMoreData.Clear();
+			specialBodies.Clear();
+			actorToMoreData = new Dictionary<string, MoreActorData>();
+			prepare();
+			Main instance = Main.instance;
+			specialBodyLimit = instance.SpecialBodyLimit;
+			summonTian1Limit = instance.summonTian1Limit;
+            familys = instance.familys.Values.ToList();
+			chunkToElement = instance.chunkToElement;
+			specialBodies = AddAssetManager.specialBodyLibrary.list;
+		}
         public string toJson()
         {
 			string text = "";
@@ -57,6 +68,35 @@ namespace Cultivation_Way
         {
 			return Zip.Compress(this.toJson());
         }
+		private void prepare()
+        {
+			Main instance = Main.instance;
+			foreach (Actor actor in MapBox.instance.units)
+			{
+                if (actor != null)
+                {
+					MoreActorData moreData = new MoreActorData();
+					MoreActorData copyFrom = actor.GetMoreData();
+					moreData.cultisystem = copyFrom.cultisystem;
+					moreData.element = copyFrom.element;
+					moreData.familyID = copyFrom.familyID;
+					moreData.magic = copyFrom.magic;
+					moreData.bonusStats = copyFrom.bonusStats;
+					moreData.coolDown = copyFrom.coolDown;
+                    if (copyFrom.specialBody == null || copyFrom.specialBody == string.Empty)
+                    {
+						copyFrom.specialBody = "FT";
+						moreData.specialBody = "FT";
+                    }
+                    else
+                    {
+						moreData.specialBody = copyFrom.specialBody;
+
+					}
+					actorToMoreData.Add(actor.GetData().actorID, moreData);
+                }
+			}
+		}
 		public SavedModData() { }
     }
 }

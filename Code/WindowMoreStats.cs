@@ -44,7 +44,7 @@ namespace Cultivation_Way
 
             checkMoreStats.GetComponent<RectTransform>().sizeDelta = new Vector2(60f, 60f);
             checkMoreStats.transform.Find("Icon").GetComponent<RectTransform>().sizeDelta = new Vector2(36f, 36f);
-            checkMoreStats.GetComponent<Image>().sprite = Sprites.LoadSprite($"Mods/Cultivation-Way/EmbededResources/backButtonRight.png");
+            checkMoreStats.GetComponent<Image>().sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/backButtonRight.png");
             #endregion
 
             window_MoreStats = Windows.CreateNewWindow("window_MoreStats", "详细信息");
@@ -65,7 +65,7 @@ namespace Cultivation_Way
         }
         private static void clickForWindow_MoreStats()
         {
-            Main.instance.actorToMoreStats[((ActorStatus)Reflection.GetField(typeof(Actor), Config.selectedUnit, "data")).actorID].magic++;
+            Main.instance.actorToMoreStats[Config.selectedUnit.GetData().actorID].magic++;
 
             setWindowContent();
 
@@ -112,13 +112,19 @@ namespace Cultivation_Way
             //    value.Add(property.GetValue(moreStats,null).ToString());
             //}
             //Debug.Log(properties.Length);
-            MoreStats stats = Main.instance.actorToMoreStats[((ActorStatus)Reflection.GetField(typeof(Actor), Config.selectedUnit, "data")).actorID];
-            ActorStatus data = Reflection.GetField(typeof(Actor), Config.selectedUnit, "data") as ActorStatus;
+            ActorStatus data = Config.selectedUnit.GetData();
+            MoreStats stats = Main.instance.actorToMoreStats[data.actorID];
+            
             item.Add("family");
             value.Add(stats.family.id+"氏");
             item.Add("cultivationBook");
             value.Add(stats.family.cultivationBook.bookName);
-
+            item.Add("specialBody");
+            value.Add(Config.selectedUnit.GetSpecialBody().name);
+            item.Add("origin");
+            value.Add(Config.selectedUnit.GetSpecialBody().origin);
+            item.Add("madeBy");
+            value.Add(Config.selectedUnit.GetSpecialBody().madeBy);
             item.Add("elementType");
             value.Add(stats.element.element.name + "灵根");
             item.Add("Gold");
@@ -137,9 +143,12 @@ namespace Cultivation_Way
             int realm = data.level;
             if (realm > 10)
             {
-                realm = (realm + 9) / 10+8;
+                realm = (realm + 9) / 10+9;
             }
             value.Add(((CultisystemLibrary)AssetManager.instance.dict["cultisystem"]).get(stats.cultisystem).realms[realm-1]);
+
+            item.Add("magic");
+            value.Add(Main.instance.actorToMoreData[data.actorID].magic + "/" + stats.magic);
             return toFormat(item, value);
         }
         private static string toFormat(List<string> item, List<string> value)

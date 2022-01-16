@@ -111,13 +111,13 @@ namespace Cultivation_Way
         private void setSpecial()
         {
             BuildingAsset p = AssetManager.buildings.get("windmill_Tian");
-            p.baseStats.health = 100;
+            p.baseStats.health = 10000;
             p.baseStats.targets = 10;
             p.baseStats.range = 38f;
             p.tower = true;
             p.tower_projectile = "lightning_orb";
             p.tower_projectile_amount = 1;
-            p.tower_projectile_offset = 15f;
+            p.tower_projectile_offset = 7f;
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Building),"applyScale")]
@@ -138,6 +138,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
+
             BuildingAsset ba = Reflection.GetField(typeof(Building), b, "stats") as BuildingAsset;
             if (ba.baseStats.range < 20f)
             {

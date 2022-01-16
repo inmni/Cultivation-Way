@@ -1,5 +1,6 @@
 ﻿using CultivationWay;
 using System;
+using UnityEngine;
 
 namespace Cultivation_Way
 {
@@ -9,24 +10,17 @@ namespace Cultivation_Way
         public int[] baseElementContainer;
         //衍生元素类型
         public ChineseElementAsset element;
-
         //元素变化
         public void change() { }
         //随机设置元素
         public ChineseElement getRandom()
         {
-            int sum = 0;
-            int[] content = new int[5] { 0, 0, 0, 0, 0 };
+            baseElementContainer = new int[5] {20,20,20,20,20};
             for (int i = 0; i < 5; i++)
             {
-                content[i] = Toolbox.randomInt(0, 101);
-                sum += content[i];
+                baseElementContainer[i] = Toolbox.randomInt(0, 101);
             }
-            for (int i = 0; i < 5; i++)
-            {
-                content[i] = content[i] * 100 / sum;
-            }
-            baseElementContainer = content;
+            normalize();
             setType();
             return this;
         }
@@ -52,10 +46,9 @@ namespace Cultivation_Way
                     maxMembership = new Tuple<string, int>(id, membership);
                 }
             }
-            element = elementLibrary.dict[maxMembership.Item1];
-            
+            element = elementLibrary.get(maxMembership.Item1);
         }
-        //计算元素纯净度
+        //计算元素不纯净度
         public float getPurity()
         {
             int maxPos = 0;
@@ -66,12 +59,31 @@ namespace Cultivation_Way
                     maxPos = i;
                 }
             }
-            float purity = 0;
+            return 100f / baseElementContainer[maxPos];
+        }
+        //修改至总量为100
+        public void normalize()
+        {
+            int sum = 0;
             for (int i = 0; i < 5; i++)
             {
-                purity += baseElementContainer[i] / (float)baseElementContainer[maxPos];
+                sum += baseElementContainer[i];
             }
-            return purity;
+            for (int i = 0; i < 5; i++)
+            {
+                baseElementContainer[i] = baseElementContainer[i] * 100 / sum;
+            }
+            sum = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                sum += baseElementContainer[i];
+            }
+            while (sum < 100)
+            {
+                int index = Toolbox.randomInt(0, 5);
+                baseElementContainer[index]++;
+                sum++;
+            }
         }
 
         public ChineseElement(int[] content)
@@ -79,6 +91,8 @@ namespace Cultivation_Way
             baseElementContainer = content;
             setType();
         }
-        public ChineseElement() { }
+        public ChineseElement() {
+            getRandom();
+        }
     }
 }
