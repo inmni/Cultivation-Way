@@ -5,6 +5,9 @@ using NCMS.Utils;
 using ReflectionUtility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using UnityEngine;
 using static Config;
 
@@ -16,6 +19,21 @@ namespace Cultivation_Way
         private static Race tRace;
         internal void init()
         {
+            #region 东方人族
+            Main.instance.moreRaces.Add("EasternHuman");
+            Race EasternHuman = AssetManager.raceLibrary.clone("EasternHuman", "human");
+            tRace = EasternHuman;
+            EasternHuman.icon = "iconEasternHuman";
+            EasternHuman.nameLocale = "EasternHumans";
+            EasternHuman.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
+            EasternHuman.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
+            EasternHuman.skin_warrior = List.Of<string>(new string[] { "unit_warrior_1" });
+            setPreferredStatPool("diplomacy#1,warfare#1,stewardship#1,intelligence#1");
+            setPreferredFoodPool("bread#1");
+            addPreferredWeapon("bow", 1);
+            addPreferredWeapon("sword", 1);
+            #endregion
+
             #region 天族
             Main.instance.moreRaces.Add("Tian");
             Race Tian = AssetManager.raceLibrary.clone("Tian", "human");
@@ -74,30 +92,71 @@ namespace Cultivation_Way
             addPreferredWeapon("sword", 1);
             #endregion
 
+            #region 妖族
+            Main.instance.moreRaces.Add("Yao");
+            Race Yao = AssetManager.raceLibrary.clone("Yao", "human");
+            tRace = Yao;
+            Yao.culture_rate_tech_limit = 8;
+            Yao.culture_knowledge_gain_per_intelligence = 1.2f;
+            Yao.civ_baseCities = 1;
+            Yao.civ_baseArmy = 5;
+            Yao.civ_baseZones = 16;
+            Yao.color = Toolbox.makeColor("#000000");
+            Yao.icon = "iconYao";
+            Yao.nameLocale = "Yaos";
+            Yao.bannerId = "orc";
+            Yao.hateRaces = "elf,human";
+            Yao.preferred_weapons.Clear();
+            Yao.production = new string[] { "metals", "bread" };
+            Yao.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
+            Yao.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
+            Yao.skin_warrior = List.Of<string>(new string[] { "unit_warrior_1" });
+            Yao.name_template_city = "Yao_city";
+            Yao.name_template_kingdom = "Yao_kingdom";
+            Yao.name_template_culture = "Yao_culture";
+            Yao.culture_forbidden_tech.Add("building_roads");
+            setPreferredStatPool("diplomacy#1,warfare#8,stewardship#1,intelligence#1");
+            setPreferredFoodPool("meat#10,fish#5,bread#1,sushi#1,cider#1,tea#1");
+            addPreferredWeapon("stick", 5);
+            addPreferredWeapon("axe", 10);
+            addPreferredWeapon("spear", 3);
+            addPreferredWeapon("bow", 1);
+            #endregion
+
         }
         internal void setIntelligentRaceFeature()
         {
-            RaceFeature humanFeature = Main.instance.raceFeatures["human"];
+            RaceFeature humanFeature = Main.instance.raceFeatures["unit_human"];
 
-            RaceFeature elfFeature = Main.instance.raceFeatures["elf"];
+            RaceFeature elfFeature = Main.instance.raceFeatures["unit_elf"];
 
-            RaceFeature dwarfFeature = Main.instance.raceFeatures["dwarf"];
+            RaceFeature dwarfFeature = Main.instance.raceFeatures["unit_dwarf"];
 
-            RaceFeature orcFeature = Main.instance.raceFeatures["orc"];
+            RaceFeature orcFeature = Main.instance.raceFeatures["unit_orc"];
 
-            RaceFeature TianFeature = Main.instance.raceFeatures["Tian"];
+            RaceFeature TianFeature = Main.instance.raceFeatures["unit_Tian"];
             TianFeature.raceSpells.Add(new ExtensionSpell("summonTian"));
             TianFeature.raceSpells.Add(new ExtensionSpell("summonTian1"));
-            RaceFeature MingFeature = Main.instance.raceFeatures["Ming"];
+            RaceFeature MingFeature = Main.instance.raceFeatures["unit_Ming"];
             MingFeature.raceSpells.Add(new ExtensionSpell("summon") { might = 2f });
+            RaceFeature YaoFeature = Main.instance.raceFeatures["unit_Yao"];
         }
         internal void setOtherRaceFeature()
         {
             RaceFeature JiaoDragonFeature = Main.instance.raceFeatures["JiaoDragon"];
             JiaoDragonFeature.raceSpells.Add(new ExtensionSpell("JiaoDragon_laser"));
+
+            RaceFeature EasternDragonFeature = Main.instance.raceFeatures["EasternDragon"];
+            EasternDragonFeature.raceSpells.Add(new ExtensionSpell("JiaoDragon_laser"));
+
             RaceFeature MengZhuFeature = Main.instance.raceFeatures["MengZhu"];
             MengZhuFeature.raceSpells.Add(new ExtensionSpell("lightning"));
             MengZhuFeature.raceSpells.Add(new ExtensionSpell("summonTian"));
+
+            RaceFeature MonkeySheng1 = Main.instance.raceFeatures["MonkeySheng1"];
+            MonkeySheng1.raceSpells.Add(new ExtensionSpell("goldBar"));
+            MonkeySheng1.raceSpells.Add(new ExtensionSpell("goldBarDown"));
+
         }
 
         //国家颜色
@@ -158,7 +217,43 @@ namespace Cultivation_Way
         #endregion
 
         #region 拦截
-
+        //妖族行为
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ActorBase), "nextJobActor")]
+        public static void nextJobActor_Postfix(ref string __result, ActorBase pActor)
+        {
+            if (pActor.stats.race == "Yao")
+            {
+                if (pActor.stats.baby)
+                {
+                    __result = "baby";
+                }
+                else if (pActor.city != null)
+                {
+                    __result = "citizen";
+                }
+            }
+        }
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(Actor), "create")]
+        public static IEnumerable<CodeInstruction> create_Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> codes = instructions.ToList();
+            MethodInfo isCitizen = AccessTools.Method(typeof(MoreRaces), "isCitizen");
+            codes[20] = new CodeInstruction(OpCodes.Callvirt, isCitizen);
+            codes[21] = new CodeInstruction(OpCodes.Nop);
+            return codes.AsEnumerable();
+        }
+        public static bool isCitizen(Actor actor)
+        {
+            return (actor.stats.unit ||Main.instance.MoreActors.protoAndYao==null
+                    || Main.instance.MoreActors.protoAndShengs==null
+                    ||Main.instance.MoreActors.protoAndShengs.Count<2
+                    || Main.instance.MoreActors.protoAndYao.GetSeconds().Contains(actor.stats.id)
+                    || Main.instance.MoreActors.protoAndShengs[0].GetSeconds().Contains(actor.stats.id)
+                    || Main.instance.MoreActors.protoAndShengs[1].GetSeconds().Contains(actor.stats.id)
+                    ||actor.stats.id =="EasternDragon");
+        }
         //城市界面
         [HarmonyPostfix]
         [HarmonyPatch(typeof(CityWindow), "showInfo")]
@@ -170,7 +265,7 @@ namespace Cultivation_Way
             }
             if (Main.instance.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
             {
-                __instance.icon.sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
+                __instance.icon.sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
             }
         }
         //主贴图加载
@@ -188,22 +283,22 @@ namespace Cultivation_Way
                 string[] names = new string[8] { "swim_0", "swim_1", "swim_2", "swim_3", "walk_0", "walk_1", "walk_2", "walk_3" };
                 foreach (string name in names)
                 {
-                    Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{name}.png",ActorBase.spriteOffset.x);
+                    Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{name}.png", ActorBase.spriteOffset.x);
                     sprite.name = name;
                     sprites.Add(name, sprite);
                 }
                 if (Main.instance.moreRaces.Contains(pStats.race))
                 {
-                    for(int i = 4; i < 8; i++)
+                    for (int i = 4; i < 8; i++)
                     {
                         float extraOffset = 0f;
                         if (i == 5 || i == 6)
                         {
                             extraOffset = 0.5f;
                         }
-                        Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{names[i]+"_item"}.png", ActorBase.spriteOffset.x, ActorBase.spriteOffset.y*(3.5f+extraOffset));
-                        sprite.name = names[i]+"_item";
-                        sprites.Add(names[i]+"_item", sprite);
+                        Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{names[i] + "_item"}.png", ActorBase.spriteOffset.x, ActorBase.spriteOffset.y * (3.5f + extraOffset));
+                        sprite.name = names[i] + "_item";
+                        sprites.Add(names[i] + "_item", sprite);
                     }
                 }
 
@@ -267,20 +362,7 @@ namespace Cultivation_Way
             }
             return true;
         }
-        //音频加载
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(sfx.MusicMan), "clear")]
-        public static bool sfx_MusicMan_clear_Prefix(sfx.MusicMan __instance)
-        {
-            if (sfx.MusicMan.races.Count == 0)
-            {
-                foreach (string race in Main.instance.moreRaces)
-                {
-                    sfx.MusicMan.races.Add(race, new sfx.MusicRaceContainer());
-                }
-            }
-            return true;
-        }
+        
         #endregion
     }
 

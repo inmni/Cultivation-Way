@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NCMS.Utils;
+﻿using System.Collections.Generic;
 namespace Cultivation_Way
 {
     class RaceFeature
     {
         public string raceID;
 
-        public List<ExtensionSpell> raceSpells;//种族自带法术
+        public int[] preferedElement;//种族更倾向的元素
 
+        public List<ExtensionSpell> raceSpells;//种族自带法术
     }
 }

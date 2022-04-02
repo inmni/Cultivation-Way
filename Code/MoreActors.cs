@@ -1,10 +1,13 @@
-﻿using CultivationWay;
+﻿using Cultivation_Way.Utils;
+using CultivationWay;
 using HarmonyLib;
 using ReflectionUtility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,51 +15,259 @@ namespace Cultivation_Way
 {
     class MoreActors
     {
+        internal static EasternDragonAsset easternDragonAsset;
+        internal static Dictionary<string, SpecialActorAsset> specialActorAssets = new Dictionary<string, SpecialActorAsset>();
         private static List<int> _color_sets = new List<int>();
+        internal BiDictionary<string, string> protoAndYao = new BiDictionary<string, string>();
+        internal List<BiDictionary<string, string>> protoAndShengs = new List<BiDictionary<string, string>>();
         internal void init()
         {
+            #region 召唤物
+            ActorStats summoned = AssetManager.unitStats.clone("summoned", "skeleton");
+            summoned.canLevelUp = false;
+            summoned.take_items_ignore_range_weapons = true;
+            summoned.maxAge = 200;
+            summoned.job = "attacker";
+            summoned.race = "summoned";
+            summoned.procreate = false;
+            summoned.useSkinColors = false;
+            summoned.shadow = false;
+            summoned.traits.Remove("immortal");
+            ActorStats summon = AssetManager.unitStats.clone("summon", "summoned");
+            ActorStats summoned1 = AssetManager.unitStats.clone("summoned1", "summoned");//仅用于填补旧版本的坑
+            ActorStats summonTian = AssetManager.unitStats.clone("summonTian", "summoned");
+            summonTian.race = "Tian";
+            summonTian.use_items = false;
+            summonTian.inspectAvatarScale = 2f;
+            summonTian.ignoreTileSpeedMod = true;
+            summonTian.actorSize = ActorSize.S17_Dragon;
+            summonTian.shadow = true;
+            summonTian.ignoreTileSpeedMod = true;
+            summonTian.canHaveStatusEffect = false;
+            summonTian.shadowTexture = "unitShadow_23";
+            summonTian.body_separate_part_head = false;
+            summonTian.canReceiveTraits = false;
+            summonTian.defaultWeapons = new List<string>();
+            summonTian.maxAge = 100;
+            summonTian.baseStats.knockbackReduction = 100f;
+            summonTian.baseStats.range = 25f;
+            summonTian.baseStats.projectiles = 1;
+            summonTian.baseStats.scale = 0.3f;
+            summonTian.baseStats.speed = 1.5f;
+            summonTian.traits.Add("giant");
+            summonTian.disablePunchAttackAnimation = true;
+            summonTian.texture_path = "summonTian";
+            summonTian.flying = true;
+            summonTian.very_high_flyer = true;
+            summonTian.dieOnBlocks = false;
+            summonTian.procreate = false;
+            summonTian.defaultAttack = "summonTian";
+            addActor(summonTian);
+            ActorStats summonTian1 = AssetManager.unitStats.clone("summonTian1", "summoned");
+            summonTian1.ignoreTileSpeedMod = true;
+            summonTian1.actorSize = ActorSize.S17_Dragon;
+            summonTian1.shadow = true;
+            summonTian1.shadowTexture = "unitShadow_9";
+            summonTian1.maxAge = 499;
+            summonTian1.baseStats.knockbackReduction = 100f;
+            summonTian1.baseStats.range = 25f;
+            summonTian1.baseStats.projectiles = 1;
+            summonTian1.baseStats.scale = 0.42f;
+            summonTian1.baseStats.speed = 1.5f;
+            summonTian1.traits.Add("giant");
+            summonTian1.disablePunchAttackAnimation = true;
+            summonTian1.texture_path = "summonTian1";
+            summonTian1.body_separate_part_head = false;
+            summonTian1.swimToIsland = false;
+            summonTian1.procreate = false;
+            summonTian1.defaultAttack = "summonTian1";
+            summonTian1.defaultWeapons = new List<string>();
+            summonTian1.use_items = false;
+            addActor(summonTian1);
+            Main.instance.creatureLimit.Add(summonTian1.id, 1);
+            #endregion
+
             #region 智慧种族
+
             AssetManager.unitStats.get("unit_human").procreate = true;
+            AssetManager.unitStats.get("unit_human").oceanCreature = false;
             AssetManager.unitStats.get("unit_elf").procreate = true;
+            AssetManager.unitStats.get("unit_elf").oceanCreature = false;
             AssetManager.unitStats.get("unit_dwarf").procreate = true;
+            AssetManager.unitStats.get("unit_dwarf").oceanCreature = false;
             AssetManager.unitStats.get("unit_orc").procreate = true;
+            AssetManager.unitStats.get("unit_orc").oceanCreature = false;
+            #region 东方人族
+            ActorStats EasternHuman = AssetManager.unitStats.clone("unit_EasternHuman", "unit_human");
+            EasternHuman.race = "EasternHuman";
+            EasternHuman.nameLocale = "EasternHumans";
+            EasternHuman.heads = 0;
+            EasternHuman.useSkinColors = true;
+            EasternHuman.action_death = (WorldAction)Delegate.Combine(EasternHuman.action_death, new WorldAction(ExtensionSpellActionLibrary.aTransformToGod));
+            addActor(EasternHuman);
+            addColor(EasternHuman, "default", "#FFE599", "#F9CB9C");
+            #endregion
+            #region 天族
             ActorStats TianAsset = AssetManager.unitStats.clone("Tian", "unit_human");
-            TianAsset.maxAge = 500;
+            TianAsset.maxAge = 300;
             TianAsset.race = "Tian";
             TianAsset.unit = true;
-            TianAsset.landCreature = true;
-            TianAsset.oceanCreature = true;
-            TianAsset.needFood = false;
+            TianAsset.oceanCreature = false;
             TianAsset.procreate = true;
             TianAsset.nameLocale = "Tians";
             TianAsset.nameTemplate = "Tian_name";
-            TianAsset.shadowTexture = "unitShadow_5";
             TianAsset.setBaseStats(120, 17, 30, 4, 5, 100, 3);
             TianAsset.useSkinColors = false;
             TianAsset.texture_path = "t_Tian";
             TianAsset.texture_heads = "";
-            TianAsset.heads = 2;
+            TianAsset.heads = 0;
             TianAsset.icon = "Tian";
             TianAsset.animation_idle = "walk_0,walk_1,walk_2,walk_3";
             addActor(TianAsset);
-
+            addActor(AssetManager.unitStats.clone("unit_Tian", "Tian"));
+            #region 天族附属
+            ActorStats Tian1 = AssetManager.unitStats.clone("summonTian2", "summonTian");
+            Tian1.texture_path = "summonTian2";
+            Tian1.nameTemplate = "default_name";
+            Tian1.race = "Tian";
+            Tian1.kingdom = "nomads_Tian";
+            Tian1.baseStats.scale = 0.2f;
+            Tian1.baseStats.speed = 10f;
+            Tian1.traits = new List<string>();
+            Tian1.actorSize = ActorSize.S15_Bear;
+            Tian1.canLevelUp = true;
+            addActor(Tian1);
+            #endregion
+            #endregion
+            #region 冥族
             ActorStats MingAsset = AssetManager.unitStats.clone("Ming", "unit_human");
-            MingAsset.maxAge = 500;
+            MingAsset.maxAge = 300;
             MingAsset.race = "Ming";
             MingAsset.unit = true;
-            MingAsset.needFood = false;
+            MingAsset.needFood = true;
             MingAsset.procreate = true;
+            MingAsset.oceanCreature = false;
+            MingAsset.shadow = false;
             MingAsset.traits.Add("cursed_immune");
             MingAsset.nameLocale = "Mings";
             MingAsset.nameTemplate = "Ming_name";
-            MingAsset.shadowTexture = "unitShadow_5";
             MingAsset.setBaseStats(150, 20, 35, 4, 0, 90, 0);
             MingAsset.useSkinColors = false;
+            MingAsset.have_skin = false;
             MingAsset.texture_path = "t_Ming";
             MingAsset.texture_heads = "";
-            MingAsset.heads = 2;
+            MingAsset.heads = 0;
             MingAsset.animation_idle = "walk_0,walk_1,walk_2,walk_3";
             addActor(MingAsset);
+            //addColor(MingAsset);
+            addActor(AssetManager.unitStats.clone("unit_Ming", "Ming"));
+            //addColor(AssetManager.unitStats.get("unit_Ming"));
+            #endregion
+            #region 妖族
+            ActorStats YaoAsset = AssetManager.unitStats.clone("Yao", "unit_orc");
+            YaoAsset.maxAge = 500;
+            YaoAsset.race = "Yao";
+            YaoAsset.unit = true;
+            YaoAsset.needFood = true;
+            YaoAsset.procreate = true;
+            YaoAsset.damagedByOcean = false;
+            YaoAsset.oceanCreature = false;
+            YaoAsset.landCreature = true;
+            YaoAsset.swimToIsland = true;
+            YaoAsset.ignoreTileSpeedMod = true;
+            YaoAsset.nameLocale = "Yaos";
+            YaoAsset.icon = "iconYao";
+            YaoAsset.countAsUnit = true;
+            YaoAsset.setBaseStats(150, 20, 35, 4, 0, 90, 0);
+            YaoAsset.color = Toolbox.makeColor("#2F5225");
+            YaoAsset.useSkinColors = true;
+            YaoAsset.body_separate_part_head = false;
+            YaoAsset.texture_heads = "";
+            YaoAsset.heads = 0;
+            YaoAsset.animation_idle = "walk_0,walk_1,walk_2,walk_3";
+            YaoAsset.animation_walk = "walk_0,walk_1,walk_2,walk_3";
+            YaoAsset.animation_swim = "swim_0,swim_1,swim_2,swim_3";
+            YaoAsset.canTurnIntoTumorMonster = false;
+            YaoAsset.canTurnIntoMush = false;
+            YaoAsset.canTurnIntoZombie = false;
+            addColor(YaoAsset);
+            addActor(YaoAsset);
+            addActor(AssetManager.unitStats.clone("unit_Yao", "Yao"));
+            addColor(AssetManager.unitStats.get("unit_Yao"));
+            protoAndYao.add(YaoAsset.id, YaoAsset.id);
+            #region 妖族附属
+            ActorStats _Yao = AssetManager.unitStats.clone("_Yao", "Yao");
+            _Yao.unit = false;
+            _Yao.kingdom = "nomads_Yao";
+            addYao("snake");
+            addYao("chicken");
+            addYao("bear");
+            addYao("buffalo");
+            addYao("cat");
+            addYao("fox");
+            addYao("monkey");
+            addYao("crocodile");
+            addYao("rhino");
+            addYao("cow");
+            ActorStats CrabYao = addYao("crab");
+            CrabYao.oceanCreature = true;
+            CrabYao.landCreature = false;
+            addYao("frog");
+            addYao("dog");
+            addYao("hyena");
+            ActorStats PiranhaYao = addYao("piranha");
+            PiranhaYao.oceanCreature = true;
+            PiranhaYao.landCreature = false;
+            addYao("penguin");
+            addYao("rat");
+            addYao("ratKing");
+            addYao("rabbit");
+            addYao("turtle");
+            addYao("wolf");
+            addYao("sheep");
+            addYao("cock");
+            ActorStats LobsterYao = addYao("lobster");
+            LobsterYao.oceanCreature = true;
+            LobsterYao.landCreature = false;
+            addYao("reindeer");
+            #endregion
+            #region 妖圣
+            protoAndShengs.Add(new BiDictionary<string, string>());
+            protoAndShengs.Add(new BiDictionary<string, string>());
+            ActorStats YaoSheng = AssetManager.unitStats.clone("YaoSheng", "_Yao");
+            YaoSheng.dieOnBlocks = false;
+            YaoSheng.dieOnGround = false;
+            YaoSheng.procreate = false;
+            YaoSheng.canTurnIntoZombie = false;
+            YaoSheng.ignoreTileSpeedMod = true;
+            YaoSheng.baseStats.range = 15f;
+            YaoSheng.use_items = false;
+            YaoSheng.baseStats.health = 2000;
+            YaoSheng.baseStats.damage = 300;
+            YaoSheng.traits.Add("giant");
+            //猴子例外
+            ActorStats MonkeySheng1 = AssetManager.unitStats.clone("MonkeySheng1", "YaoSheng");
+            MonkeySheng1.texture_path = "MonkeySheng1";
+            MonkeySheng1.nameTemplate = "monkey_name";
+            addColor(MonkeySheng1);
+            addActor(MonkeySheng1);
+            protoAndShengs[0].add("monkey", MonkeySheng1.id);
+            Main.instance.creatureLimit.Add(MonkeySheng1.id, 1);
+            ActorStats MonkeySheng2 = AssetManager.unitStats.clone("MonkeySheng2", "MonkeySheng1");
+            MonkeySheng2.texture_path = "MonkeySheng2";
+            addColor(MonkeySheng2);
+            addActor(MonkeySheng2);
+            protoAndShengs[1].add("monkey", MonkeySheng2.id);
+            Main.instance.creatureLimit.Add(MonkeySheng2.id, 1);
+            addYaoSheng("cat");
+            addYaoSheng("cow");
+            addYaoSheng("snake");
+            addYaoSheng("wolf");
+            addYaoSheng("chicken");
+            #endregion
+
+            #endregion
+
             #endregion
 
             #region 其他生物
@@ -74,18 +285,100 @@ namespace Cultivation_Way
             FairyFoxAsset.defaultAttack = "snowball";
             FairyFoxAsset.damagedByOcean = false;
             addActor(FairyFoxAsset);
+            //福人
+            ActorStats FuRenAsset = AssetManager.unitStats.clone("FuRen", "fox");
+            FuRenAsset.maxAge = 100;
+            FuRenAsset.race = "EasternHuman";
+            FuRenAsset.nameLocale = "FuRen";
+            FuRenAsset.useSkinColors = false;
+            FuRenAsset.texture_path = "FuRen";
+            FuRenAsset.texture_heads = "";
+            FuRenAsset.icon = "iconFuRen";
+            FuRenAsset.defaultAttack = "firework";
+            FuRenAsset.use_items = false;
+            addActor(FuRenAsset);
+            Main.instance.creatureLimit.Add(FuRenAsset.id, 1);
+            //虎
+            ActorStats TigerAsset = AssetManager.unitStats.clone("Tiger", "wolf");
+            TigerAsset.race = "Tiger";
+            TigerAsset.nameLocale = "Tiger";
+            TigerAsset.nameTemplate = "tiger_name";
+            TigerAsset.texture_path = "Tiger";
+            TigerAsset.icon = "iconTiger";
+            addActor(TigerAsset);
+            AssetManager.topTiles.get("grass_low").addUnitsToSpawn("Tiger");
             //东方龙
-            ActorStats EasternDragonAsset = AssetManager.unitStats.clone("EasternDragon", "fox");
-            //EasternDragonAsset.race = "dragon";
-            //EasternDragonAsset.kingdom = "dragons";
-            EasternDragonAsset.flying = true;
+            ActorStats EasternDragonAsset = AssetManager.unitStats.clone("EasternDragon", "dragon");
+            EasternDragonAsset.race = "EasternDragon";
             EasternDragonAsset.actorSize = ActorSize.S17_Dragon;
             EasternDragonAsset.shadowTexture = "unitShadow_23";
             EasternDragonAsset.texture_path = "EasternDragon";
             EasternDragonAsset.texture_heads = "";
             EasternDragonAsset.icon = "iconEasternDragon";
+            EasternDragonAsset.skipFightLogic = true;
             EasternDragonAsset.disablePunchAttackAnimation = true;
+            EasternDragonAsset.dieOnBlocks = false;
+            EasternDragonAsset.dieOnGround = false;
+            EasternDragonAsset.baseStats.range = 20f;
+            EasternDragonAsset.baseStats.size = 10f;
+            EasternDragonAsset.oceanCreature = true;
+            EasternDragonAsset.landCreature = true;
+            EasternDragonAsset.swampCreature = true;
+            EasternDragonAsset.canTurnIntoTumorMonster = false;
+            EasternDragonAsset.canTurnIntoMush = false;
+            EasternDragonAsset.canTurnIntoZombie = false;
+            EasternDragonAsset.traits.Remove("strong_minded");
             addActor(EasternDragonAsset);
+            Main.instance.creatureLimit.Add(EasternDragonAsset.id, 1);
+            //各路神明
+            ActorStats Achelous = AssetManager.unitStats.clone("Achelous", "wolf");
+            Achelous.maxAge = 0;
+            Achelous.race = "EasternHuman";
+            Achelous.needFood = false;
+            Achelous.canTurnIntoMush = false;
+            Achelous.canTurnIntoZombie = false;
+            Achelous.canTurnIntoTumorMonster = false;
+            Achelous.countAsUnit = true;
+            Achelous.kingdom = "nomads_EasternHuman";
+            Achelous.procreate = false;
+            Achelous.ignoreJobs = true;
+            Achelous.useSkinColors = false;
+            Achelous.use_items = false;
+            Achelous.texture_path = "Achelous";
+            Achelous.icon = "Achelous";
+            addActor(Achelous);
+            Main.instance.creatureLimit.Add(Achelous.id, 1);
+            Main.instance.godList.Add(Achelous.id, "河伯");
+            ActorStats EarthGod = AssetManager.unitStats.clone("EarthGod", "Achelous");
+            EarthGod.texture_path = "EarthGod";
+            EarthGod.icon = "EarthGod";
+            addActor(EarthGod);
+            Main.instance.creatureLimit.Add(EarthGod.id, 1);
+            Main.instance.godList.Add(EarthGod.id, "土地");
+            ActorStats Mammon = AssetManager.unitStats.clone("Mammon", "Achelous");
+            Mammon.texture_path = "Mammon";
+            Mammon.icon = "Mammon";
+            addActor(Mammon);
+            Main.instance.creatureLimit.Add(Mammon.id, 1);
+            Main.instance.godList.Add(Mammon.id, "财神");
+            ActorStats Hymen = AssetManager.unitStats.clone("Hymen", "Achelous");
+            Hymen.texture_path = "Hymen";
+            Hymen.icon = "Hymen";
+            addActor(Hymen);
+            Main.instance.creatureLimit.Add(Hymen.id, 1);
+            Main.instance.godList.Add(Hymen.id, "月老");
+            ActorStats MountainGod = AssetManager.unitStats.clone("MountainGod", "Achelous");
+            MountainGod.texture_path = "MountainGod";
+            MountainGod.icon = "MountainGod";
+            addActor(MountainGod);
+            Main.instance.creatureLimit.Add(MountainGod.id, 1);
+            Main.instance.godList.Add(MountainGod.id, "山神");
+            ActorStats ZhongKui = AssetManager.unitStats.clone("ZhongKui", "Achelous");
+            ZhongKui.texture_path = "ZhongKui";
+            ZhongKui.icon = "ZhongKui";
+            addActor(ZhongKui);
+            Main.instance.creatureLimit.Add(ZhongKui.id, 1);
+            Main.instance.godList.Add(ZhongKui.id, "钟馗");
             #endregion
 
             #region BOSS
@@ -100,7 +393,11 @@ namespace Cultivation_Way
             JiaoDragonAsset.useSkinColors = false;
             JiaoDragonAsset.texture_path = "JiaoDragon";
             JiaoDragonAsset.texture_heads = "";
+            JiaoDragonAsset.canTurnIntoZombie = false;
+            JiaoDragonAsset.canTurnIntoMush = false;
+            JiaoDragonAsset.canTurnIntoTumorMonster = false;
             JiaoDragonAsset.icon = "iconJiaoDrangon";
+            JiaoDragonAsset.inspectAvatarScale = 0.35f;
             JiaoDragonAsset.setBaseStats(1000000, 10000, 0, 99, 100, 100);
             JiaoDragonAsset.defaultAttack = "snowball";
             JiaoDragonAsset.damagedByOcean = false;
@@ -126,6 +423,17 @@ namespace Cultivation_Way
             XieDragonAsset.baseStats.scale = 0.20f;
             XieDragonAsset.baseStats.size = 0.5f;
             addActor(XieDragonAsset);
+
+            ActorStats NianAsset = AssetManager.unitStats.clone("Nian", "EasternDragon");
+            NianAsset.race = "Nian";
+            NianAsset.kingdom = "boss";
+            NianAsset.texture_path = "Nian";
+            NianAsset.icon = "iconNian";
+            NianAsset.baseStats.range = 23f;
+            NianAsset.oceanCreature = false;
+            NianAsset.action_death = (WorldAction)Delegate.Combine(NianAsset.action_death, new WorldAction(ExtensionSpellActionLibrary.aNianDie));
+            addActor(NianAsset);
+            Main.instance.creatureLimit.Add(NianAsset.id, 1);
             #endregion
 
             #region 彩蛋
@@ -140,7 +448,11 @@ namespace Cultivation_Way
             MengZhuAsset.useSkinColors = false;
             MengZhuAsset.inspect_home = false;
             MengZhuAsset.inspect_children = false;
+            MengZhuAsset.inspectAvatarScale = 0.5f;
             MengZhuAsset.ignoreTileSpeedMod = true;
+            MengZhuAsset.canTurnIntoZombie = false;
+            MengZhuAsset.canTurnIntoMush = false;
+            MengZhuAsset.canTurnIntoTumorMonster = false;
             MengZhuAsset.needFood = false;
             MengZhuAsset.texture_path = "MengZhu";
             MengZhuAsset.texture_heads = "";
@@ -162,68 +474,66 @@ namespace Cultivation_Way
             addActor(MengZhuAsset);
             #endregion
 
-            #region 召唤物
-            ActorStats summoned = AssetManager.unitStats.clone("summoned", "skeleton");
-            summoned.canLevelUp = false;
-            summoned.take_items_ignore_range_weapons = true;
-            summoned.job = "attacker";
-            summoned.race = "summoned";
-            summoned.useSkinColors = false;
-            ActorStats summon = AssetManager.unitStats.clone("summon", "summoned");
-            summon.race = "undead";
-            ActorStats summonTian = AssetManager.unitStats.clone("summonTian", "summoned");
-            summonTian.use_items = false;
-            summonTian.ignoreTileSpeedMod = true;
-            summonTian.actorSize = ActorSize.S17_Dragon;
-            summonTian.shadow = true;
-            summonTian.shadowTexture = "unitShadow_23";
-            summonTian.body_separate_part_head = false;
-            summonTian.canReceiveTraits = false;
-            summonTian.defaultWeapons = new List<string>();
-            summonTian.baseStats.knockbackReduction = 100f;
-            summonTian.baseStats.range = 15f;
-            summonTian.baseStats.projectiles = 1;
-            summonTian.baseStats.scale = 0.3f;
-            summonTian.baseStats.speed = 1.5f;
-            summonTian.traits.Add("giant");
-            summonTian.disablePunchAttackAnimation = true;
-            summonTian.texture_path = "summonTian";
-            summonTian.flying = true;
-            summonTian.procreate = false;
-            summonTian.defaultAttack = "shotgun";
-            addActor(summonTian);
-            ActorStats summonTian1 = AssetManager.unitStats.clone("summonTian1", "summoned");
-            summonTian1.ignoreTileSpeedMod = true;
-            summonTian1.actorSize = ActorSize.S17_Dragon;
-            summonTian1.shadow = true;
-            summonTian1.shadowTexture = "unitShadow_9";
-            summonTian1.baseStats.knockbackReduction = 100f;
-            summonTian1.baseStats.range = 15f;
-            summonTian1.baseStats.projectiles = 1;
-            summonTian1.baseStats.scale = 0.42f;
-            summonTian1.baseStats.speed = 1.5f;
-            summonTian1.traits.Add("giant");
-            summonTian1.disablePunchAttackAnimation = true;
-            summonTian1.texture_path = "summonTian1";
-            summonTian1.body_separate_part_head = false;
-            summonTian1.swimToIsland = false;
-            summonTian1.procreate = false;
-            summonTian1.defaultAttack = "summonTian1";
-            summonTian1.defaultWeapons = new List<string>();
-            summonTian1.use_items = false;
-            addActor(summonTian1);
+            #region 各种幼崽
+            ActorStats babyEasternHuman = AssetManager.unitStats.clone("baby_EasternHuman", "unit_EasternHuman");
+            babyEasternHuman.timeToGrow = 200;
+            babyEasternHuman.baby = true;
+            babyEasternHuman.growIntoID = "unit_EasternHuman";
+            addActor(babyEasternHuman);
+            addColor(babyEasternHuman);
+            ActorStats babyTian = AssetManager.unitStats.clone("baby_Tian", "unit_Tian");
+            babyTian.timeToGrow = 200;
+            babyTian.baby = true;
+            babyTian.growIntoID = "unit_Tian";
+            addActor(babyTian);
+            //addColor(babyTian);
+            ActorStats babyMing = AssetManager.unitStats.clone("baby_Ming", "unit_Ming");
+            babyMing.timeToGrow = 200;
+            babyMing.baby = true;
+            babyMing.growIntoID = "unit_Ming";
+            addActor(babyMing);
+            //addColor(babyMing);
+            ActorStats babyYao = AssetManager.unitStats.clone("baby_Yao", "unit_Yao");
+            babyYao.timeToGrow = 200;
+            babyYao.baby = true;
+            babyYao.growIntoID = "unit_Yao";
+            addActor(babyYao);
+            addColor(babyYao);
             #endregion
+            initEasternDragonAsset();
+            initOthersSpecialActorAssets();
         }
-
-        private void addActor(ActorStats pStats,string from = "#FFC984",string to = "#543E2C")
+        private ActorStats addYao(string id)
         {
-            Main.instance.moreActors.Add(pStats.id);
+            string tranformID = ActorTools.getTranformID(id);
+            ActorStats pStats = AssetManager.unitStats.clone(tranformID, "_Yao");
+            pStats.texture_path = tranformID;
+            pStats.nameTemplate = id + "_name";
+            addColor(pStats);
+            addActor(pStats);
+            protoAndYao.add(id, tranformID);
+            return pStats;
+        }
+        private void addYaoSheng(string id)
+        {
+            string tranformID = ActorTools.getTranformID(id).Replace("Yao", "Sheng");
+            ActorStats pStats = AssetManager.unitStats.clone(tranformID, "YaoSheng");
+            pStats.texture_path = tranformID;
+            pStats.nameTemplate = id + "_name";
+            pStats.useSkinColors = false;
+            addActor(pStats);
+            protoAndShengs[0].add(id, tranformID);
+            Main.instance.creatureLimit.Add(tranformID, 1);
+        }
+        private void addColor(ActorStats pStats, string pID = "default", string from = "#FFC984", string to = "#543E2C")
+        {
+            pStats.useSkinColors = true;
             if (pStats.color_sets == null)
             {
                 pStats.color_sets = new List<ColorSet>();
             }
             ColorSet colorSet = new ColorSet();
-            colorSet.id = "default";
+            colorSet.id = pID;
             pStats.color_sets.Add(colorSet);
             Color pFrom = Toolbox.makeColor(from);
             Color pTo = Toolbox.makeColor(to);
@@ -239,6 +549,10 @@ namespace Cultivation_Way
                 Color c = Toolbox.blendColor(pFrom, pTo, num3);
                 colorSet.colors.Add(c);
             }
+        }
+        private void addActor(ActorStats pStats)
+        {
+            Main.instance.moreActors.Add(pStats.id);
             if (pStats.shadow)
             {
                 Reflection.CallMethod(AssetManager.unitStats, "loadShadow", pStats);
@@ -248,42 +562,189 @@ namespace Cultivation_Way
 			((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).clone(pStats.nameTemplate, "human_name");
 			*/
         }
-
-
-        #region 原版函数
-        public static void setSkinSet(Actor pActor, string pForceUnitSet)
+        private void initEasternDragonAsset()
         {
-            if (string.IsNullOrEmpty(pForceUnitSet) || !pActor.stats.useSkinColors)
+            easternDragonAsset = new EasternDragonAsset();
+            easternDragonAsset.list = new EasternDragonAssetContainer[11];
+            Sprite[] moveDragon = Utils.ResourcesHelper.loadAllSprite("actors/EasternDragon/dragon/Move", 0.5f);
+            Sprite[] moveHuman = Utils.ResourcesHelper.loadAllSprite("actors/EasternDragon/human/Move", 0.5f);
+            Sprite[] stopHuman = Utils.ResourcesHelper.loadAllSprite("actors/EasternDragon/human/stop", 0.5f);
+            Sprite[] upDragon = Utils.ResourcesHelper.loadAllSprite("actors/EasternDragon/human/up", 0.5f);
+            Sprite[] landingHuman = Utils.ResourcesHelper.loadAllSprite("actors/EasternDragon/dragon/Landing", 0.5f);
+            Sprite[] attackDragon = Utils.ResourcesHelper.loadAllSprite("actors/EasternDragon/dragon/attack", 0.5f);
+            #region 龙形态
+            //龙移动
+            EasternDragonAssetContainer container1 = new EasternDragonAssetContainer();
+            container1.frames = moveDragon;
+            container1.id = new EasternDragonState()
             {
-                return;
-            }
-            if (pActor.stats.color_sets.Count == 0)
+                actionState = EasternDragonState.ActionState.Move,
+                shape = EasternDragonState.Shape.Dragon
+            };
+            easternDragonAsset.list[0] = container1;
+            //龙停止
+            EasternDragonAssetContainer container2 = new EasternDragonAssetContainer();
+            container2.frames = moveDragon;
+            container2.id = new EasternDragonState()
             {
-                return;
-            }
-            _color_sets.Clear();
-            _color_sets = new List<int>();
-            int num = 0;
-            for (int i = 0; i < pActor.stats.color_sets.Count; i++)
+                actionState = EasternDragonState.ActionState.Stop,
+                shape = EasternDragonState.Shape.Dragon
+            };
+            easternDragonAsset.list[1] = container2;
+            //龙攻击
+            EasternDragonAssetContainer container3 = new EasternDragonAssetContainer();
+            container3.frames = moveDragon;
+            container3.id = new EasternDragonState()
             {
-                if (pActor.stats.color_sets[i].id.Contains(pForceUnitSet))
-                {
-                    _color_sets.Add(num);
-                }
-                num++;
-            }
-            if (_color_sets.Count > 0)
+                actionState = EasternDragonState.ActionState.Attack,
+                shape = EasternDragonState.Shape.Dragon
+            };
+            easternDragonAsset.list[2] = container3;
+            //龙死亡
+            EasternDragonAssetContainer container4 = new EasternDragonAssetContainer();
+            container4.frames = moveDragon;
+            container4.id = new EasternDragonState()
             {
-                int random = _color_sets.GetRandom();
-
-                pActor.GetData().skin_set = random;
-            }
+                actionState = EasternDragonState.ActionState.Death,
+                shape = EasternDragonState.Shape.Dragon
+            };
+            easternDragonAsset.list[3] = container4;
+            //化龙
+            EasternDragonAssetContainer container5 = new EasternDragonAssetContainer();
+            container5.frames = upDragon;
+            container5.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Up,
+                shape = EasternDragonState.Shape.Dragon
+            };
+            easternDragonAsset.list[4] = container5;
+            //龙施法
+            EasternDragonAssetContainer container11 = new EasternDragonAssetContainer();
+            container11.frames = attackDragon;
+            container11.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Spell,
+                shape = EasternDragonState.Shape.Dragon
+            };
+            easternDragonAsset.list[10] = container11;
+            #endregion
+            #region 人形态
+            //化人
+            EasternDragonAssetContainer container6 = new EasternDragonAssetContainer();
+            container6.frames = landingHuman;
+            container6.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Landing,
+                shape = EasternDragonState.Shape.Human
+            };
+            easternDragonAsset.list[5] = container6;
+            //人移动
+            EasternDragonAssetContainer container7 = new EasternDragonAssetContainer();
+            container7.frames = moveHuman;
+            container7.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Move,
+                shape = EasternDragonState.Shape.Human
+            };
+            easternDragonAsset.list[6] = container7;
+            //人停止
+            EasternDragonAssetContainer container8 = new EasternDragonAssetContainer();
+            container8.frames = stopHuman;
+            container8.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Stop,
+                shape = EasternDragonState.Shape.Human
+            };
+            easternDragonAsset.list[7] = container8;
+            //人攻击
+            EasternDragonAssetContainer container9 = new EasternDragonAssetContainer();
+            container9.frames = stopHuman;
+            container9.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Attack,
+                shape = EasternDragonState.Shape.Human
+            };
+            easternDragonAsset.list[8] = container9;
+            //人死亡
+            EasternDragonAssetContainer container10 = new EasternDragonAssetContainer();
+            container10.frames = stopHuman;
+            container10.id = new EasternDragonState()
+            {
+                actionState = EasternDragonState.ActionState.Death,
+                shape = EasternDragonState.Shape.Human
+            };
+            easternDragonAsset.list[9] = container10;
+            #endregion
 
         }
+        private void initOthersSpecialActorAssets()
+        {
+            SpecialActorAsset Nian = new SpecialActorAsset();
 
-        #endregion
+            MoreActors.specialActorAssets.Add("Nian", Nian);
+            #region 年兽
+            Nian.list = new SpecialActorAssetContainer[5];
+            Sprite[] stopNianSprites = Utils.ResourcesHelper.loadAllSprite("actors/Nian/stop", 0.5f, 0);
+            Sprite[] moveNianSprites = Utils.ResourcesHelper.loadAllSprite("actors/Nian/move", 0.5f, 0);
+            Sprite[] attackNianSprites = Utils.ResourcesHelper.loadAllSprite("actors/Nian/attack", 0.5f, 0);
+            SpecialActorAssetContainer stopNian = new SpecialActorAssetContainer();
+            stopNian.id = SpecialActorState.Stop;
+            stopNian.frames = stopNianSprites;
+            Nian.list[0] = stopNian;
+
+            SpecialActorAssetContainer moveNian = new SpecialActorAssetContainer();
+            moveNian.id = SpecialActorState.Move;
+            moveNian.frames = moveNianSprites;
+            Nian.list[1] = moveNian;
+
+            SpecialActorAssetContainer attackNian = new SpecialActorAssetContainer();
+            attackNian.id = SpecialActorState.Attack;
+            attackNian.frames = attackNianSprites;
+            Nian.list[2] = attackNian;
+
+            SpecialActorAssetContainer deathNian = new SpecialActorAssetContainer();
+            deathNian.id = SpecialActorState.Death;
+            deathNian.frames = stopNianSprites;
+            Nian.list[3] = deathNian;
+
+            SpecialActorAssetContainer spellNian = new SpecialActorAssetContainer();
+            spellNian.id = SpecialActorState.Spell;
+            spellNian.frames = stopNianSprites;
+            Nian.list[4] = spellNian;
+            #endregion
+        }
 
         #region 拦截
+        //龙的攻击逻辑
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Actor), "canFight")]
+        public static bool canFight_Prefix(Actor __instance, ref bool __result)
+        {
+            if (__instance.stats.id == "EasternDragon" && __instance.GetComponent<EasternDragon>().getState().shape == EasternDragonState.Shape.Human)
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+        //龙的生成，暂时采用此处拦截
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Actor), "addChildren")]
+        public static void addChildren_Postfix(Actor __instance)
+        {
+            if (__instance.stats.id == "EasternDragon")
+            {
+                __instance.gameObject.AddComponent<EasternDragon>();
+                Reflection.SetField(__instance, "children_special", new List<BaseActorComponent>() { __instance.GetComponent<EasternDragon>() });
+                __instance.GetComponent<EasternDragon>().create();
+            }
+            else if(__instance.stats.id == "Nian")
+            {
+                __instance.gameObject.AddComponent<SpecialActor>();
+                Reflection.SetField(__instance, "children_special", new List<BaseActorComponent>() { __instance.GetComponent<SpecialActor>() });
+                __instance.GetComponent<SpecialActor>().create();
+            }
+        }
         //释放法术
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MapBox), "applyAttack")]
@@ -298,28 +759,61 @@ namespace Cultivation_Way
             MoreStats morestats = Main.instance.actorToMoreStats[dataA.actorID];
             if (morestats.spells.Count != 0)
             {
-                int index = Toolbox.randomInt(0, Main.instance.actorToMoreStats[dataA.actorID].spells.Count);
-                ExtensionSpell spell = morestats.spells[index];
-                if (moreData.coolDown.ContainsKey(spell.spellAssetID))
+                int count = morestats.spells.Count;
+                int max = dataA.level / 20 + 1;
+                List<int> index = new List<int>(count);
+                for (int i = 0; i < count; i++)
                 {
+                    index.Add(i);
+                }
+                index.Shuffle();
+                for (int i = 0, num = 0; i < count && num < max; i++)
+                {
+                    if (!pTarget.base_data.alive)
+                    {
+                        return true;
+                    }
+                    ExtensionSpell spell = morestats.spells[index[i]];
                     //进行蓝耗和冷却检查
                     if (moreData.coolDown[spell.spellAssetID] == 1 && moreData.magic >= spell.cost
-                        && AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).type.attacking)
+                        && spell.GetSpellAsset().type.attacking && spell.GetSpellAsset().type.requiredLevel <= dataA.level)
                     {
                         if (spell.castSpell(pAttacker, pTarget))
                         {
                             moreData.coolDown[spell.spellAssetID] = spell.cooldown;
                             moreData.magic -= spell.cost;
-                            return false;
+                            num++;
                         }
                     }
                 }
-                else
-                {
-                    MonoBehaviour.print(spell.spellAssetID);
-                }
+
             }
             return true;
+        }
+        //攻击距离判定修改（并入法术距离判定
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Actor), "isInAttackRange")]
+        public static void isInAttackRange_Postfix(ref bool __result, Actor __instance, BaseSimObject pObject)
+        {
+            if (__result)
+            {
+                return;
+            }
+            MoreActorData moredata = __instance.GetMoreData();
+            MoreStats morestats = __instance.GetMoreStats();
+            float rangeLimit = Mathf.Max(__instance.GetCurStats().range, morestats.spellRange) + ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pObject, "curStats")).size;
+            foreach (ExtensionSpell spell in morestats.spells)
+            {
+                if (moredata.coolDown[spell.spellAssetID] == 1 && moredata.magic >= spell.cost
+                    && spell.GetSpellAsset().type.attacking)
+                {
+                    if (Toolbox.DistVec3(__instance.currentPosition, pObject.currentPosition) < rangeLimit)
+                    {
+                        __result = true;
+                        return;
+                    }
+                }
+            }
         }
         //经验条修改
         [HarmonyPrefix]
@@ -327,7 +821,12 @@ namespace Cultivation_Way
         public static bool getExpToLevelUp(Actor __instance, ref int __result)
         {
             ActorStatus data = __instance.GetData();
-            __result = (int)((100 + (data.level - 1) * (data.level - 1) * 50) * Main.instance.actorToMoreStats[data.actorID].element.getPurity());
+            if (data == null)
+            {
+                __result = int.MaxValue;
+                return false;
+            }
+            __result = (int)((100 + (data.level - 1) * (data.level - 1) * 50) * __instance.GetMoreData().element.getImPurity()/__instance.GetMoreData().element.GetAsset().rarity);
             return false;
         }
         //升级修改
@@ -335,11 +834,28 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(Actor), "addExperience")]
         public static bool addExperiece_Prefix(Actor __instance, int pValue)
         {
+            if (__instance == null || !__instance.GetData().alive)
+            {
+                return true;
+            }
+            StackTrace st = new StackTrace();
+            for (int i = 2; i < 5; i++)
+            {
+                if (st.GetFrame(i).GetMethod().Name == "applyAttack")
+                {
+                    return false;
+                }
+            }
             ActorStatus data = __instance.GetData();
-            int num = 110;
-            data.experience += pValue;
             MoreStats moreStats = __instance.GetMoreStats();
             MoreActorData moreData = __instance.GetMoreData();
+            if (!moreData.canCultivate)
+            {
+                return false;
+            }
+            int num = 110;
+            data.experience += pValue;
+
             if (data.experience >= __instance.getExpToLevelup())
             {
                 //回蓝，回冷却
@@ -358,15 +874,16 @@ namespace Cultivation_Way
             {
                 return false;
             }
+            //如果等级达到上限，或者该生物不能升级，则优化灵根
             if (data.level >= num || !__instance.stats.canLevelUp)
             {
                 while (data.experience >= __instance.getExpToLevelup())
                 {
                     data.experience -= __instance.getExpToLevelup();
                     ChineseElement element1 = new ChineseElement();
-                    if (element1.getPurity() < moreStats.element.getPurity())
+                    if (element1.getImPurity() < moreData.element.getImPurity())
                     {
-                        moreStats.element = element1;
+                        moreData.element = element1;
                     }
                 }
             }
@@ -376,41 +893,51 @@ namespace Cultivation_Way
                 data.experience -= __instance.getExpToLevelup();
                 data.level++;
                 //准备雷劫
-
+                if ((data.level - 1) % 10 == 0)
+                {
+                    if(!PowerActionLibrary.lightningPunishment(__instance))
+                    {
+                        return false;
+                    }
+                }
                 #region 升级福利
                 data.health = int.MaxValue >> 4;
                 int realm = data.level;
                 if (realm > 10)
                 {
-                    if (data.level == 110)
+                    if (data.level == 50)
+                    {
+                        __instance.tryToUnite();
+                    }
+                    else if (data.level == 110)
                     {
                         __instance.generateNewBody();
                     }
                     realm = (realm + 9) / 10 + 9;
                 }
                 //家族升级
-
-                if (data.level > moreStats.family.maxLevel)
+                Family family = Main.instance.familys[moreData.familyID];
+                if (data.level > family.maxLevel)
                 {
                     int count = 0;
-                    while (count < moreStats.family.maxLevel / 10)
+                    while (count < family.maxLevel / 10)
                     {
                         ChineseElement element1 = new ChineseElement();
-                        if (element1.getPurity() < moreStats.element.getPurity())
+                        if (element1.getImPurity() < moreData.element.getImPurity())
                         {
-                            moreStats.element = element1;
+                            moreData.element = element1;
                             break;
                         }
                         count++;
                     }
-                    moreStats.family.levelUp(data.firstName);
+                    family.levelUp(data.firstName);
                 }
-                else if (data.level == moreStats.family.maxLevel)
+                else if (data.level == family.maxLevel)
                 {
                     ChineseElement element1 = new ChineseElement();
-                    if (element1.getPurity() < moreStats.element.getPurity())
+                    if (element1.getImPurity() < moreData.element.getImPurity())
                     {
-                        moreStats.element = element1;
+                        moreData.element = element1;
                     }
                 }
                 //国家和城市领导人变化
@@ -442,6 +969,15 @@ namespace Cultivation_Way
                         }
                     }
                 }
+                if (data.level == 5)
+                {
+                    __instance.tryTransform();
+                    return false;
+                }
+                if (data.level == 110 && __instance.stats.race == "Yao")
+                {
+                    __instance.tryToUnite();
+                }
             }
 
             //法术释放
@@ -465,23 +1001,30 @@ namespace Cultivation_Way
         //境界压制
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Actor), "getHit")]
-        public static bool getHit_Prefix(Actor __instance, ref float pDamage,AttackType pType = AttackType.None, BaseSimObject pAttacker = null)
+        public static bool getHit_Prefix(Actor __instance, ref float pDamage, AttackType pType = AttackType.None, BaseSimObject pAttacker = null)
         {
+            if (__instance == null)
+            {
+                return true;
+            }
             ActorStatus data1 = __instance.GetData();
-            
+            if (!data1.alive)
+            {
+                return true;
+            }
             if (__instance.haveTrait("asylum"))
             {
                 return false;
             }
-            if(pType == AttackType.Age)
+            if (pType == AttackType.None)
             {
                 if (__instance.GetCurStats().armor != 0)
                 {
-                    pDamage /= 1 - __instance.GetCurStats().armor/100f;
+                    pDamage /= 1 - __instance.GetCurStats().armor / 100f;
                 }
                 return true;
-            }
-            if (pAttacker == null)//采用年龄伤害作为真伤判断
+            }//采用无类型伤害作为真伤判断
+            if (pAttacker == null)
             {
                 pDamage *= 1f - data1.level * 0.1f;
                 return true;
@@ -503,7 +1046,26 @@ namespace Cultivation_Way
                 {
                     pDamage *= 1 - (data1.level - data2.level + 1) * data1.level / 100f;
                 }
+                if (pAttacker.kingdom != null && pAttacker.kingdom.raceID == "EasternHuman"&&__instance.kingdom!=null)
+                {
+                    switch (__instance.kingdom.raceID)
+                    {
+                        case "Ming":
+                            if (KingdomAndCityTools.checkZhongKui((Actor)pAttacker))
+                                pDamage *= 1.5f;
+                            break;
+                        case "Yao":
+                            if (KingdomAndCityTools.checkZhongKui((Actor)pAttacker))
+                                pDamage *= 1.2f;
+                            break;
+                        case "Tian":
+                            if (KingdomAndCityTools.checkZhongKui((Actor)pAttacker))
+                                pDamage *= 1.1f;
+                            break;
+                    }
+                }
             }
+
             //人对塔伤害减免暂时去除
             //else
             //{
@@ -516,6 +1078,10 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(Actor), "updateAge")]
         public static bool updateAge(Actor __instance)
         {
+            if (__instance == null)
+            {
+                return true;
+            }
             ActorStatus data = __instance.GetData();
             MoreStats moreStats = __instance.GetMoreStats();
             MoreActorData moreData = __instance.GetMoreData();
@@ -541,476 +1107,71 @@ namespace Cultivation_Way
                     moreData.coolDown[spell.spellAssetID]--;
                 }
             }
-
             ChineseElement chunkElement = Main.instance.chunkToElement[__instance.currentTile.chunk.id];
-            ChineseElement actorElement = moreStats.element;
-            //MonoBehaviour.print(__instance + "准备");
-            //MonoBehaviour.print(Main.instance.actorToID.ContainsValue(data.actorID));
-            //ChineseElement actorElement = new ChineseElement();
-            //try
-            //{
-            //    actorElement = Main.instance.actorToMoreStats[data.actorID].element;
-            //}
-            //catch (Exception e)
-            //{
-            //    WorldTip.showNow("清理bug生物: "+data.firstName,false,"top");
-            //    __instance.killHimself();
-            //    return false;
-            //}
+            ChineseElement actorElement = moreData.element;
 
-            float exp = 5;
+            float exp = 5 + __instance.GetFamily().cultivationBook.rank;
+            float mod = 0f;
             for (int i = 0; i < 5; i++)
             {
                 int temp = chunkElement.baseElementContainer[i] % 100;
-                exp *= temp / (float)(actorElement.baseElementContainer[i] + 1);
+                mod += (temp * (actorElement.baseElementContainer[i] + 1)) / 1000f;
             }
+            exp *= mod * __instance.GetSpecialBody().rank;
             addExperiece_Prefix(__instance, (int)exp);
 
             if (data.age > 100 && Toolbox.randomChance(0.03f))
             {
                 __instance.addTrait("wise");
             }
-            //人人平等
-            //if (__instance.city != null)
-            //{
-            //    if (__instance.kingdom.king == __instance)
-            //    {
-            //        addExperiece_Prefix(__instance, 2);
-            //    }
-            //    if (__instance.city.leader == __instance)
-            //    {
-            //        addExperiece_Prefix(__instance, 1);
-            //    }
-            //}
             return false;
         }
-        //属性添加
-        [HarmonyPrefix]
+        //属性实现
+        [HarmonyTranspiler]
         [HarmonyPatch(typeof(ActorBase), "updateStats")]
-        public static bool updateStats_Prefix(Actor __instance)
+        public static IEnumerable<CodeInstruction> updateStats_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            BaseStats curStats = __instance.GetCurStats();
-            ActorStatus data = __instance.GetData();
-            #region 数据索引不存在排错（也用于新生物生成
-            if (!Main.instance.actorToMoreStats.ContainsKey(data.actorID))
-            {
-                MoreStats moreStats = new MoreStats();
-                MoreActorData moreData = new MoreActorData();
-                moreStats.spells = Main.instance.raceFeatures[__instance.stats.race].raceSpells;
-                moreData.cultisystem = moreStats.cultisystem;
-                moreData.element = moreStats.element;
-                moreData.magic = moreStats.magic;
-                if (Toolbox.randomChance(0.001f))
-                {
-                    moreData.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
-                }
-                else
-                {
-                    moreData.specialBody = "FT";
-                }
-                Main.instance.actorToMoreStats.Add(data.actorID, moreStats);
-
-                Main.instance.actorToMoreData.Add(data.actorID, moreData);
-                string name = data.firstName;
-                foreach (string fn in ChineseNameAsset.familyNameTotal)
-                {
-                    if (name.StartsWith(fn))
-                    {
-                        moreStats.family = Main.instance.familys[fn];
-                        moreData.familyID = moreStats.family.id;
-                        break;
-                    }
-                }
-                if (moreStats.family == null)
-                {
-                    moreStats.family = Main.instance.familys["甲"];
-                    moreData.familyID = moreStats.family.id;
-                }
-            }
+            List<CodeInstruction> codes = instructions.ToList();
+            #region 绑定函数
+            MethodInfo getCity = AccessTools.Method(typeof(ActorTools), "GetCity");
+            MethodInfo getMoreStats = AccessTools.Method(typeof(ActorTools), "GetMoreStats");
+            MethodInfo getCurStats = AccessTools.Method(typeof(ActorTools), "GetCurStats");
+            MethodInfo getBsFromMoreStats = AccessTools.Method(typeof(MoreStats), "GetBaseStats");
+            MethodInfo part1 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper1");
+            MethodInfo part2 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper2");
+            MethodInfo addStats = AccessTools.Method(typeof(BaseStats), "addStats", new System.Type[] { typeof(BaseStats) });
+            //MethodInfo addStats = typeof(BaseStats).GetMethod("addStats", BindingFlags.Instance | BindingFlags.NonPublic);
             #endregion
-            MoreStats morestats = __instance.GetMoreStats();
-            MoreActorData moredata = __instance.GetMoreData();
-            #region 修炼体系
-            if (__instance.getCulture() != null && moredata.cultisystem == "default")
-            {
-                List<string> cultisystem = new List<string>();
-                foreach (string tech in __instance.getCulture().list_tech_ids)
-                {
-                    if (tech.StartsWith("culti_"))
-                    {
-                        cultisystem.Add(tech);
-                    }
-                }
-                if (cultisystem.Count > 0)
-                {
-                    morestats.cultisystem = cultisystem.GetRandom().Remove(0, 6);
-                    moredata.cultisystem = morestats.cultisystem;
-                }
-            }
+            #region 属性添加处理
+            int offset = 0;
+            codes.Insert(56 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            offset++;
+            codes.Insert(56 + offset, new CodeInstruction(OpCodes.Callvirt, part1));
+            offset++;//执行part1函数(done)
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            offset++;
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, getCurStats));
+            offset++;//获取并将CurStats压入栈
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            offset++;
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, getMoreStats));
+            offset++;
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, getBsFromMoreStats));
+            offset++;//获取MoreStats的BaseStats并压入栈
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, addStats));
+            offset++;//两者相加
             #endregion
-            #region 原版其他
-            Reflection.SetField(__instance, "statsDirty", false);
-            if (__instance.stats.useSkinColors && data.skin_set == -1 && __instance.stats.color_sets != null)
-            {
-                //typeof(ActorBase).GetMethod("setSkinSet", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, null);
-                setSkinSet(__instance, "default");
-            }
-            if (__instance.stats.useSkinColors && data.skin == -1)
-            {
-                data.skin = Toolbox.randomInt(0, __instance.stats.color_sets[data.skin_set].colors.Count);
-            }
-            if (string.IsNullOrEmpty(data.mood))
-            {
-                data.mood = "normal";
-            }
-            MoodAsset moodAsset = AssetManager.moods.get(data.mood);
+            #region 性格设置（为妖族
+            codes[224 + offset] = new CodeInstruction(OpCodes.Callvirt, getCity);
+            codes[225 + offset] = new CodeInstruction(OpCodes.Nop);
             #endregion
-            #region 种族法术与各类属性
-            morestats.clear();
-            morestats.spells.AddRange(Main.instance.raceFeatures[__instance.stats.race].raceSpells);
-            int realm = data.level;
-            if (realm > 10)
-            {
-                realm = (realm + 9) / 10 + 9;
-                if (realm > 19)
-                {
-                    realm = 19;
-                }
-            }
-            if (!data.alive)
-            {
-                return false;
-            }
-            //每个境界属性均加上
-            for (int i = 0; i < realm; i++)
-            {
-                morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(morestats.cultisystem).moreStats[i]);
-                morestats.addAnotherStats(morestats.family.cultivationBook.stats[i]);
-            }
+            #region 属性规格化处理
+            codes.Insert(728 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            offset++;
+            codes.Insert(728 + offset, new CodeInstruction(OpCodes.Callvirt, part2));
+            offset++;
             #endregion
-            #region 法术去重
-            List<ExtensionSpell> fixedSpells = new List<ExtensionSpell>();
-            for (int i = 0; i < morestats.spells.Count; i++)
-            {
-                ExtensionSpell spell = morestats.spells[i];
-                ExtensionSpellAsset spellAsset = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID);
-                if (!spellAsset.bannedCultisystem.Contains(morestats.cultisystem) && __instance.kingdom != null && !spellAsset.bannedRace.Contains(__instance.kingdom.raceID))
-                {
-                    bool flag = false;
-                    for (int j = 0; j < fixedSpells.Count; j++)
-                    {
-                        ExtensionSpell spell1 = fixedSpells[j];
-                        if (spell1.spellAssetID == spellAsset.id)
-                        {
-                            flag = true;
-                            if (spell1.might < spell.might)
-                            {
-                                fixedSpells[j] = spell;
-                            }
-                            break;
-                        }
-
-                    }
-                    if (!flag)
-                    {
-                        fixedSpells.Add(spell);
-                    }
-                }
-            }
-            fixedSpells.Sort((ExtensionSpell spell1, ExtensionSpell spell2) =>
-            {
-                ExtensionSpellAsset spellAsset1 = spell1.GetSpellAsset();
-                ExtensionSpellAsset spellAsset2 = spell2.GetSpellAsset();
-                if (spellAsset1.rarity > spellAsset2.rarity)
-                {
-                    return -1;
-                }
-                else if (spellAsset1.rarity == spellAsset2.rarity)
-                {
-                    if (spellAsset1.might > spellAsset2.might)
-                    {
-                        return -1;
-                    }
-                    else if (spellAsset1.might == spellAsset2.might)
-                    {
-                        if (spellAsset1.chineseElement.getPurity() < spellAsset2.chineseElement.getPurity())
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    }
-                    else
-                    {
-                        return 1;
-                    }
-                }
-                else
-                {
-                    return 1;
-                }
-            });
-            morestats.spells.Clear();
-            morestats.spells = fixedSpells;
-            #endregion
-            #region 冷却实现
-            if (moredata.coolDown == null)
-            {
-                moredata.coolDown = new Dictionary<string, int>();
-            }
-            if (moredata.bonusStats == null)
-            {
-                moredata.bonusStats = new MoreStats();
-            }
-            if (morestats.spells.Count > 0 && moredata.coolDown.Count < morestats.spells.Count)
-            {
-                foreach (ExtensionSpell spell in morestats.spells)
-                {
-                    if (moredata.coolDown.ContainsKey(spell.spellAssetID))
-                    {
-                        continue;
-                    }
-                    moredata.coolDown[spell.spellAssetID] = spell.cooldown;
-                }
-            }
-            #endregion
-            #region 添加属性
-            morestats.addAnotherStats(moredata.bonusStats);
-            curStats.CallMethod("clear");
-            curStats.CallMethod("addStats", __instance.stats.baseStats);
-            curStats.CallMethod("addStats", moodAsset.baseStats);
-            curStats.CallMethod("addStats", morestats.baseStats);
-
-            curStats.diplomacy += data.diplomacy;
-            curStats.stewardship += data.stewardship;
-            curStats.intelligence += data.intelligence;
-            curStats.warfare += data.warfare;
-            #endregion
-            #region 原版的一堆东西（注意一个攻击方式，装备贴图，装备属性
-            if (Reflection.GetField(typeof(Actor), __instance, "activeStatusEffects") != null)
-            {
-                for (int i = 0; i < ((List<ActiveStatusEffect>)Reflection.GetField(typeof(Actor), __instance, "activeStatusEffects")).Count; i++)
-                {
-                    ActiveStatusEffect activeStatusEffect = ((List<ActiveStatusEffect>)Reflection.GetField(typeof(Actor), __instance, "activeStatusEffects"))[i];
-                    curStats.CallMethod("addStats", activeStatusEffect.asset.baseStats);
-                }
-            }
-            ItemAsset itemAsset = AssetManager.items.get(__instance.stats.defaultAttack);
-            if (itemAsset != null)
-            {
-                curStats.CallMethod("addStats", itemAsset.baseStats);
-            }
-            Reflection.SetField(__instance, "s_attackType", ((ItemAsset)__instance.CallMethod("getWeaponAsset")).attackType);
-            Reflection.SetField(__instance, "s_slashType", ((ItemAsset)__instance.CallMethod("getWeaponAsset")).slash);
-            Reflection.SetField(__instance, "item_sprite_dirty", true);
-            if (__instance.stats.use_items && !__instance.equipment.weapon.isEmpty())
-            {
-                Reflection.SetField(__instance, "s_weapon_texture", "w_" + __instance.equipment.weapon.data.id + "_" + __instance.equipment.weapon.data.material);
-            }
-            else
-            {
-                Reflection.SetField(__instance, "s_weapon_texture", string.Empty);
-            }
-            typeof(ActorBase).GetMethod("findHeadSprite", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, null);
-            for (int j = 0; j < data.traits.Count; j++)
-            {
-                string pID = data.traits[j];
-                if (pID == "eyepatch" || pID == "crippled")
-                {
-                    data.traits.Remove(pID);
-                    continue;
-                }
-                ActorTrait actorTrait = AssetManager.traits.get(pID);
-                if (actorTrait != null)
-                {
-                    curStats.CallMethod("addStats", actorTrait.baseStats);
-                }
-            }
-            if (__instance.stats.unit)
-            {
-                Reflection.SetField(__instance, "s_personality", (PersonalityAsset)null);
-                if ((__instance.kingdom != null && __instance.kingdom.isCiv() && __instance.kingdom.king == __instance) || (__instance.city != null && __instance.city.leader == __instance))
-                {
-                    string pID2 = "balanced";
-                    int num = curStats.diplomacy;
-                    if (curStats.diplomacy > curStats.stewardship)
-                    {
-                        pID2 = "diplomat";
-                        num = curStats.diplomacy;
-                    }
-                    else if (curStats.diplomacy < curStats.stewardship)
-                    {
-                        pID2 = "administrator";
-                        num = curStats.stewardship;
-                    }
-                    if (curStats.warfare > num)
-                    {
-                        pID2 = "militarist";
-                    }
-                    Reflection.SetField(__instance, "s_personality", AssetManager.personalities.get(pID2));
-                    curStats.CallMethod("addStats", ((PersonalityAsset)Reflection.GetField(typeof(Actor), __instance, "s_personality")).baseStats);
-                }
-            }
-            Reflection.SetField(__instance, "_trait_weightless", __instance.haveTrait("weightless"));
-            Reflection.SetField(__instance, "_status_frozen", __instance.CallMethod("haveStatus", "frozen"));
-            Reflection.SetField(__instance, "_trait_weightless", __instance.haveTrait("weightless"));
-            ((HashSet<string>)Reflection.GetField(typeof(Actor), __instance, "s_traits_ids")).Clear();
-            List<ActorTrait> list = (List<ActorTrait>)Reflection.GetField(typeof(Actor), __instance, "s_special_effect_traits");
-            if (list != null)
-            {
-                list.Clear();
-            }
-            for (int k = 0; k < data.traits.Count; k++)
-            {
-                string text = data.traits[k];
-                ((HashSet<string>)Reflection.GetField(typeof(Actor), __instance, "s_traits_ids")).Add(text);
-                ActorTrait actorTrait2 = AssetManager.traits.get(text);
-                if (actorTrait2 != null && actorTrait2.action_special_effect != null)
-                {
-                    if ((List<ActorTrait>)Reflection.GetField(typeof(Actor), __instance, "s_special_effect_traits") == null)
-                    {
-                        Reflection.SetField(__instance, "s_special_effect_traits", new List<ActorTrait>());
-                    }
-                    ((List<ActorTrait>)Reflection.GetField(typeof(Actor), __instance, "s_special_effect_traits")).Add(actorTrait2);
-                }
-            }
-            List<ActorTrait> list2 = (List<ActorTrait>)Reflection.GetField(typeof(Actor), __instance, "s_special_effect_traits");
-            if (list2 != null && list2.Count == 0)
-            {
-                Reflection.SetField(__instance, "s_special_effect_traits", (List<ActorTrait>)null);
-            }
-            typeof(ActorBase).GetMethod("checkMadness", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, null);
-            Reflection.SetField(__instance, "_trait_peaceful", __instance.haveTrait("peaceful"));
-            Reflection.SetField(__instance, "_trait_fire_resistant", __instance.haveTrait("fire_proof"));
-            if (__instance.stats.use_items)
-            {
-                List<ActorEquipmentSlot> list3 = ActorEquipment.getList(__instance.equipment, false);
-                for (int l = 0; l < list3.Count; l++)
-                {
-                    ActorEquipmentSlot actorEquipmentSlot = list3[l];
-                    if (actorEquipmentSlot.data != null)
-                    {
-                        ItemTools.calcItemValues(actorEquipmentSlot.data);
-                        curStats.CallMethod("addStats", ItemTools.s_stats);
-                    }
-                }
-            }
-            #endregion
-            #region 属性倍乘
-            curStats.health += (int)((float)curStats.health * (curStats.mod_health / 100f));
-            curStats.damage += (int)((float)curStats.damage * (curStats.mod_damage / 100f));
-            curStats.armor += (int)((float)curStats.armor * (curStats.mod_armor / 100f));
-            curStats.crit += (float)((int)(curStats.crit * (curStats.mod_crit / 100f)));
-            curStats.diplomacy += (int)((float)curStats.diplomacy * (curStats.mod_diplomacy / 100f));
-            curStats.speed += (float)((int)(curStats.speed * (curStats.mod_speed / 100f)));
-            curStats.attackSpeed += (float)((int)(curStats.attackSpeed * (curStats.mod_attackSpeed / 100f)));
-            #endregion
-            #region 满血
-            if ((bool)Reflection.GetField(typeof(Actor), __instance, "event_full_heal") == true)
-            {
-                Reflection.SetField(__instance, "event_full_heal", false);
-                data.health = curStats.health + (int)((float)curStats.health * (curStats.mod_health / 100f));
-            }
-            #endregion
-            #region 属性格式化
-            curStats.normalize();
-            Culture culture = __instance.getCulture();
-            if (culture != null)
-            {
-                curStats.damage = (int)((float)curStats.damage + (float)curStats.damage * culture.stats.bonus_damage.value);
-                curStats.armor = (int)((float)curStats.armor + (float)curStats.armor * culture.stats.bonus_armor.value);
-            }
-            if (curStats.health < 1)
-            {
-                curStats.health = 1;
-            }
-            if (data.health > curStats.health)
-            {
-                data.health = curStats.health;
-            }
-            if (data.health < 1)
-            {
-                data.health = 1;
-            }
-            if (curStats.damage < 1)
-            {
-                curStats.damage = 1;
-            }
-            if (curStats.speed < 1f)
-            {
-                curStats.speed = 1f;
-            }
-            if (curStats.armor < 0)
-            {
-                curStats.armor = 0;
-            }
-            int maxArmor = 80 + data.level / 6;
-            if (morestats.cultisystem == "bodying")
-            {
-                maxArmor += 5;
-            }
-            if (maxArmor > 99)
-            {
-                maxArmor = 99;
-            }
-            if (curStats.armor > maxArmor)
-            {
-                curStats.armor = maxArmor;
-            }
-            if (curStats.diplomacy < 0)
-            {
-                curStats.diplomacy = 0;
-            }
-            if (curStats.dodge < 0f)
-            {
-                curStats.dodge = 0f;
-            }
-            if (curStats.accuracy < 10f)
-            {
-                curStats.accuracy = 10f;
-            }
-            if (curStats.crit < 0f)
-            {
-                curStats.crit = 0f;
-            }
-            if (curStats.attackSpeed < 0f)
-            {
-                curStats.attackSpeed = 1f;
-            }
-            if (curStats.attackSpeed >= 300f)
-            {
-                curStats.attackSpeed = 300f;
-            }
-            if (moredata.magic > morestats.magic)
-            {
-                moredata.magic = morestats.magic;
-            }
-            Reflection.SetField(__instance, "s_attackSpeed_seconds", (300f - curStats.attackSpeed) / (100f + curStats.attackSpeed));
-            curStats.s_crit_chance = curStats.crit / 100f;
-            curStats.zones = (curStats.stewardship + 1) * 2;
-            curStats.cities = curStats.stewardship / 5 + 1;
-            curStats.army = curStats.warfare + 5;
-            curStats.bonus_towers = curStats.warfare / 10;
-            if (curStats.bonus_towers > 2)
-            {
-                curStats.bonus_towers = 2;
-            }
-            if (curStats.army < 0)
-            {
-                curStats.army = 5;
-            }
-            #endregion
-            #region 设置攻击时间与人物大小
-            Reflection.SetField(__instance, "attackTimer", 0f);
-            typeof(ActorBase).GetMethod("updateTargetScale", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, null);
-            curStats.normalize();
-            __instance.currentScale.x = curStats.scale;
-            __instance.currentScale.y = curStats.scale;
-            __instance.currentScale.z = curStats.scale;
-            #endregion
-            return false;
+            return codes;
         }
         //寿命实现
         public static bool updateAge(Race pRace, ActorStatus pData, Actor pActor)
@@ -1023,18 +1184,21 @@ namespace Cultivation_Way
                 return true;
             }
             int num = actorStats.maxAge;
-            Culture culture = MapBox.instance.cultures.get(pData.culture);
-            if (culture != null)
-            {
-                num += culture.getMaxAgeBonus();
-            }
             MoreStats morestats = pActor.GetMoreStats();
             if (morestats.maxAge == 0 && pData.level > 1)
             {
-                pActor.setStatsDirty();
+                pActor.CallMethod("updateStats");
             }
-            num += morestats.maxAge;
-            return actorStats.maxAge == 0 || num > pData.age || (morestats.maxAge == 0 && pData.level > 1) || !Toolbox.randomChance(0.15f) || pActor.haveTrait("asylum");
+            if (!actorStats.id.StartsWith("summon"))
+            {
+                num += morestats.maxAge;
+                Culture culture = MapBox.instance.cultures.get(pData.culture);
+                if (culture != null)
+                {
+                    num += culture.getMaxAgeBonus();
+                }
+            }
+            return actorStats.maxAge == 0 || num > pData.age || !Toolbox.randomChance(0.15f) || pActor.haveTrait("asylum");
         }
         //人物窗口
         [HarmonyPrefix]
@@ -1110,11 +1274,16 @@ namespace Cultivation_Way
             __instance.text_description.text = "";
             __instance.text_values.text = "";
             Color32 colorAge = Color.green;
-            if (data.age * 5 >= (Main.instance.actorToMoreStats[data.actorID].maxAge + AssetManager.unitStats.get(data.statsID).maxAge) << 2)
+            int maxAge = AssetManager.unitStats.get(data.statsID).maxAge;
+            if (!data.statsID.StartsWith("summon"))
+            {
+                maxAge += Main.instance.actorToMoreStats[data.actorID].maxAge;
+            }
+            if (data.age * 5 >= maxAge << 2)
             {
                 colorAge = Color.red;
             }
-            helper.showStat("creature_statistics_age", data.age + "/" + (Main.instance.actorToMoreStats[data.actorID].maxAge + AssetManager.unitStats.get(data.statsID).maxAge), colorAge);
+            helper.showStat("creature_statistics_age", data.age + "/" + maxAge, colorAge);
             if (selectedUnit.stats.inspect_kills)
             {
                 helper.showStat("creature_statistics_kills", data.kills);
@@ -1262,17 +1431,179 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(Actor), "killHimself")]
         public static bool killHimself_Prefix(Actor __instance)
         {
-            if (__instance.haveTrait("asylum"))
+            if (__instance == null || !__instance.GetData().alive)
+            {
+                return true;
+            }
+            if (__instance.haveTrait("asylum") && !__instance.stats.baby)
             {
                 return false;
             }
-            if (__instance.stats.id == "summonTian1")
+            if (__instance.kingdom != null)
             {
-                Main.instance.summonTian1Limit++;
+                List<Actor> actors = null;
+                if (Main.instance.kingdomBindActors.TryGetValue(__instance.kingdom.id, out actors))
+                {
+                    if(actors.Remove(__instance))
+                        MonoBehaviour.print("[MoreActors.killHimself_Prefix]"+__instance.GetData().statsID + ":" + __instance.GetData().actorID);
+                }
             }
             return true;
         }
-        //待补充
+        //小孩问题修复
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Baby), "update")]
+        public static bool update_Prefix(Baby __instance, float pElapsed)
+        {
+            if (__instance.timerGrow > pElapsed)
+            {
+                return true;
+            }
+            Actor actorF = __instance.GetComponent<Actor>();
+            ActorStatus data = actorF.GetData();
+            if (!data.alive)
+            {
+                return false;
+            }
+            if ((bool)MapBox.instance.CallMethod("isPaused"))
+            {
+                return false;
+            }
+
+            Actor actor = MapBox.instance.createNewUnit(actorF.stats.growIntoID, actorF.currentTile, null, 0f, null);
+            ActorStatus data1 = actor.GetData();
+            actor.startBabymakingTimeout();
+            data1.hunger = actor.stats.maxHunger / 2;
+            ((GameStatsData)Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data")).creaturesBorn--;
+            if (actorF.city != null)
+            {
+                actorF.city.addNewUnit(actor, true, true);
+            }
+            actor.CallMethod("setKingdom", actorF.kingdom);
+            data1.diplomacy = data.diplomacy;
+            data1.intelligence = data.intelligence;
+            data1.stewardship = data.stewardship;
+            data1.warfare = data.warfare;
+            data1.culture = data.culture;
+            data1.experience = data.experience;
+            data1.level = data.level;
+            data1.firstName = data.firstName;
+            if (data.skin != -1)
+            {
+                data1.skin = data.skin;
+            }
+            if (data.skin_set != -1)
+            {
+                data1.skin_set = data.skin_set;
+            }
+            data1.age = data.age;
+            data1.bornTime = data.bornTime;
+            data1.health = data.health;
+            data1.gender = data.gender;
+            data1.kills = data.kills;
+            foreach (string text in data.traits)
+            {
+                if (!(text == "peaceful"))
+                {
+                    actor.addTrait(text);
+                }
+            }
+            if (data.favorite)
+            {
+                data1.favorite = true;
+            }
+            if (Config.spectatorMode && MoveCamera.focusUnit == actorF)
+            {
+                MoveCamera.focusUnit = actor;
+            }
+            ActorTools.copyMore(actorF, actor);
+            actorF.killHimself(true, AttackType.GrowUp, false, false);
+            return false;
+        }
+        //蛋问题修复
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(Egg), "update", typeof(float))]
+        public static IEnumerable<CodeInstruction> update_Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> codes = instructions.ToList();
+            MethodInfo copyMore = AccessTools.Method(typeof(ActorTools), "copyMore", new System.Type[] { typeof(Actor), typeof(Actor) });
+            MethodInfo getActor = AccessTools.Method(typeof(ActorTools), "getActor", new System.Type[] { typeof(Egg) });
+            Label ret = new Label();
+
+            int offset = 0;
+            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            offset++;
+            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Callvirt, getActor));
+            offset++;
+            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldloc_0));
+            offset++;
+            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Call, copyMore));
+            offset++;
+            codes[88 + offset].labels.Add(ret);
+            codes[17].operand = ret;
+            return codes.AsEnumerable();
+        }
+        //处理新生物
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ActorBase), "generatePersonality")]
+        public static void generatePersonality_Postfix(ActorBase __instance)
+        {
+            #region 设置出生属性
+            MoreActorData moreData = new MoreActorData();
+            MoreStats moreStats = new MoreStats();
+            ActorStatus status = Reflection.GetField(typeof(ActorBase), __instance, "data") as ActorStatus;
+            Main.instance.actorToMoreStats[status.actorID] = moreStats;
+            Main.instance.actorToMoreData[status.actorID] = moreData;
+            moreData.bonusStats = new MoreStats();
+            moreData.coolDown = new Dictionary<string, int>();
+            moreData.element = new ChineseElement();
+            moreStats.maxAge = __instance.stats.maxAge;
+            //获取修炼体系
+            if (__instance.getCulture() != null)
+            {
+                List<string> cultisystem = new List<string>();
+                Culture culture = __instance.getCulture();
+                foreach (string tech in culture.list_tech_ids)
+                {
+                    if (tech.StartsWith("culti_"))
+                    {
+                        cultisystem.Add(tech);
+                    }
+                }
+                if (cultisystem.Count > 0)
+                {
+                    moreData.cultisystem = cultisystem.GetRandom().Remove(0, 6);
+                }
+            }
+            if (!MoreRaces.isCitizen((Actor)__instance))
+            {
+                if (Toolbox.randomChance(0.6f))
+                {
+                    moreData.canCultivate = false;
+                }
+            }
+            if (Toolbox.randomChance(0.001f))
+            {
+                moreData.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+            }
+            //设置名字
+            if (!__instance.stats.unit)
+            {
+                moreData.familyName = AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_endList.GetRandom();
+                moreData.familyID = moreData.familyName;
+                status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, moreData.familyName, false);
+            }
+            else
+            {
+                moreData.familyName = AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_startList.GetRandom();
+                moreData.familyID = moreData.familyName;
+                status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, moreData.familyName, true);
+            }
+            Family family = Main.instance.familys[moreData.familyID];
+            family.num++;
+            #endregion
+        }
+
         #endregion
     }
 }

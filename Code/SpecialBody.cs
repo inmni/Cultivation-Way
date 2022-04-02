@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    public class SpecialBody:Asset
+    public class SpecialBody : Asset
     {
         public string name;//名字
         public string madeBy;//创造者

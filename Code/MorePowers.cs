@@ -1,10 +1,10 @@
-﻿using NCMS.Utils;
+﻿using CultivationWay;
+using NCMS.Utils;
+using System.IO;
+using System.Net;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using CultivationWay;
-using System.Linq;
-using System.Collections.Generic;
-using System;
 
 namespace Cultivation_Way
 {
@@ -77,6 +77,15 @@ namespace Cultivation_Way
 
             Utils.TabHelper.AddButtonToTab(button);
 
+            button = PowerButtons.CreateButton("Update", Sprites.LoadSprite($"{Main.mainPath}/icon.png", -0.5f, -0.5f),
+           "前往更新模组", "目前不支持自动更新", Vector3.zero, ButtonType.Click, null, clickForUpdate);
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("CultivationWayLaw", Resources.Load<Sprite>("ui/icons/iconworldlaws"),
+                "世界道则", "", Vector3.zero, ButtonType.Click, null, clickForWindow_MoreWorldLaws);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
             button = PowerButtons.CreateButton("Top", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconTop.png"),
                 "天榜", "", Vector3.zero, ButtonType.Click, null, clickForWindow_Top);
 
@@ -90,6 +99,7 @@ namespace Cultivation_Way
             toggleIcon.AddComponent<Image>();
             toggleIcon.AddComponent<ToggleIcon>();
             toggleIcon.GetComponent<Image>().sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconCheckElementOff.png");
+            toggleIcon.GetComponent<Image>().transform.localScale = new Vector3(0.5f, 0.5f, 0);
             toggleIcon.GetComponent<ToggleIcon>().spriteON = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconCheckElementOn.png");
             toggleIcon.GetComponent<ToggleIcon>().spriteOFF = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconCheckElementOff.png");
             toggleIcon.transform.SetParent(button.transform);
@@ -120,33 +130,72 @@ namespace Cultivation_Way
             #endregion
 
             #region 生物
-            button = PowerButtons.CreateButton("spawnTian", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconTian.png"),
+            button = PowerButtons.CreateButton("spawnEasternHuman", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconEasternHuman.png"),
+                "东方人族", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("spawnTian", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconTian.png"),
                 "天族", "天，颠也。颠者，人之顶也。", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("spawnMing", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconMing.png"),
+            button = PowerButtons.CreateButton("spawnYao", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconYao.png"),
+                "妖族", "妖者，盖精气之依物者也", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("spawnMing", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconMing.png"),
                 "冥族", "冥者，明之藏也。", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
 
             Utils.TabHelper.AddLine();
 
-            button = PowerButtons.CreateButton("spawnEasternDragon", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconEasternDragon.png"),
+            button = PowerButtons.CreateButton("spawnEasternDragon", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconEasternDragon.png"),
                 "龙", "", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("spawnFairyFox", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconFairyFox.png"),
+            button = PowerButtons.CreateButton("spawnFairyFox", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconFairyFox.png"),
                 "仙狐", "", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
+            #region 妖圣
+            button = PowerButtons.CreateButton("spawnMonkeySheng1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconMonkeySheng1.png"),
+                "齐天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            Utils.TabHelper.AddButtonToTab(button);
 
+            button = PowerButtons.CreateButton("spawnMonkeySheng2", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconMonkeySheng2.png"),
+                "通风大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+            button = PowerButtons.CreateButton("spawnCowSheng", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconCowSheng.png"),
+                "平天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+            button = PowerButtons.CreateButton("spawnCatSheng", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconCatSheng.png"),
+                "移山大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+            button = PowerButtons.CreateButton("spawnWolfSheng", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconWolfSheng.png"),
+                "驱神大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+            button = PowerButtons.CreateButton("spawnSnakeSheng", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconSnakeSheng.png"),
+                "覆海大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+            button = PowerButtons.CreateButton("spawnChickenSheng", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconChickenSheng.png"),
+                "混天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+            #endregion
             Utils.TabHelper.AddLine();
             #endregion
 
             #region BOSS
-            button = PowerButtons.CreateButton("spawnJiaoDragon", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconJiaoDragon.png"),
+            button = PowerButtons.CreateButton("spawnJiaoDragon", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconJiaoDragon.png"),
                 "蛟龙", "蛟，龙之属也。", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
@@ -155,16 +204,29 @@ namespace Cultivation_Way
             //    "邪龙", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
 
             //Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("spawnFuRen", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconFuRen.png"),
+                "福人", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
+            button = PowerButtons.CreateButton("spawnNian", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconNian.png"),
+                "年","", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
             #endregion
 
             #region 彩蛋
-            button = PowerButtons.CreateButton("spawnMengZhu", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconMengZhu.png"),
+            button = PowerButtons.CreateButton("spawnMengZhu", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconMengZhu.png"),
                 "盟主", "変態盟主", Vector3.zero, ButtonType.GodPower, null, null);
 
             Utils.TabHelper.AddButtonToTab(button);
             #endregion
         }
-
+        public static void clickForWindow_MoreWorldLaws()
+        {
+            Windows.ShowWindow("window_MoreWorldLaws");
+        }
         public static void tabButtonClick()
         {
             GameObject tab = GameObjects.FindEvenInactive("Tab_Cultivation_Way");
@@ -175,7 +237,7 @@ namespace Cultivation_Way
         {
             Config.timeScale += 10;
             WorldTip.showNow("当前时间流速为" + Config.timeScale + "倍", false, "top");
-            
+
         }
         public static void minusTimeScale()
         {
@@ -197,7 +259,7 @@ namespace Cultivation_Way
             //GC.Collect();
             //MonoBehaviour.print("=>" + Main.instance.actorToMoreData.Count);
             //MonoBehaviour.print("**************************");
-            
+
             //MonoBehaviour.print("[修真之路Cultivation Way]:某区块五行元素含量依次为:");
             //for (int i = 0; i < 5; i++)
             //{
@@ -207,13 +269,80 @@ namespace Cultivation_Way
         }
         public static void clickForWindow_AboutThis()
         {
-            Windows.ShowWindow("AboutThis");
+            Windows.ShowWindow("window_AboutThis");
         }
         public static void clickForWindow_Top()
         {
             WindowTops windowTops = new WindowTops();
             windowTops.set();
-            Windows.ShowWindow("windowTop");
+            Windows.ShowWindow("window_Top");
+        }
+        public static void clickForUpdate()
+        {
+            //Thread t = new Thread(new ThreadStart(update));
+            //t.Start();
+            update();
+        }
+
+        public static void update()
+        {
+            string webSite = @"https://www.worldboxmod.com/forum.php?mod=viewthread&tid=280&extra=page%3D1"; //这里url必须带上协议
+            Application.OpenURL(webSite);
+            //var wc = new WebClient();
+            //wc.DownloadFile("link", $"D:\\Steam\\steamapps\\common\\worldbox\\{text}.rar");
+
+
+
+        }
+        public static string Fetch(string url, string charset)
+        {
+            Encoding encoding;
+            HttpWebRequest request;
+            HttpWebResponse response = null;
+            Stream resStream = null;
+            StreamReader sr = null;
+            string result = string.Empty;
+            try
+            {
+                request = (HttpWebRequest)HttpWebRequest.Create(url);
+                response = (HttpWebResponse)request.GetResponse();
+                resStream = response.GetResponseStream();
+                if (!string.IsNullOrEmpty(charset))
+                {
+                    encoding = Encoding.GetEncoding(charset);
+                }
+                else if (!string.IsNullOrEmpty(response.CharacterSet))
+                {
+                    encoding = Encoding.GetEncoding(response.CharacterSet);
+                }
+                else
+                {
+                    encoding = Encoding.Default;
+                }
+                sr = new StreamReader(resStream, encoding);
+                result = sr.ReadToEnd();
+            }
+            //catch (Exception ex)          
+            //{             
+            //    throw ex;
+            //}            
+            finally
+            {
+                if (sr != null)
+                {
+                    sr.Close();
+                }
+                if (resStream != null)
+                {
+                    resStream.Close();
+                }
+                if (response != null)
+                {
+                    response.Close();
+                }
+            }
+            return result;
         }
     }
 }
+

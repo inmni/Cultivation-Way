@@ -113,12 +113,12 @@ namespace Cultivation_Way
             //}
             //Debug.Log(properties.Length);
             ActorStatus data = Config.selectedUnit.GetData();
-            MoreStats stats = Main.instance.actorToMoreStats[data.actorID];
-            
+            MoreStats stats = Config.selectedUnit.GetMoreStats();
+            MoreActorData moredata = Config.selectedUnit.GetMoreData();
             item.Add("family");
-            value.Add(stats.family.id+"氏");
+            value.Add(moredata.familyID + "氏");
             item.Add("cultivationBook");
-            value.Add(stats.family.cultivationBook.bookName);
+            value.Add(Main.instance.familys[moredata.familyID].cultivationBook.bookName);
             item.Add("specialBody");
             value.Add(Config.selectedUnit.GetSpecialBody().name);
             item.Add("origin");
@@ -126,26 +126,26 @@ namespace Cultivation_Way
             item.Add("madeBy");
             value.Add(Config.selectedUnit.GetSpecialBody().madeBy);
             item.Add("elementType");
-            value.Add(stats.element.element.name + "灵根");
-            item.Add("Gold");
-            value.Add(stats.element.baseElementContainer[0] + "%");
-            item.Add("Wood");
-            value.Add(stats.element.baseElementContainer[1] + "%");
-            item.Add("Water");
-            value.Add(stats.element.baseElementContainer[2] + "%");
-            item.Add("Fire");
-            value.Add(stats.element.baseElementContainer[3] + "%");
-            item.Add("Ground");
-            value.Add(stats.element.baseElementContainer[4] + "%");
+            value.Add(moredata.element.name + "灵根");
+            item.Add("elementGold");
+            value.Add(moredata.element.baseElementContainer[0] + "%");
+            item.Add("elementWood");
+            value.Add(moredata.element.baseElementContainer[1] + "%");
+            item.Add("elementWater");
+            value.Add(moredata.element.baseElementContainer[2] + "%");
+            item.Add("elementFire");
+            value.Add(moredata.element.baseElementContainer[3] + "%");
+            item.Add("elementGround");
+            value.Add(moredata.element.baseElementContainer[4] + "%");
             item.Add("cultisystem");
-            value.Add(((CultisystemLibrary)AssetManager.instance.dict["cultisystem"]).get(stats.cultisystem).name);
+            value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).name);
             item.Add("realm");
             int realm = data.level;
             if (realm > 10)
             {
-                realm = (realm + 9) / 10+9;
+                realm = (realm + 9) / 10 + 9;
             }
-            value.Add(((CultisystemLibrary)AssetManager.instance.dict["cultisystem"]).get(stats.cultisystem).realms[realm-1]);
+            value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).realms[realm - 1]);
 
             item.Add("magic");
             value.Add(Main.instance.actorToMoreData[data.actorID].magic + "/" + stats.magic);
@@ -157,9 +157,9 @@ namespace Cultivation_Way
             int length = item.Count;
             for (int i = 0; i < length; i++)
             {
-                int tmpLength = lineLength - LocalizedTextManager.getText(item[i]).Length*2 - value[i].Length;
+                int tmpLength = lineLength - LocalizedTextManager.getText(item[i]).Length * 2 - value[i].Length;
                 stringBuilder.Append(LocalizedTextManager.getText(item[i]));
-                for(int j = 0; j < tmpLength; j++)
+                for (int j = 0; j < tmpLength; j++)
                 {
                     stringBuilder.Append(" ");
                 }

@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using UnityEngine;
-using Cultivation_Way.Utils;
-using ReflectionUtility;
+﻿using Cultivation_Way.Utils;
 using CultivationWay;
-using System.Diagnostics;
-using HarmonyLib;
+using ReflectionUtility;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cultivation_Way
 {
@@ -38,6 +31,20 @@ namespace Cultivation_Way
 
             return true;
         }
+        //基础术法
+        public static bool baseSpell(ExtensionSpell spell,BaseSimObject pUser= null,BaseSimObject pTarget = null)
+        {
+            if (pUser == pTarget || pUser == null || pTarget == null)
+            {
+                return false;
+            }
+            string realSpell = OthersHelper.getRealBaseSpell(((Actor)pUser).GetMoreData().element);
+            Projectile p = Utils.OthersHelper.startProjectile(realSpell, pUser, pTarget);
+            Reflection.SetField(p, "byWho", (Actor)pUser);
+            p.setStats(((Actor)pUser).GetCurStats());
+            p.targetObject = pTarget;
+            return true;
+        }
         //雷法
         public static bool lightningSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
@@ -45,12 +52,12 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            OthersHelper.hitEnemiesInRange(pUser, pTarget, 6f, 0f,spell);
+            OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 6f, 0f, spell);
             if (Toolbox.randomChance(spell.might / 1000))
             {
                 MapBox.instance.startShake();
             }
-            Vector2 target = new Vector2(pTarget.currentPosition.x+0.55f, pTarget.currentPosition.y - 7f);
+            Vector2 target = new Vector2(pTarget.currentPosition.x + 0.55f, pTarget.currentPosition.y - 7f);
             Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, 3f);
             return true;
         }
@@ -60,8 +67,8 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y+2.2f);
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, ((Actor)pUser).GetData().level/20f);
+            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y + 2.2f);
+            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, ((Actor)pUser).GetData().level / 20f);
             float oriDamage = OthersHelper.getSpellDamage(spell, pUser, pTarget);
             //再进行伤害处理
             if (pTarget.objectType == MapObjectType.Actor)
@@ -82,8 +89,8 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            OthersHelper.hitEnemiesInRange(pUser, pTarget, 2f, 0f,spell);
-            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y-1.5f);
+            OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 2f, 0f, spell);
+            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y - 1.5f);
             Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, 1f);
             return true;
         }
@@ -94,19 +101,19 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            OthersHelper.hitEnemiesInRange(pUser, pTarget, 4f, 0f,spell);
+            OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 4f, 0f, spell);
             Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y - 5f);
             ResourcesHelper.playSpell(spell.spellAssetID, target, target, 2f);
             return true;
         }
         //激光，目前只用于蛟龙
-        public static bool laserSpell(ExtensionSpell spell,BaseSimObject pUser =null,BaseSimObject pTarget = null)
+        public static bool laserSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-            if (pUser == pTarget||pUser==null||pTarget==null)
+            if (pUser == pTarget || pUser == null || pTarget == null)
             {
                 return false;
             }
-            OthersHelper.hitEnemiesInRange(pUser, pTarget, 10f, 0f,spell);
+            OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 10f, 0f, spell);
             Vector3 start = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y + 2.5f);
             Vector3 end = new Vector3(pTarget.currentTile.posV3.x, pTarget.currentTile.posV3.y);
 
@@ -118,20 +125,62 @@ namespace Cultivation_Way
             }
 
             BaseSpellEffectController baseEffectController = Main.instance.spellEffects.get(spell.spellAssetID);
-            BaseSpellEffect baseEffect = ((baseEffectController != null) ? baseEffectController.spawnAt(new Vector3(end.x, end.y+ 2.8f), new Vector3(xScale * 0.02f, 0.2f, 0), new Vector3(0f, end.y - start.y, angle)) : null);
+            BaseSpellEffect baseEffect = ((baseEffectController != null) ? baseEffectController.spawnAt(new Vector3(end.x, end.y + 2.8f), new Vector3(xScale * 0.02f, 0.2f, 0), new Vector3(0f, end.y - start.y, angle)) : null);
 
             return true;
         }
-        //基础召唤
-        public static bool summonSpell(ExtensionSpell spell,BaseSimObject pUser = null,BaseSimObject pTarget = null)
+        public static bool barSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-            if (pUser == null||((Actor)pUser).stats.race.Contains("summon"))
+            if (pUser == pTarget || pUser == null || pTarget == null)
             {
                 return false;
             }
-            int num = (int)spell.might;//威力取整作为召唤生物的个数
+            OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 10f, 0f, spell);
+            Vector3 start = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y - 0.5f);
+            Vector3 end = new Vector3(pTarget.currentTile.posV3.x, pTarget.currentTile.posV3.y - 0.5f);
+            float angle = OthersHelper.getAngle(start, end);
+            BaseSpellEffectController baseEffectController1 = Main.instance.spellEffects.get(spell.spellAssetID);
+            BaseSpellEffectController baseEffectController2 = Main.instance.spellEffects.get(spell.spellAssetID);
+            BaseSpellEffectController baseEffectController3 = Main.instance.spellEffects.get(spell.spellAssetID);
+            BaseSpellEffectController baseEffectController4 = Main.instance.spellEffects.get(spell.spellAssetID);
 
-            for(int i = 0; i < num; i++)
+            BaseSpellEffect baseEffect1 = ((baseEffectController1 != null) ? baseEffectController1.spawnAt(end, new Vector3(-0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, 135)) : null);
+            BaseSpellEffect baseEffect2 = ((baseEffectController2 != null) ? baseEffectController2.spawnAt(end, new Vector3(0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, -135)) : null);
+            BaseSpellEffect baseEffect3 = ((baseEffectController3 != null) ? baseEffectController3.spawnAt(end, new Vector3(0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, 45)) : null);
+            BaseSpellEffect baseEffect4 = ((baseEffectController4 != null) ? baseEffectController4.spawnAt(end, new Vector3(-0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, -45)) : null);
+
+            return true;
+        }
+        public static bool barDownSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == pTarget || pUser == null || pTarget == null)
+            {
+                return false;
+            }
+            float rad = 15f;
+            float t = 1.5f;
+            OthersHelper.hitEnemiesInRange(pUser, pUser.currentTile, rad, 0f, spell);
+            Vector3 end1 = new Vector3(pUser.currentTile.posV3.x + 7.2f, pUser.currentTile.posV3.y);
+            Vector3 end2 = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y + 6f);
+            Vector3 end3 = new Vector3(pUser.currentTile.posV3.x - 7.2f, pUser.currentTile.posV3.y);
+            Vector3 end4 = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y - 6f);
+            ResourcesHelper.playSpell(spell.spellAssetID, end1, end1, t);
+            ResourcesHelper.playSpell(spell.spellAssetID, end1, end2, t);
+            ResourcesHelper.playSpell(spell.spellAssetID, end1, end3, t);
+            ResourcesHelper.playSpell(spell.spellAssetID, end1, end4, t);
+            return true;
+        }
+        //骷髅召唤
+        public static bool summonSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || ((Actor)pUser).stats.race.Contains("summon"))
+            {
+                return false;
+            }
+            int level = ((Actor)pUser).GetData().level;
+            int num = (int)spell.might + level / 30;//威力取整作为召唤生物的个数
+
+            for (int i = 0; i < num; i++)
             {
                 WorldTile tile = pUser.currentTile.neighboursAll.GetRandom();
                 Utils.ResourcesHelper.playSpell(spell.spellAssetID, tile.posV3, tile.posV3, 1f);
@@ -140,22 +189,22 @@ namespace Cultivation_Way
                 ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
                 ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setTask("warrior_army_follow_leader");
                 summoned.GetData().profession = UnitProfession.Warrior;
-                
+
                 summoned.kingdom = pUser.kingdom;
                 if (pUser.city != null)
                 {
                     pUser.city.addNewUnit(summoned);
                 }
-                if (((Actor)pUser).GetData().level > 10)
+                if (((Actor)pUser).GetData().level > 10 - level / 11)
                 {
-                    summoned.GetData().level = ((Actor)pUser).GetData().level - 10;
+                    summoned.GetData().level = ((Actor)pUser).GetData().level - 10 + level / 11;
                 }
                 else
                 {
                     summoned.GetData().level = 1;
                 }
                 summoned.GetData().firstName = ((Actor)pUser).GetData().firstName + "召唤物";
-                summoned.GetData().health = ((Actor)pUser).GetCurStats().health / 10;
+                summoned.GetData().health = ((Actor)pUser).GetCurStats().health / 3;
                 summoned.setStatsDirty();
             }
             return true;
@@ -170,37 +219,38 @@ namespace Cultivation_Way
             int num = (int)spell.might;//威力取整作为召唤生物的等级因素
             //设置生成位置和动画位置
             WorldTile tile1 = pUser.currentTile;
-            Vector2 pos = new Vector2(tile1.posV3.x+3f, tile1.posV3.y+12f);
+            Vector2 pos = new Vector2(tile1.posV3.x + 3f, tile1.posV3.y + 12f);
             Actor summoned = MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
+            Reflection.SetField(summoned, "hitboxZ", 10f);
             Utils.ResourcesHelper.playSpell(spell.spellAssetID, pos, pos, 15f);
-            
+
             ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
-                summoned.GetData().profession = UnitProfession.Warrior;
-                summoned.kingdom = pUser.kingdom;
-                if (pUser.city != null)
-                {
-                    pUser.city.addNewUnit(summoned);
-                }
-                if (((Actor)pUser).GetData().level > 10-num)
-                {
-                    summoned.GetData().level = ((Actor)pUser).GetData().level -10+ num;
-                }
-                else
-                {
-                    summoned.GetData().level = 1;
-                }
-                summoned.GetData().firstName = ((Actor)pUser).GetData().firstName + "召唤物";
-                summoned.GetData().health = ((Actor)pUser).GetCurStats().health;
-                summoned.setStatsDirty();
+            summoned.GetData().profession = UnitProfession.Warrior;
+            summoned.kingdom = pUser.kingdom;
+            if (pUser.city != null)
+            {
+                pUser.city.addNewUnit(summoned);
+            }
+            if (((Actor)pUser).GetData().level > 10 - num)
+            {
+                summoned.GetData().level = ((Actor)pUser).GetData().level - 10 + num;
+            }
+            else
+            {
+                summoned.GetData().level = 1;
+            }
+            summoned.GetData().firstName = ((Actor)pUser).GetData().firstName + "召唤物";
+            summoned.GetData().health = ((Actor)pUser).GetCurStats().health;
+            summoned.setStatsDirty();
             return true;
         }
         public static bool summonTianSpell1(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-            if (pUser == null || ((Actor)pUser).stats.race.Contains("summon")||Main.instance.summonTian1Limit<=0)
+            if (pUser == null || ((Actor)pUser).stats.race.Contains("summon") || Main.instance.creatureLimit[spell.spellAssetID] <= 0)
             {
                 return false;
             }
-            Main.instance.summonTian1Limit--;
+            Main.instance.creatureLimit[spell.spellAssetID]--;
             //设置生成位置和动画位置
             WorldTile tile1 = pUser.currentTile;
             Vector2 pos = new Vector2(tile1.posV3.x, tile1.posV3.y);
@@ -211,53 +261,27 @@ namespace Cultivation_Way
             {
                 pUser.city.addNewUnit(summoned);
             }
-            if (((Actor)pUser).kingdom.king == ((Actor)pUser))
+            ((Actor)pUser).kingdom.setKing(summoned);
+            int level = MapBox.instance.mapStats.year / 50 + 1;
+            if (level > 110)
             {
-                ((Actor)pUser).kingdom.king = summoned;
+                level = 110;
             }
-            else if (((Actor)pUser).city.leader == ((Actor)pUser))
-            {
-                ((Actor)pUser).city.leader = summoned;
-            }
-            else
-            {
-                ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("defender");
-                summoned.GetData().profession = UnitProfession.Warrior;
-            }
-            summoned.GetData().level = 110;
+            summoned.GetData().level = level;
             summoned.GetData().health = int.MaxValue >> 2;
             #region 复制
-            summoned.GetData().actorID = ((Actor)pUser).GetData().actorID;
-            ai.ActorTool.copyUnitToOtherUnit((Actor)pUser, summoned);
             Reflection.SetField(summoned, "s_personality", (PersonalityAsset)Reflection.GetField(typeof(Actor), (Actor)pUser, "s_personality"));
-            MoreActorData copyData = new MoreActorData();
-            MoreActorData originData = ((Actor)pUser).GetMoreData();
-            copyData.bonusStats = originData.bonusStats;
-            copyData.coolDown = originData.coolDown;
-            copyData.cultisystem = originData.cultisystem;
-            copyData.element = originData.element;
-            copyData.familyID = originData.familyID;
-            copyData.magic = originData.magic;
-            copyData.specialBody = originData.specialBody;
-            MoreStats copyStats = new MoreStats();
-            copyStats.element = copyData.element;
-            copyStats.cultisystem = copyData.cultisystem;
-            copyStats.family = Main.instance.familys[copyData.familyID];
-            //ItemGenerator.generateItem(AssetManager.items.get("summonTian1"), "adamantine", summoned.equipment.weapon,
-            //                           0, "天族帝国", null, 10);
-            ((Actor)pUser).killHimself(true, AttackType.GrowUp, false, false);
-            Main.instance.actorToMoreData[summoned.GetData().actorID] = copyData;
-            Main.instance.actorToMoreStats[summoned.GetData().actorID] = copyStats;
+            ActorTools.copyActor((Actor)pUser, summoned);
+            ((Actor)pUser).killHimself(false, AttackType.GrowUp, false, false);
             #endregion
             summoned.setStatsDirty();
-            summoned.CallMethod("updateStats");
             return true;
         }
         //法相天地
         public static bool Shengtixianhua(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
 
-            if(pUser==null||((Actor)pUser).GetData().health< ((Actor)pUser).GetCurStats().health*3/4)
+            if (pUser == null || ((Actor)pUser).GetData().health < ((Actor)pUser).GetCurStats().health * 3 / 4)
             {
                 return false;
             }
@@ -266,7 +290,7 @@ namespace Cultivation_Way
             SpecialBody body = ((Actor)pUser).GetSpecialBody();
             if (body.rank > 1)
             {
-                BaseSpellEffectController baseEffectController = Main.instance.spellEffects.get(body.origin);
+                BaseSpellEffectController baseEffectController = Main.instance.spellEffects.get(Utils.OthersHelper.getOriginBodyID(body));
                 BaseSpellEffect baseEffect = ((baseEffectController != null) ? baseEffectController.spawnAt(start, 0.1f, true, (Actor)pUser, time, 0, 2f) : null);
             }
 
@@ -282,14 +306,14 @@ namespace Cultivation_Way
             MoreStats punishStats = -0.3f * bonusStats;
             new BonusStatsManager((Actor)pUser, bonusStats, time, punishStats);
             pUser.setStatsDirty();
-            
+
             return true;
         }
 
 
 
         #region 通过游戏原版的委托进行的非交互法术
-        public static bool bLightningSpell(BaseSimObject pUser,WorldTile pTile=null)
+        public static bool bLightningSpell(BaseSimObject pUser, WorldTile pTile = null)
         {//目前只适用建筑
 
             if (pUser == null)
@@ -300,19 +324,111 @@ namespace Cultivation_Way
             {
                 pTile = pUser.currentTile;
             }
-            Vector2 pos = new Vector2(pTile.posV3.x, pTile.posV3.y-5f);
-            Utils.ResourcesHelper.playSpell("lightningPunishment", pos, pos, 3f);
+            Vector2 pos = new Vector2(pTile.posV3.x, pTile.posV3.y - 5f);
+            Utils.ResourcesHelper.playSpell("lightningPunishment", pos, pos, 8f);
             List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 6f);
-            foreach(Actor target in targets)
+            foreach (Actor target in targets)
             {
                 if (target.GetData().alive)
                 {
-                    target.CallMethod("getHit", 300f, true, AttackType.Age, null, true);
+                    target.CallMethod("getHit", 300f, true, AttackType.None, null, true);
                 }
             }
             return true;
         }
-
+        public static bool aTransformToGod(BaseSimObject pUser, WorldTile pTile = null)
+        {
+            if (((Actor)pUser).GetData().level <= 10 || Toolbox.randomChance(0.15f))
+            {
+                return false;
+            }
+            string godID = "";
+            foreach(string key in Main.instance.godList.Keys)
+            {
+                if (Main.instance.creatureLimit[key] > 0)
+                {
+                    godID = key;
+                    break;
+                }
+            }
+            if (godID == string.Empty)
+            {
+                return false;
+            }
+            Main.instance.creatureLimit[godID]--;
+            Actor god = MapBox.instance.createNewUnit(godID, pTile);
+            ActorTools.copyActor((Actor)pUser, god);
+            god.kingdom = pUser.kingdom;
+            god.city = pUser.city;
+            if (Main.instance.kingdomBindActors.ContainsKey(god.kingdom.id))
+            {
+                Main.instance.kingdomBindActors[god.kingdom.id].Add(god);
+            }
+            god.GetData().health = int.MaxValue >> 2;
+            god.GetData().level = ((Actor)pUser).GetData().level;
+            god.GetData().firstName = Main.instance.godList[godID];
+            return true;
+        }
+        public static bool aWaterPoleDamage(BaseSimObject pUser, WorldTile pTile = null)
+        {
+            if (pUser == null)
+            {
+                return false;
+            }
+            if (pTile == null)
+            {
+                pTile = pUser.currentTile;
+            }
+            List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 3f);
+            float damage = ((Actor)pUser).GetCurStats().damage * 5f;
+            foreach (Actor target in targets)
+            {
+                if (target.GetData().alive)
+                {
+                    target.CallMethod("getHit", damage, true, AttackType.Other, null, true);
+                }
+            }
+            return true;
+        }
+        public static bool aFireworkDamage(BaseSimObject pUser,WorldTile pTile = null)
+        {
+            if (pUser == null)
+            {
+                return false;
+            }
+            List<WorldTile> tiles = OthersHelper.getTilesInRange(pTile, 20f);
+            bool hasFound = false;
+            foreach(WorldTile tile in tiles)
+            {
+                foreach(Actor actor in tile.units)
+                {
+                    if (actor.stats.id == "Nian")
+                    {
+                        pTile = actor.currentTile;
+                        actor.CallMethod("getHit", 5000, true, AttackType.None, pUser, true);
+                        hasFound = true;
+                        break;
+                    }
+                }
+                if (hasFound)
+                {
+                    break;
+                }
+            }
+            Vector2 pos = new Vector2();
+            Utils.ResourcesHelper.playSpell("firework", pUser.currentTile.pos, pTile.pos, 20f);
+            return true;
+        }
+        public static bool aNianDie(BaseSimObject pUser, WorldTile pTile = null)
+        {
+            if (pUser == null)
+            {
+                return false;
+            }
+            pTile = pUser.currentTile;
+            Utils.ResourcesHelper.playSpell("happySpringFestival", pTile.pos, pTile.pos, 20f);
+            return true;
+        }
         #endregion
     }
 }

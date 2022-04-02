@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cultivation_Way
 {
+    /// <summary>
+    /// Copied from game
+    /// </summary>
     class BaseSpellEffectController : MonoBehaviour
     {
+
         public WorldTile currentTile;
 
         public Vector3 zPosition;
@@ -77,7 +77,7 @@ namespace Cultivation_Way
         }
         internal void addNewObject(BaseSpellEffect pEffect)
         {
-            pEffect.setWorld();
+            pEffect.world = MapBox.instance;
             pEffect.controller = this;
             pEffect.transform.parent = base.transform;
         }
@@ -126,124 +126,124 @@ namespace Cultivation_Way
                 this.create();
             }
         }
-		public void update(float pElapsed)
-		{
-			this.updateChildren(pElapsed);
-			this.updateSpawn(pElapsed);
-		}
+        public void update(float pElapsed)
+        {
+            this.updateChildren(pElapsed);
+            this.updateSpawn(pElapsed);
+        }
 
-		private void updateSpawn(float pElapsed)
-		{
-			if ((bool)ReflectionUtility.Reflection.GetField(typeof(MapBox),world,"_isPaused"))
-			{
-				return;
-			}
-			if (this.useInterval)
-			{
-				if (this.timer > 0f)
-				{
-					this.timer -= pElapsed;
-					return;
-				}
-				this.timer = this.timer_interval;
-				this.spawn();
-			}
-		}
+        private void updateSpawn(float pElapsed)
+        {
+            if ((bool)ReflectionUtility.Reflection.GetField(typeof(MapBox), world, "_isPaused"))
+            {
+                return;
+            }
+            if (this.useInterval)
+            {
+                if (this.timer > 0f)
+                {
+                    this.timer -= pElapsed;
+                    return;
+                }
+                this.timer = this.timer_interval;
+                this.spawn();
+            }
+        }
 
-		private void updateChildren(float pElapsed)
-		{
-			for (int i = this.activeIndex - 1; i >= 0; i--)
-			{
-				BaseSpellEffect baseEffect = this.list[i];
-				if (baseEffect.created && baseEffect.active)
-				{
-					baseEffect.update(pElapsed);
-				}
-			}
-		}
+        private void updateChildren(float pElapsed)
+        {
+            for (int i = this.activeIndex - 1; i >= 0; i--)
+            {
+                BaseSpellEffect baseEffect = this.list[i];
+                if (baseEffect.created && baseEffect.active)
+                {
+                    baseEffect.update(pElapsed);
+                }
+            }
+        }
 
-		public virtual void spawn()
-		{
-		}
+        public virtual void spawn()
+        {
+        }
 
-		public BaseSpellEffect spawnNew()
-		{
-			if (this.isInLimit())
-			{
-				return null;
-			}
-			BaseSpellEffect @object = this.GetObject();
-			if (@object.spriteAnimation != null)
-			{
-				@object.spriteAnimation.resetAnim(0);
-			}
-			return @object;
-		}
+        public BaseSpellEffect spawnNew()
+        {
+            if (this.isInLimit())
+            {
+                return null;
+            }
+            BaseSpellEffect @object = this.GetObject();
+            if (@object.spriteAnimation != null)
+            {
+                @object.spriteAnimation.resetAnim(0);
+            }
+            return @object;
+        }
 
-		internal virtual BaseSpellEffect spawnAt(WorldTile pTile, float pScale = 0.5f, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
-		{
-			if (this.isInLimit())
-			{
-				return null;
-			}
-			BaseSpellEffect @object = this.GetObject();
-			@object.prepare(pTile, pScale);
-			@object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
-			return @object;
-		}
+        internal virtual BaseSpellEffect spawnAt(WorldTile pTile, float pScale = 0.5f, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
+        {
+            if (this.isInLimit())
+            {
+                return null;
+            }
+            BaseSpellEffect @object = this.GetObject();
+            @object.prepare(pTile, pScale);
+            @object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
+            return @object;
+        }
 
-		internal virtual BaseSpellEffect spawnAt(Vector3 pVector, float pScale = 0.5f, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
-		{
-			if (this.isInLimit())
-			{
-				return null;
-			}
-			BaseSpellEffect @object = this.GetObject();
-			@object.prepare(pVector, pScale);
-			@object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
-			return @object;
-		}
-		internal virtual BaseSpellEffect spawnAt(Vector3 pVector, Vector3 scale,Vector3 eulerAngle, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
-		{
-			if (this.isInLimit())
-			{
-				return null;
-			}
-			BaseSpellEffect @object = this.GetObject();
-			@object.prepare(pVector, scale,eulerAngle);
-			@object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
-			return @object;
-		}
+        internal virtual BaseSpellEffect spawnAt(Vector3 pVector, float pScale = 0.5f, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
+        {
+            if (this.isInLimit())
+            {
+                return null;
+            }
+            BaseSpellEffect @object = this.GetObject();
+            @object.prepare(pVector, pScale);
+            @object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
+            return @object;
+        }
+        internal virtual BaseSpellEffect spawnAt(Vector3 pVector, Vector3 scale, Vector3 eulerAngle, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
+        {
+            if (this.isInLimit())
+            {
+                return null;
+            }
+            BaseSpellEffect @object = this.GetObject();
+            @object.prepare(pVector, scale, eulerAngle);
+            @object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
+            return @object;
+        }
 
-		public BaseSpellEffect spawnAtRandomScale(WorldTile pTile, float pScaleMin = 1f, float pScaleMax = 1f)
-		{
-			if (this.isInLimit())
-			{
-				return null;
-			}
-			BaseSpellEffect @object = this.GetObject();
-			float pScale = Toolbox.randomFloat(pScaleMin, pScaleMax);
-			@object.prepare(pTile, pScale);
-			return @object;
-		}
+        public BaseSpellEffect spawnAtRandomScale(WorldTile pTile, float pScaleMin = 1f, float pScaleMax = 1f)
+        {
+            if (this.isInLimit())
+            {
+                return null;
+            }
+            BaseSpellEffect @object = this.GetObject();
+            float pScale = Toolbox.randomFloat(pScaleMin, pScaleMax);
+            @object.prepare(pTile, pScale);
+            return @object;
+        }
 
-		private bool isInLimit()
-		{
-			return this.objectLimit != 0 && this.activeIndex > this.objectLimit;
-		}
+        private bool isInLimit()
+        {
+            return this.objectLimit != 0 && this.activeIndex > this.objectLimit;
+        }
 
-		internal void clear()
-		{
-			for (int i = 0; i < this.list.Count; i++)
-			{
-				BaseSpellEffect pObject = this.list[i];
-				this.makeInactive(pObject);
-			}
-			this.activeIndex = 0;
-		}
+        internal void clear()
+        {
+            for (int i = 0; i < this.list.Count; i++)
+            {
+                BaseSpellEffect pObject = this.list[i];
+                this.makeInactive(pObject);
+            }
+            this.activeIndex = 0;
+        }
 
-		public BaseSpellEffectController()
-		{
-		}
-	}
+        public BaseSpellEffectController()
+        {
+        }
+    }
 }

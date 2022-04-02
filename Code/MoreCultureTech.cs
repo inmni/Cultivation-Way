@@ -92,7 +92,7 @@ namespace Cultivation_Way
                 }
                 else
                 {
-                    sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + cultureTechAsset.icon+".png");
+                    sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + cultureTechAsset.icon + ".png");
                 }
                 __instance.iconCurrentTech.GetComponent<Image>().sprite = sprite;
                 __instance.iconCurrentTech.gameObject.SetActive(true);

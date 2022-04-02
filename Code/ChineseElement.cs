@@ -1,21 +1,30 @@
-﻿using CultivationWay;
-using System;
-using UnityEngine;
+﻿using System;
 
 namespace Cultivation_Way
 {
     class ChineseElement
     {
-        //该元素的基本元素含量
+        /// <summary>
+        /// 五大元素含量，顺序为金木水火土
+        /// </summary>
         public int[] baseElementContainer;
-        //衍生元素类型
-        public ChineseElementAsset element;
+        /// <summary>
+        /// 名字
+        /// </summary>
+        public string name;
+        /// <summary>
+        /// 对应的id
+        /// </summary>
+        public string id;
         //元素变化
         public void change() { }
-        //随机设置元素
+        /// <summary>
+        /// 随机设置元素，并自动判断类型
+        /// </summary>
+        /// <returns></returns>
         public ChineseElement getRandom()
         {
-            baseElementContainer = new int[5] {20,20,20,20,20};
+            baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
             for (int i = 0; i < 5; i++)
             {
                 baseElementContainer[i] = Toolbox.randomInt(0, 101);
@@ -24,32 +33,54 @@ namespace Cultivation_Way
             setType();
             return this;
         }
-        //确定元素衍生类型
+        /// <summary>
+        /// 判断类型
+        /// </summary>
         public void setType()
         {
-
-            ChineseElementLibrary elementLibrary = (ChineseElementLibrary)AssetManager.instance.dict["element"];
-
+            bool isAll = true;
+            for(int i = 0; i < 5; i++)
+            {
+                if (baseElementContainer[i] != 20)
+                {
+                    isAll = false;
+                    break;
+                }
+            }
+            
+            ChineseElementLibrary elementLibrary = AddAssetManager.chineseElementLibrary;
+            if (isAll)
+            {
+                ChineseElementAsset allElement = elementLibrary.get("AllElement");
+                name = allElement.name;
+                id = allElement.id;
+            }
             Tuple<string, int> maxMembership = new Tuple<string, int>("All", 100000);
 
 
             foreach (string id in elementLibrary.dict.Keys)
             {
+                //rarity作为量度，rarity越大，要求的membership越小
                 int membership = 1;
                 for (int i = 0; i < 5; i++)
                 {
                     membership *= Math.Abs(baseElementContainer[i] - elementLibrary.dict[id].content[i]) + 1;
                 }
 
-                if (membership < maxMembership.Item2)
+                if (membership < maxMembership.Item2&&id!= "AllElement")
                 {
                     maxMembership = new Tuple<string, int>(id, membership);
                 }
             }
-            element = elementLibrary.get(maxMembership.Item1);
+            ChineseElementAsset element = elementLibrary.get(maxMembership.Item1);
+            name = element.name;
+            id = element.id;
         }
-        //计算元素不纯净度
-        public float getPurity()
+        /// <summary>
+        /// 返回不纯净度
+        /// </summary>
+        /// <returns></returns>
+        public float getImPurity()
         {
             int maxPos = 0;
             for (int i = 1; i < 5; i++)
@@ -61,7 +92,9 @@ namespace Cultivation_Way
             }
             return 100f / baseElementContainer[maxPos];
         }
-        //修改至总量为100
+        /// <summary>
+        /// 规格化，调整总和为100
+        /// </summary>
         public void normalize()
         {
             int sum = 0;
@@ -85,13 +118,29 @@ namespace Cultivation_Way
                 sum++;
             }
         }
-
+        /// <summary>
+        /// 获取对应的Asset
+        /// </summary>
+        /// <returns></returns>
+        public ChineseElementAsset GetAsset()
+        {
+            return AddAssetManager.chineseElementLibrary.get(id);
+        }
+        /// <summary>
+        /// 根据数组确定元素，顺序为金木水火土
+        /// </summary>
+        /// <param name="content"></param>
         public ChineseElement(int[] content)
         {
             baseElementContainer = content;
+            normalize();
             setType();
         }
-        public ChineseElement() {
+        /// <summary>
+        /// 设定随机元素
+        /// </summary>
+        public ChineseElement()
+        {
             getRandom();
         }
     }

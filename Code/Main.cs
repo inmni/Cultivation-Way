@@ -6,8 +6,12 @@ using NCMS.Utils;
 using ReflectionUtility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Purchasing.MiniJSON;
 using static Config;
 /*
 MonoBehaviour.print("[修真之路Cultivation Way]:测试点n");//测试用测试点格式
@@ -18,10 +22,8 @@ namespace CultivationWay
     [ModEntry]
     class Main : MonoBehaviour
     {
-        //注意：武器贴图加载存在一定问题
         //注意：Culture.create()已在ChineseNameGenerator添加完全拦截
-        //注意：下一个优化点使用dynamic关键字
-
+        //注意：智慧种族的声音未解决
         public const string mainPath = "Mods/Cultivation-Way";//主路径
         //另一条"worldbox_Data/StreamingAssets/Mods/NCMS/Core/Temp/Mods/修真之路"
 
@@ -36,10 +38,12 @@ namespace CultivationWay
         public string addMapMode = "";
 
         private bool flag = false;
-        private float controlDeltTime = 5f;
+        private float controlDeltTime = 0.5f;
 
-        internal int SpecialBodyLimit = 100;
-        internal int summonTian1Limit = 1;
+        internal int SpecialBodyLimit = 200;
+        internal Dictionary<string, List<Actor>> kingdomBindActors = new Dictionary<string, List<Actor>>();//国家id与其绑定的生物
+        internal Dictionary<string, string> godList = new Dictionary<string, string>();//神明列表及其中文名
+        internal Dictionary<string, int> creatureLimit = new Dictionary<string, int>();//生物限制
 
         #region 映射词典
         public List<MapChunk> chunks = new List<MapChunk>();//方便获取区块
@@ -64,7 +68,7 @@ namespace CultivationWay
         #endregion
 
         #region 更多玩意
-        public MoreItem MoreItem = new MoreItem();
+        public MoreItems MoreItems = new MoreItems();
         public MoreTraits MoreTraits = new MoreTraits();
         public MoreActors MoreActors = new MoreActors();
         public MoreProjectiles MoreProjectiles = new MoreProjectiles();
@@ -75,10 +79,11 @@ namespace CultivationWay
         public MoreDrops MoreDrops = new MoreDrops();
         public MoreCultureTech MoreCultureTech = new MoreCultureTech();
         public MoreMapModes MoreMapModes = new MoreMapModes();
+        public MoreWorldLaws MoreWorldLaws = new MoreWorldLaws();
         public List<string> moreActors = new List<string>();
         public List<string> moreItems = new List<string>();
         public List<string> moreRaces = new List<string>();
-        public List<string> moreProjectiles = new List<string>();
+        public Dictionary<string, Vector2> moreProjectiles = new Dictionary<string, Vector2>();
         #endregion
 
         #region 初始化n件套
@@ -87,15 +92,28 @@ namespace CultivationWay
         {
             instance = this;
             MonoBehaviour.print("[修真之路Cultivation Way]:开始加载");
+        }
+        void Start()
+        {
+            //创建按钮栏
+            print("[修真之路Cultivation Way]:创建按钮栏");
+            MorePowers.createPowerTab();
+            print("[修真之路Cultivation Way]:创建按钮栏成功");
+            //添加Asset
+            print("[修真之路Cultivation Way]:添加Asset");
+            AddAssetManager.addAsset();
+            print("[修真之路Cultivation Way]:添加Asset成功");
+            //加载按钮
+            print("[修真之路Cultivation Way]:加载按钮");
+            MorePowers.createButtons();
+            print("[修真之路Cultivation Way]:加载按钮成功");
+            setLanguage_Postfix(Reflection.GetField(typeof(LocalizedTextManager), LocalizedTextManager.instance, "language") as string);
             //开启拦截
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截");
             patchHarmony();
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
             spellEffects = this.transform.gameObject.AddComponent<StackSpellEffects>();
             spellEffects.Awake();
-        }
-        void Start()
-        {
         }
         void Update()
         {
@@ -107,30 +125,14 @@ namespace CultivationWay
             {
                 initiated = true;
                 #region 初始化
-                MonoBehaviour.print("[修真之路Cultivation Way]:初始化");
+                print("[修真之路Cultivation Way]:初始化");
                 AddInitLibs.initMyLibs();
-                MonoBehaviour.print("[修真之路Cultivation Way]:初始化库成功");
+                print("[修真之路Cultivation Way]:初始化库成功");
                 initWindows();
-                MonoBehaviour.print("[修真之路Cultivation Way]:初始化窗口成功");
-                //添加Asset
-                MonoBehaviour.print("[修真之路Cultivation Way]:添加Asset");
-                AddAssetManager.addAsset();
-                MonoBehaviour.print("[修真之路Cultivation Way]:添加Asset成功");
-                //添加文字资源
-                MonoBehaviour.print("[修真之路Cultivation Way]:添加文字资源");
-                addForLocalization();
-                MonoBehaviour.print("[修真之路Cultivation Way]:添加文字资源成功");
-                //创建按钮栏
-                MonoBehaviour.print("[修真之路Cultivation Way]:创建按钮栏");
-                MorePowers.createPowerTab();
-                MonoBehaviour.print("[修真之路Cultivation Way]:创建按钮栏成功");
-                //加载按钮
-                MonoBehaviour.print("[修真之路Cultivation Way]:加载按钮");
-                MorePowers.createButtons();
-                MonoBehaviour.print("[修真之路Cultivation Way]:加载按钮成功");
+                print("[修真之路Cultivation Way]:初始化窗口成功");
                 //添加其他
-                MonoBehaviour.print("[修真之路Cultivation Way]:添加其他");
-                sfx_MusicMan_racesAdd();
+                print("[修真之路Cultivation Way]:添加其他");
+                //sfx_MusicMan_racesAdd();
                 MoreRaces.kingdomColorsDataInit();
                 initChunkElement();
                 MoreMapModes.add();
@@ -139,13 +141,13 @@ namespace CultivationWay
                 MonoBehaviour.print("[修真之路Cultivation Way]:添加其他成功");
                 #endregion
                 MonoBehaviour.print("[修真之路Cultivation Way]:加载成功");
-                
+
             }
             if (instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6)
             {
                 initChunkElement();
             }
-            
+
             if (controlDeltTime > 0)
             {
                 controlDeltTime -= Time.deltaTime;
@@ -170,11 +172,11 @@ namespace CultivationWay
             {
                 return;
             }
-            if(!(bool)Reflection.GetField(typeof(MapBox),MapBox.instance,"alreadyUsedZoom") && ((bool)MapBox.instance.CallMethod("canInspectWithMainTouch") || (bool)MapBox.instance.CallMethod("canInspectWithRightClick")) 
+            if (!(bool)Reflection.GetField(typeof(MapBox), MapBox.instance, "alreadyUsedZoom") && ((bool)MapBox.instance.CallMethod("canInspectWithMainTouch") || (bool)MapBox.instance.CallMethod("canInspectWithRightClick"))
                 && ((float)Reflection.GetField(typeof(MapBox), MapBox.instance, "inspectTimerClick") < 0.2f) && !MapBox.instance.isActionHappening() && !MoveCamera.cameraDragActivated)
             {
                 WorldTile mouseTilePos = MapBox.instance.getMouseTilePos();
-                
+
                 if (mouseTilePos != null)
                 {
                     if (MapBox.instance.showElementZones())
@@ -189,7 +191,6 @@ namespace CultivationWay
         }
         void patchHarmony()
         {
-            //new Harmony("me.xiaoye97.plugin.Tutorial").PatchAll();
             Harmony.CreateAndPatchAll(typeof(AddAssetManager));
             MonoBehaviour.print("Create and patch all:AddAssetManager");
             Harmony.CreateAndPatchAll(typeof(ChineseNameGenerator));
@@ -200,8 +201,8 @@ namespace CultivationWay
             MonoBehaviour.print("Create and patch all:MoreActors");
             Harmony.CreateAndPatchAll(typeof(MoreBuildings));
             MonoBehaviour.print("Create and patch all:MoreBuildings");
-            Harmony.CreateAndPatchAll(typeof(MoreItem));
-            MonoBehaviour.print("Create and patch all:MoreItem");
+            Harmony.CreateAndPatchAll(typeof(MoreItems));
+            MonoBehaviour.print("Create and patch all:MoreItems");
             Harmony.CreateAndPatchAll(typeof(MoreMapModes));
             MonoBehaviour.print("Create and patch all:MoreMapModes");
             Harmony.CreateAndPatchAll(typeof(MoreRaces));
@@ -218,87 +219,102 @@ namespace CultivationWay
             MonoBehaviour.print("Create and patch all:SaveAndLoadManager");
             Harmony.CreateAndPatchAll(typeof(WindowCreatureInfoHelper));
             MonoBehaviour.print("Create and patch all:WindowCreatureInfoHelper");
+            Harmony.CreateAndPatchAll(typeof(MoreGodPowers));
+            MonoBehaviour.print("Create and patch all:MoreGodPowers");
+            Harmony.CreateAndPatchAll(typeof(WorldTools));
+            MonoBehaviour.print("Create and patch all:WorldTools");
+            Harmony.CreateAndPatchAll(typeof(WorldLawHelper));
+            MonoBehaviour.print("Create and patch all:WorldLawHelper");
         }
-        void addForLocalization()
-        {
-            Localization.addLocalization("Button_Cultivation_Way", "修真之路");
-            string[] temp = new string[] {
-                "QQ群总部：602184962",
-                "混沌轮回天地间，人生道尽又一年。\n路走人间似神仙，观望百态红尘间。",
-                "道可道，非恒道;\n名可名，非恒名",
-                "魔前一叩三千年，回首凡尘不作仙"
-            };
-            Localization.addLocalization("tab_cw", temp.GetRandom());
-            Localization.addLocalization("Tians", "天族");
-            Localization.addLocalization("Mings", "冥族");
-            Localization.addLocalization("JiaoDragons", "蛟龙");
-            Localization.addLocalization("FairyFox", "仙狐");
-            #region 属性
-            Localization.addLocalization("specialBody", "体质");
-            Localization.addLocalization("origin", "起源体质");
-            Localization.addLocalization("madeBy", "血脉源头");
-            Localization.addLocalization("spells", "法术");
-            Localization.addLocalization("spellRange", "施法距离");
-            Localization.addLocalization("magic", "灵力");
-            Localization.addLocalization("vampire", "吸血");
-            Localization.addLocalization("antiInjury", "反伤");
-            Localization.addLocalization("spellRelief", "法伤赦免");
-            Localization.addLocalization("cultisystem", "修炼体系");
-            Localization.addLocalization("realm", "境界");
-            Localization.addLocalization("talent", "天赋");
-            Localization.addLocalization("elementType", "灵根");
-            Localization.addLocalization("family", "家族");
-            Localization.addLocalization("cultivationBook", "功法");
-            Localization.setLocalization("Gold", "金");
-            Localization.addLocalization("Wood", "木");
-            Localization.addLocalization("Water", "水");
-            Localization.setLocalization("Fire", "火");
-            Localization.addLocalization("Ground", "土");
-            Localization.setLocalization("creature_statistics_age", "年龄/寿元");
-            
-            #endregion
+        
+        //  因添加文字材质，废弃
+        //
+        //void addForLocalization()
+        //{
+        //    Localization.addLocalization("Button_Cultivation_Way", "修真之路");
+        //    string[] temp = new string[] {
+        //        "QQ群总部：602184962",
+        //        "混沌轮回天地间，人生道尽又一年。\n路走人间似神仙，观望百态红尘间。",
+        //        "道可道，非恒道;\n名可名，非恒名",
+        //        "魔前一叩三千年，回首凡尘不作仙"
+        //    };
+        //    Localization.addLocalization("tab_cw", temp.GetRandom());
+        //    Localization.addLocalization("Tians", "天族");
+        //    Localization.addLocalization("Mings", "冥族");
+        //    Localization.addLocalization("Yaos", "妖族");
+        //    Localization.addLocalization("EasternHumans", "东方人族");
+        //    Localization.addLocalization("JiaoDragons", "蛟龙");
+        //    Localization.addLocalization("FairyFox", "仙狐");
+        //    #region 属性
+        //    Localization.addLocalization("specialBody", "体质");
+        //    Localization.addLocalization("origin", "起源体质");
+        //    Localization.addLocalization("madeBy", "血脉源头");
+        //    Localization.addLocalization("spells", "法术");
+        //    Localization.addLocalization("spellRange", "施法距离");
+        //    Localization.addLocalization("magic", "灵力");
+        //    Localization.addLocalization("vampire", "吸血");
+        //    Localization.addLocalization("antiInjury", "反伤");
+        //    Localization.addLocalization("spellRelief", "法伤赦免");
+        //    Localization.addLocalization("cultisystem", "修炼体系");
+        //    Localization.addLocalization("realm", "境界");
+        //    Localization.addLocalization("talent", "天赋");
+        //    Localization.addLocalization("elementType", "灵根");
+        //    Localization.addLocalization("family", "家族");
+        //    Localization.addLocalization("cultivationBook", "功法");
+        //    Localization.setLocalization("Gold", "金");
+        //    Localization.addLocalization("Wood", "木");
+        //    Localization.addLocalization("Water", "水");
+        //    Localization.setLocalization("Fire", "火");
+        //    Localization.addLocalization("Ground", "土");
+        //    Localization.setLocalization("creature_statistics_age", "年龄/寿元");
 
-            #region 特质
-            Localization.addLocalization("trait_cursed_immune", "诅咒免疫");
-            Localization.addLocalization("trait_asylum", "天道眷顾");
-            Localization.addLocalization("trai_asylum_info", "真正的永恒");
-            Localization.addLocalization("trait_race", "种族");
-            Localization.addLocalization("trait_realm", "境界");
-            Localization.addLocalization("trait_element", "灵根");
-            Localization.addLocalization("trait_cultivationBook", "家族功法");
-            Localization.addLocalization("trait_realm_info", "境界信息");
-            Localization.addLocalization("trait_element_info", "灵根信息");
-            Localization.addLocalization("trait_cultivationBook_info","功法信息");
-            #endregion
+        //    #endregion
 
-            #region 文化科技
-            Localization.addLocalization("tech_culti_normal", "仙路");
-            Localization.addLocalization("tech_culti_bodying", "炼体");
-            Localization.addLocalization("tech_culti_bushido", "武道");
-            #endregion
-            #region 装备
-            Localization.addLocalization("item_summonTian1", "哈？没名字");
-            #endregion
-        }
+        //    #region 特质
+        //    Localization.addLocalization("trait_cursed_immune", "诅咒免疫");
+        //    Localization.addLocalization("trait_asylum", "天道眷顾");
+        //    Localization.addLocalization("trait_asylum_info", "真正的永恒");
+        //    Localization.addLocalization("trait_race", "种族");
+        //    Localization.addLocalization("trait_realm", "境界");
+        //    Localization.addLocalization("trait_element", "灵根");
+        //    Localization.addLocalization("trait_cultivationBook", "家族功法");
+        //    Localization.addLocalization("trait_realm_info", "境界信息");
+        //    Localization.addLocalization("trait_element_info", "灵根信息");
+        //    Localization.addLocalization("trait_cultivationBook_info", "功法信息");
+        //    #endregion
+
+        //    #region 文化科技
+        //    Localization.addLocalization("tech_culti_normal", "仙路");
+        //    Localization.addLocalization("tech_culti_bodying", "炼体");
+        //    Localization.addLocalization("tech_culti_bushido", "武道");
+        //    #endregion
+        //    #region 装备
+        //    Localization.addLocalization("item_summonTian1", "哈？没名字");
+
+        //    #endregion
+        //    #region 世界信息
+        //    Localization.addLocalization("baseLog", "用作文本加载");
+        //    Localization.addLocalization("Yao_unite", "$king$ 统一妖族，立万世妖庭——$kingdom$");
+        //    #endregion
+        //}
         void initWindows()
         {
+            MoreWorldLaws.init();
             WindowAboutThis.init();
             WindowChunkInfo.init();
+            WindowFamily.init();
             WindowMoreStats.init();
             WindowTops.init();
         }
         void addRaceFeature()
         {
-            foreach(ActorStats stats in AssetManager.unitStats.list)
+            foreach (ActorStats stats in AssetManager.unitStats.list)
             {
-                if (raceFeatures.ContainsKey(stats.race))
-                {
-                    continue;
-                }
+
                 RaceFeature feature = new RaceFeature();
                 feature.raceID = stats.race;
                 feature.raceSpells = new List<ExtensionSpell>();
-                this.raceFeatures.Add(stats.race, feature);
+                this.raceFeatures.Add(stats.id, feature);
             }
             MoreRaces.setIntelligentRaceFeature();
             MoreRaces.setOtherRaceFeature();
@@ -315,7 +331,7 @@ namespace CultivationWay
         public void createOrResetFamily()
         {
             instance.familys.Clear();
-            foreach(string familyName in ChineseNameAsset.familyNameTotal)
+            foreach (string familyName in ChineseNameAsset.familyNameTotal)
             {
                 if (!familys.ContainsKey(familyName))
                 {
@@ -331,31 +347,39 @@ namespace CultivationWay
             {
                 MoreStats moreStats = new MoreStats();
                 MoreActorData moreData = new MoreActorData();
-                //ActorStatus data = (ActorStatus)Reflection.GetField(typeof(Actor), actor, "data");
-                ActorStatus data = actor.GetData();
-                
-                string id = data.actorID;
-                instance.actorToMoreData.Add(id, moreData);
-                instance.actorToMoreStats.Add(id, moreStats);
-                string name = data.firstName;
+                instance.actorToMoreData.Add(actor.GetData().actorID, moreData);
+                instance.actorToMoreStats.Add(actor.GetData().actorID, moreStats);
+                string name = actor.GetData().firstName;
                 foreach (string fn in ChineseNameAsset.familyNameTotal)
                 {
-                        if (name.StartsWith(fn))
-                        {
-                            moreStats.family = instance.familys[fn];
-                            break;
-                        }
+                    if (actor.stats.unit && name.StartsWith(fn))
+                    {
+                        moreData.familyID = fn;
+                        break;
+                    }
+                    else if (!actor.stats.unit && name.EndsWith(fn))
+                    {
+                        moreData.familyID = fn;
+                    }
                 }
-                if (moreStats.family == null)
-                {
-                    moreStats.family = Main.instance.familys["甲"];
-                }
-                moreData.cultisystem = moreStats.cultisystem;
-                moreData.element = moreStats.element;
+                moreData.cultisystem = "default";
+                moreData.specialBody = "FT";
+                moreData.element = new ChineseElement();
                 moreData.bonusStats = new MoreStats();
                 moreData.coolDown = new Dictionary<string, int>();
-                moreData.familyID = moreStats.family.id;
+                moreData.canCultivate = true;
+                moreStats.element = moreData.element;
             }
+        }
+        public void resetCreatureLimit()
+        {
+            Dictionary<string, int> temp = new Dictionary<string, int>();
+            foreach (string id in instance.creatureLimit.Keys)
+            {
+                temp[id] = 1;
+            }
+            instance.creatureLimit.Clear();
+            instance.creatureLimit = temp;
         }
         void updateChunkElement()
         {
@@ -383,7 +407,7 @@ namespace CultivationWay
                     instance.chunkToElement[chunk.id].baseElementContainer[type] +=
                         instance.chunkToElement[chunk.id].baseElementContainer[type] << 10;
                 }
-                
+
                 foreach (MapChunk neighbourChunk in chunk.neighbours)
                 {
                     for (int type = 0; type < 5; type++)
@@ -403,7 +427,7 @@ namespace CultivationWay
                 {
                     instance.chunkToElement[chunkID].baseElementContainer[i] >>= 10;
                     if (instance.chunkToElement[chunkID].baseElementContainer[i] > 100) { instance.chunkToElement[chunkID].baseElementContainer[i] = 100; }
-                    if (instance.chunkToElement[chunkID].baseElementContainer[i] < 0) { instance.chunkToElement[chunkID].baseElementContainer[i] =0; }
+                    if (instance.chunkToElement[chunkID].baseElementContainer[i] < 0) { instance.chunkToElement[chunkID].baseElementContainer[i] = 0; }
                 }
                 instance.chunkToElement[chunkID].normalize();
             }
@@ -418,10 +442,10 @@ namespace CultivationWay
             Dictionary<int, BaseStats> TactorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
             Dictionary<string, MoreActorData> TactorToMoreData = new Dictionary<string, MoreActorData>();//单位编号与更多数据映射词典
 
-            valueClone<string, MoreStats>(actorToMoreStats,TactorToMoreStats);
-            valueClone<int, ActorStatus>(actorToData, TactorToData);
-            valueClone<int, BaseStats>(actorToCurStats,TactorToCurStats);
-            valueClone<string, MoreActorData>(actorToMoreData, TactorToMoreData);
+            valueClone(actorToMoreStats, TactorToMoreStats);
+            valueClone(actorToData, TactorToData);
+            valueClone(actorToCurStats, TactorToCurStats);
+            valueClone(actorToMoreData, TactorToMoreData);
 
             actorToMoreStats.Clear();
             actorToData.Clear();
@@ -436,9 +460,9 @@ namespace CultivationWay
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();
         }
-        void valueClone<T1,T2>(Dictionary<T1,T2> from, Dictionary<T1, T2> to)
+        void valueClone<T1, T2>(Dictionary<T1, T2> from, Dictionary<T1, T2> to)
         {
-            foreach(T1 key in from.Keys)
+            foreach (T1 key in from.Keys)
             {
                 if (key != null)
                 {
@@ -466,6 +490,48 @@ namespace CultivationWay
         //    //}
         //}
 
+        //重建地图导致问题
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(MapBox), "generateNewMap", typeof(string))]
+        public static void GenerateMap()
+        {
+            instance.initChunkElement();
+            instance.createOrResetFamily();
+            instance.resetCreatureLimit();
+            instance.SpecialBodyLimit = 200;
+            AddAssetManager.specialBodyLibrary.reset();
+            instance.actorToCurStats = new Dictionary<int, BaseStats>();
+            instance.actorToMoreStats = new Dictionary<string, MoreStats>();
+            instance.actorToMoreData = new Dictionary<string, MoreActorData>();
+            instance.actorToData = new Dictionary<int, ActorStatus>();
+            foreach (string key in WorldLawHelper.originLaws.Keys)
+            {
+                MapBox.instance.worldLaws.dict.Add(key, WorldLawHelper.originLaws[key]);
+            }
+
+        }
+        //语言材质加载
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(LocalizedTextManager),"setLanguage")]
+        public static void setLanguage_Postfix(string pLanguage)
+        {
+            if (pLanguage != "cz")
+            {
+                pLanguage = "en";
+                ChineseNameGenerator.isBeingUsed = false;
+            }
+            else
+            {
+                ChineseNameGenerator.isBeingUsed = true;
+            }
+            string text = ResourcesHelper.LoadTextAsset("languages/" + pLanguage + ".txt");
+            Dictionary<string, object> textDic = Json.Deserialize(text) as Dictionary<string,object>;
+            Dictionary<string, string> localizedText = Reflection.GetField(typeof(LocalizedTextManager), LocalizedTextManager.instance, "localizedText") as Dictionary<string, string>;
+            foreach(string key in textDic.Keys)
+            {
+                localizedText[key] = textDic[key] as string;
+            }
+        }
         //解决控制问题
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MapBox), "updateControls")]
@@ -487,6 +553,37 @@ namespace CultivationWay
             //{
             //    print(pActor+"不存在");
             //}
+            if (pActor == null || pActor.GetData() == null)
+            {
+                return true;
+            }
+            if (instance.creatureLimit.ContainsKey(pActor.stats.id))
+            {
+                instance.creatureLimit[pActor.stats.id]++;
+            }
+            MoreActorData moreData = null;
+            instance.actorToMoreData.TryGetValue(pActor.GetData().actorID, out moreData);
+            if (moreData != null)
+            {
+                Family family = instance.familys[moreData.familyID];
+                family.num--;
+                if (family.num <= 0)
+                {
+                    instance.familys[moreData.familyID] = new Family(moreData.familyID);
+                }
+            }
+            if (pActor.kingdom != null)
+            {
+                try
+                {
+                    instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
+                }
+                catch
+                {
+                    //直接用于排除非智慧国家，以及与killhimself重叠部分
+                    //This paragraph is used to exclude non-intelligent kingdoms and the overlap with "killHimself".
+                }
+            }
             instance.actorToCurStats.Remove(pActor.GetInstanceID());
             instance.actorToData.Remove(pActor.GetInstanceID());
             instance.actorToMoreData.Remove(pActor.GetData().actorID);
@@ -496,17 +593,17 @@ namespace CultivationWay
         //百年事件（更新灵气，清理内存，以及其他
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox), "updateObjectAge")]
-        public static void toUpdateChunkElement()
+        public static void toUpdateTimeEvent()
         {
             List<BonusStatsManager> temp = new List<BonusStatsManager>();
-            foreach (BonusStatsManager bonusStatsManager in instance.bonusStatsManagers)
+            for (int i = 0; i < instance.bonusStatsManagers.Count; i++)
             {
-                bonusStatsManager.update();
-                if (bonusStatsManager.leftTime <= 0)
+                instance.bonusStatsManagers[i].update();
+                if (instance.bonusStatsManagers[i].leftTime <= 0)
                 {
                     continue;
                 }
-                temp.Add(bonusStatsManager);
+                temp.Add(instance.bonusStatsManagers[i]);
             }
             instance.bonusStatsManagers = temp;
             if (MapBox.instance.mapStats.year % 100 == 0)
@@ -521,9 +618,10 @@ namespace CultivationWay
                     if (kingdom.raceID == "Tian" && kingdom.getPopulationTotal() > 0)
                     {
                         Actor User = kingdom.getMaxLevelActor();
-                        if (User.GetMoreData().coolDown["summonTian"] == 1)
+                        if (User.stats.id == "unit_Tian" && User.GetMoreData().coolDown.ContainsKey("summonTian"))
                         {
-                            instance.raceFeatures["Tian"].raceSpells[0].castSpell(User, null);//召唤战舰s
+
+                            instance.raceFeatures["unit_Tian"].raceSpells[0].castSpell(User, null);//召唤战舰s
                         }
                     }
                 }
@@ -531,28 +629,39 @@ namespace CultivationWay
                 {
                     Thread t = new Thread(new ThreadStart(instance.clearMemory));
                     t.Start();
-                    if (MapBox.instance.mapStats.year % 1000 == 0)
+                    foreach (Kingdom kingdom in MapBox.instance.kingdoms.list_civs)
                     {
-                        foreach (Kingdom kingdom in MapBox.instance.kingdoms.list_civs)
+                        if (kingdom.raceID == "Tian" && kingdom.king != null)
                         {
-                            if (kingdom.raceID == "Tian" && kingdom.king!=null)
+                            if (kingdom.king.stats.id == "unit_Tian" && kingdom.king.GetMoreData().coolDown["summonTian1"] == 1)
                             {
-                                if (kingdom.king.GetMoreData().coolDown["summonTian1"] == 1)
-                                {
-                                    instance.raceFeatures["Tian"].raceSpells[1].castSpell(kingdom.king, null);//召唤机甲
-                                }
+                                instance.raceFeatures["unit_Tian"].raceSpells[1].castSpell(kingdom.king, null);//召唤机甲
                             }
                         }
                     }
                 }
             }
+            if (MapBox.instance.worldLaws.dict["MoreDisasters"].boolVal &&MapBox.instance.mapStats.month == 2&&instance.creatureLimit["Nian"]>0&&MapBox.instance.mapStats.year%2022==0)
+            {
+                WorldTile tile = MapBox.instance.tilesList.GetRandom();
+                Actor Nian = MapBox.instance.spawnNewUnit("Nian", tile);
+                int level = MapBox.instance.mapStats.year / 2022*10 + 1;
+                if (level > 110)
+                {
+                    level = 110;
+                }
+                Nian.GetData().level = level;
+                Nian.GetData().health = int.MaxValue >> 2;
+                instance.creatureLimit["Nian"]--;
+                WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning,true)}>年兽入侵！</color>", "iconKingslayer",tile);
+            }
         }
         //城市给予物品修复
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(City),"giveItem")]
-        public static bool giveItem_Prefix(ref bool __result,Actor pActor,ActorEquipmentSlot pSlot,City pCity)
+        [HarmonyPatch(typeof(City), "giveItem")]
+        public static bool giveItem_Prefix(ref bool __result, Actor pActor, ActorEquipmentSlot pSlot, City pCity)
         {
-            if (pActor == null||pActor.equipment==null|| pSlot == null || pCity == null)
+            if (pActor == null || pActor.equipment == null || pSlot == null || pCity == null)
             {
                 __result = false;
                 return false;
@@ -561,8 +670,8 @@ namespace CultivationWay
         }
         //城市获取死亡人口的装备修复
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(City),"giveItemsToCity")]
-        public static bool giveItemsToCity_Prefix(City pCity,Actor pDeadActor)
+        [HarmonyPatch(typeof(City), "giveItemsToCity")]
+        public static bool giveItemsToCity_Prefix(City pCity, Actor pDeadActor)
         {
             if (pDeadActor.stats.use_items)
             {
@@ -573,11 +682,20 @@ namespace CultivationWay
         #endregion
 
         #region 乱七八糟的初始化
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(sfx.MusicMan), "clear")]
+        public static IEnumerable<CodeInstruction> clear_Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> codes = instructions.ToList();
+            MethodInfo addRaces = AccessTools.Method(typeof(Main), "sfx_MusicMan_racesAdd");
+            codes.Insert(23, new CodeInstruction(OpCodes.Callvirt, addRaces));
+            return codes.AsEnumerable();
+        }
         public static void sfx_MusicMan_racesAdd()
         {
             foreach (string race in instance.moreRaces)
             {
-                sfx.MusicMan.races.Add(race, new sfx.MusicRaceContainer());
+                sfx.MusicMan.races[race] = new sfx.MusicRaceContainer();
             }
         }
         #endregion

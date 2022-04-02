@@ -1,42 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ReflectionUtility;
+﻿using ReflectionUtility;
 using UnityEngine;
 namespace Cultivation_Way
 {
+    /// <summary>
+    /// Copied from Game
+    /// </summary>
     public class BaseSpellEffect : MonoBehaviour
     {
-        /// <summary>
-        /// 直接cv游戏BaseEffect
-        /// </summary>
-        /// 
-
-        internal SpriteAnimation spriteAnimation;
-
-        internal MapObjectShadow shadow;
-
-        internal Vector3 lastShadowPos;
-
-        internal Vector3 lastShadowScale;
-
-        public WorldTile currentTile;
-
-        public Vector3 zPosition;
-
-        public Vector2 currentPosition;
-
-        public Vector3 currentScale;
-
-        internal bool created;
-
-        protected MapBox world;
-
-        internal Transform m_transform;
-
-        internal GameObject m_gameObject;
+        
 
         public const int STATE_START = 1;
 
@@ -45,14 +16,31 @@ namespace Cultivation_Way
         public const int STATE_KILLED = 3;
 
         public WorldTile tile;
-
+        public WorldTile currentTile;
+        public Vector2 currentPosition;
+        public Vector3 zPosition;
+        public Vector3 currentScale;
         public SpriteRenderer spriteRenderer;
 
         protected float scale;//特效尺寸
 
         protected float alpha;//特效不透明度
+        internal bool created;
+
+        internal MapBox world;
+
+        internal Transform m_transform;
+
+        internal GameObject m_gameObject;
 
         internal BaseSpellEffectController controller;
+        internal SpriteAnimation spriteAnimation;
+
+        internal MapObjectShadow shadow;
+
+        internal Vector3 lastShadowPos;
+
+        internal Vector3 lastShadowScale;
 
         internal bool active;
 
@@ -84,7 +72,7 @@ namespace Cultivation_Way
             this.created = true;
             this.m_gameObject = base.gameObject;
             this.m_transform = this.m_gameObject.transform;
-            this.setWorld();
+            this.world = MapBox.instance;
             this.spriteAnimation = base.gameObject.GetComponent<SpriteAnimation>();
             if (this.spriteAnimation != null)
             {
@@ -161,7 +149,7 @@ namespace Cultivation_Way
             #region this.spriteAnimation.update(pElapsed)
             if (this.spriteAnimation != null)
             {
-                this.spriteAnimation.CallMethod("update",pElapsed);
+                this.spriteAnimation.CallMethod("update", pElapsed);
                 if (spriteAnimation.useNormalDeltaTime)
                 {
                     pElapsed = Time.deltaTime;
@@ -174,7 +162,7 @@ namespace Cultivation_Way
                 }
                 if (!spriteAnimation.isOn)
                 {
-                    if ((bool)Reflection.GetField(typeof(SpriteAnimation),spriteAnimation,"stopFrameTrigger"))
+                    if ((bool)Reflection.GetField(typeof(SpriteAnimation), spriteAnimation, "stopFrameTrigger"))
                     {
                         Reflection.SetField(spriteAnimation, "stopFrameTrigger", false);
                         spriteAnimation.CallMethod("updateFrame");
@@ -191,7 +179,7 @@ namespace Cultivation_Way
                 {
                     if (spriteAnimation.currentFrameIndex + 1 >= spriteAnimation.frames.Length)
                     {
-                        if (spriteAnimation.returnToPool&&(!isCycle||leftTime<=0f))
+                        if (spriteAnimation.returnToPool && (!isCycle || leftTime <= 0f))
                         {
                             base.GetComponent<BaseSpellEffect>().kill();
                             return;
@@ -227,19 +215,15 @@ namespace Cultivation_Way
                 spriteAnimation.CallMethod("updateFrame");
             }
             #endregion
-            
+
             if (this.callbackOnFrame != -1 && this.spriteAnimation.currentFrameIndex == this.callbackOnFrame)
             {
-                
+
                 this.callback();
                 this.clear();
             }
         }
-        internal void setWorld()
-        {
-            this.world = MapBox.instance;
-        }
-        internal void setCycle(bool cycle = false,Actor follow=null,float totalTime=0f,float Xoffset = 0f,float Yoffset = 0f)
+        internal void setCycle(bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
         {
             isCycle = true;
             leftTime = totalTime;
@@ -280,7 +264,7 @@ namespace Cultivation_Way
             this.callbackOnFrame = pFrame;
             this.callback = pCallback;
         }
-        
+
         //准备结束
         internal void prepareKill()
         {

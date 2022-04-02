@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
+    /// <summary>
+    /// 用于表示法术信息，而非类别
+    /// </summary>
     class ExtensionSpellType
     {
         public bool attacking = true;
         public bool attacked = false;
         public bool levelUp = false;
         public bool byChance = false;
-        public int requiredLevel = 1;
+        /// <summary>
+        /// 表示境界，并非等级
+        /// </summary>
+        public int requiredLevel = 10;
         public float chance = 0.2f;
         public ExtensionSpellType()
         {

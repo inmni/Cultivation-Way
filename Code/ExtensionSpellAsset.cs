@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CultivationWay;
+﻿using System.Collections.Generic;
 
 namespace Cultivation_Way
 {
@@ -31,7 +26,8 @@ namespace Cultivation_Way
 
         public SpellAction spellAction;//具体法术效果
 
-        public ExtensionSpellAsset(){
+        public ExtensionSpellAsset()
+        {
             bannedRace = new List<string>();
             bannedCultisystem = new List<string>();
         }

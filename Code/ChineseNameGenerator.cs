@@ -8,25 +8,40 @@ namespace Cultivation_Way
     class ChineseNameGenerator
     {
         public static ChineseNameGenerator instance;
-
+        public static bool isBeingUsed = true;
         public static void init()
         {
             instance = new ChineseNameGenerator();
         }
-
+        public static string getName(string pAssetID)
+        {
+            ChineseNameAsset chineseNameAsset;
+            if (AddAssetManager.chineseNameGenerator.dict.ContainsKey(pAssetID))
+            {
+                chineseNameAsset = AddAssetManager.chineseNameGenerator.get(pAssetID);
+            }
+            else
+            {
+                chineseNameAsset = AddAssetManager.chineseNameGenerator.get("default_name");
+            }
+            return instance.getNameFromTemplate(chineseNameAsset);
+        }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(NameGenerator), "getName")]
         public static bool getChineseName(string pAssetID, ref string __result)
         {
-            ChineseNameAsset chineseNameAsset;
-            if (((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).dict.ContainsKey(pAssetID))
+            if (!isBeingUsed)
             {
-                chineseNameAsset = ((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).get(pAssetID);
+                return true;
+            }
+            ChineseNameAsset chineseNameAsset;
+            if (AddAssetManager.chineseNameGenerator.dict.ContainsKey(pAssetID))
+            {
+                chineseNameAsset = AddAssetManager.chineseNameGenerator.get(pAssetID);
             }
             else
             {
-                chineseNameAsset = ((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).get("default_name");
-
+                chineseNameAsset = AddAssetManager.chineseNameGenerator.get("default_name");
             }
             __result = instance.getNameFromTemplate(chineseNameAsset);
 
@@ -73,13 +88,40 @@ namespace Cultivation_Way
             Reflection.CallMethod(__instance, "prepare");
             return false;
         }
-        public string getNameFromTemplate(ChineseNameAsset pAsset)
+        public static string getCreatureName(string pAsset, string familyName, bool prefix = true)
+        {
+            if (!isBeingUsed)
+            {
+                return NameGenerator.getName(pAsset);
+            }
+            ChineseNameAsset asset = AddAssetManager.chineseNameGenerator.get(pAsset);
+            //prefix表示姓氏是否为前缀
+            string origin = instance.getNameFromTemplate(asset, false);
+            if (prefix)
+            {
+                origin = familyName + origin;
+            }
+            else
+            {
+                origin = origin + familyName;
+            }
+            if (!asset.onlyByTemplate && asset.fixedList != null && asset.fixedList.Count > 0 && Toolbox.randomChance(asset.fixedNameChance))
+            {
+                return asset.fixedList.GetRandom();
+            }
+            return origin;
+        }
+        public string getNameFromTemplate(ChineseNameAsset pAsset,bool useFixedName = true)
         {
             StringBuilder nameBuilder = new StringBuilder();
             //如果该命名可使用固定名
-            if (!pAsset.onlyByTemplate && Toolbox.randomChance(pAsset.fixedNameChance))
+            if (useFixedName&&!pAsset.onlyByTemplate && pAsset.fixedList!=null&&pAsset.fixedList.Count>0&&Toolbox.randomChance(pAsset.fixedNameChance))
             {
                 return pAsset.fixedList.GetRandom();
+            }
+            if (pAsset.templates == null || pAsset.templates.Length == 0)
+            {
+                return "";
             }
             //否则进行随机
             int length = pAsset.templates.Length;

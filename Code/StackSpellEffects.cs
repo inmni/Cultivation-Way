@@ -1,14 +1,13 @@
-﻿using System;
+﻿using ReflectionUtility;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using ReflectionUtility;
-using CultivationWay;
 
-namespace Cultivation_Way {
-    class StackSpellEffects:MonoBehaviour
+namespace Cultivation_Way
+{
+    /// <summary>
+    /// Copied from game
+    /// </summary>
+    class StackSpellEffects : MonoBehaviour
     {
         internal SpriteAnimation spriteAnimation;
 
@@ -57,9 +56,14 @@ namespace Cultivation_Way {
             this.loadEffect("default_lightning", true, 0.1f, "EffectsTop", 100);
             this.loadEffect("default_fire", true, 0.1f, "EffectsTop", 100);
             this.loadEffect("JiaoDragon_laser", true, 0.1f, "EffectsTop", 10);
+            this.loadEffect("goldBar", true, 0.1f, "EffectsTop", 10);
+            this.loadEffect("goldBarDown", true, 0.1f, "EffectsTop", 10);
+            this.loadEffect("happySpringFestival", true, 0.1f, "EffectsTop", 5);
+            this.loadEffect("firework", true, 0.1f, "EffectsTop", 100);
             this.loadEffect("LXST", true, 0.1f, "EffectsTop", 100);
             this.loadEffect("XTDT", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("HWMT", true, 0.1f, "EffectsTop",100);
+            this.loadEffect("HWMT", true, 0.1f, "EffectsTop", 100);
+            this.loadEffect("FT", true, 0.1f, "EffectsTop", 100);
             this.loadEffect("summon", true, 0.1f, "EffectsTop", 100);
             this.loadEffect("summonTian", true, 0.1f, "EffectsTop", 100);
             //this.add(prefabLightning, "lightning", 100);
@@ -93,12 +97,11 @@ namespace Cultivation_Way {
             {
                 SpriteAnimation component = gameObject.GetComponent<SpriteAnimation>();
                 component.timeBetweenFrames = pTimeBetweenFrames;
-                //component.frames = Resources.LoadAll<Sprite>("effects/" + pName + "_t");//路径待修改
-                component.frames = Utils.ResourcesHelper.loadAllSprite("effects/"+pName,0.55f,0.2f);
-                ((SpriteRenderer)Reflection.GetField(typeof(SpriteAnimation),component,"spriteRenderer")).sortingLayerName = pSortingLayerName;
+                component.frames = Utils.ResourcesHelper.loadAllSprite("effects/" + pName, 0.55f, 0.2f);
+                ((SpriteRenderer)Reflection.GetField(typeof(SpriteAnimation), component, "spriteRenderer")).sortingLayerName = pSortingLayerName;
             }
             BaseSpellEffectController baseEffectController = this.add(gameObject, pName, pLimit);
-            
+
             baseEffectController.addNewObject(gameObject.AddComponent<BaseSpellEffect>());
             baseEffectController.transform.SetParent(base.transform);
             baseEffectController.gameObject.SetActive(true);

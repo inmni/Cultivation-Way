@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ReflectionUtility;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
     class ExtensionSpell
     {
@@ -36,7 +29,16 @@ namespace Cultivation_Way
         }
         public ExtensionSpellAsset GetSpellAsset()
         {
-            return AddAssetManager.extensionSpellLibrary.get(spellAssetID);
+            ExtensionSpellAsset result = null;
+            if (AddAssetManager.extensionSpellLibrary.dict.TryGetValue(spellAssetID, out result))
+            {
+                return result;
+            }
+            else
+            {
+                spellAssetID = "example";
+                return AddAssetManager.extensionSpellLibrary.get(spellAssetID);
+            }
         }
         public bool castSpell(BaseSimObject pAttacker, BaseSimObject pTarget = null)
         {
@@ -47,7 +49,7 @@ namespace Cultivation_Way
             //    return false;
             //}
             //若为概率触发，则开始随机
-            if (spellAsset.type.byChance&&Toolbox.randomChance(0.99f))
+            if (spellAsset.type.byChance && Toolbox.randomChance(0.99f))
             {
                 return false;
             }
@@ -55,8 +57,8 @@ namespace Cultivation_Way
             {
                 pTarget = pAttacker;
             }
-            
-            return spellAsset.spellAction(this,pAttacker,pTarget);
+
+            return spellAsset.spellAction(this, pAttacker, pTarget);
         }
         //暂时弃用
         private bool isValid(BaseSimObject pAttacker, BaseSimObject pTarget)
@@ -84,7 +86,7 @@ namespace Cultivation_Way
             {
                 return true;
             }
-            else if(pTarget.objectType == MapObjectType.Actor)
+            else if (pTarget.objectType == MapObjectType.Actor)
             {
                 return true;
             }

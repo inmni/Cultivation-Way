@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CultivationWay;
+﻿using CultivationWay;
 namespace Cultivation_Way
 {
-    public class SpecialBodyLibrary:AssetLibrary<SpecialBody>
+    public class SpecialBodyLibrary : AssetLibrary<SpecialBody>
     {
         public override void init()
         {
@@ -61,14 +56,14 @@ namespace Cultivation_Way
         internal void reset()
         {
             this.dict.Clear();
-            Main.instance.SpecialBodyLimit = 100;
+            Main.instance.SpecialBodyLimit = 200;
             init();
         }
         internal void clear()
         {
             this.dict.Clear();
             this.list.Clear();
-            Main.instance.SpecialBodyLimit = 100;
+            Main.instance.SpecialBodyLimit = 200;
         }
     }
 }

@@ -1,12 +1,6 @@
-﻿using System;
+﻿using HarmonyLib;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HarmonyLib;
-using CultivationWay;
 using UnityEngine;
-using System.Reflection;
 
 namespace Cultivation_Way
 {
@@ -21,11 +15,14 @@ namespace Cultivation_Way
             t1.baseStats.attackSpeed = 50f;
             t1.baseStats.range = 20f;
             t1.baseStats.damage = 500;
+            ItemAsset t2 = AssetManager.items.clone("summonTian", "summonTian1");
+            t2.projectile = "magicArrow";
+            t2.baseStats.projectiles = 5;
             //Main.instance.moreItems.Add(t1.id);
 
             ActorAnimationLoader aal = new ActorAnimationLoader();
             Dictionary<string, Sprite> dictItems = Traverse.Create(aal).Field("dictItems").GetValue() as Dictionary<string, Sprite>;
-            Sprite[] addSprites = Utils.ResourcesHelper.loadAllSprite("items/",0.5f);
+            Sprite[] addSprites = Utils.ResourcesHelper.loadAllSprite("items/", 0.5f);
             foreach (Sprite sprite in addSprites)
             {
                 dictItems.Add(sprite.name, sprite);

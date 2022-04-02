@@ -49,30 +49,58 @@ namespace Cultivation_Way
         //public int zones;				土地限制
         #endregion
         public BaseStats baseStats;
-        public List<ExtensionSpell> spells;     //法术
-        public float spellRange;   //法术距离
-        public int magic;         //蓝量
-        public float vampire;      //吸血
-        public float antiInjury;   //反伤
-        public float spellRelief; //法伤减免
-        public string cultisystem; //修炼体系
-
-        public int talent;        //天赋
-
-        public int soul;          //元神
-
-        public int maxAge;                      //最大寿命
-
-        public SpecialBody specialBody;                //体质
-
-        public Family family;                   //家族
-
-        public ChineseElement element;          //元素
-
+        /// <summary>
+        /// 法术
+        /// </summary>
+        public List<ExtensionSpell> spells;
+        /// <summary>
+        /// 施法距离
+        /// </summary>
+        public float spellRange;
+        /// <summary>
+        /// 蓝量
+        /// </summary>
+        public int magic;
+        /// <summary>
+        /// 吸血
+        /// </summary>
+        public float vampire;
+        /// <summary>
+        /// 反伤
+        /// </summary>
+        public float antiInjury;
+        /// <summary>
+        /// 法术豁免
+        /// </summary>
+        public float spellRelief;
+        /// <summary>
+        /// 寿命
+        /// </summary>
+        public int maxAge;
+        /// <summary>
+        /// 天赋
+        /// </summary>
+        public int talent;
+        /// <summary>
+        /// 元神
+        /// </summary>
+        public int soul;
+        /// <summary>
+        /// 元素
+        /// </summary>
+        public ChineseElement element;
+        /// <summary>
+        /// 随机元素
+        /// </summary>
+        /// <returns></returns>
         private ChineseElement GetElementRandomly()
         {
             return new ChineseElement().getRandom();
         }
+        /// <summary>
+        /// 加法
+        /// </summary>
+        /// <param name="another"></param>
         public void addAnotherStats(MoreStats another)
         {
             baseStats.CallMethod("addStats", another.baseStats);
@@ -87,6 +115,10 @@ namespace Cultivation_Way
             this.soul += another.soul;
             this.maxAge += another.maxAge;
         }
+        /// <summary>
+        /// 减法
+        /// </summary>
+        /// <param name="another"></param>
         public void deleteAnotherStats(MoreStats another)
         {
             this.spellRange -= another.spellRange;
@@ -103,6 +135,14 @@ namespace Cultivation_Way
             baseStats.mod_speed -= another.baseStats.mod_speed;
             //其他属性待补充
         }
+        /// <summary>
+        /// 设置基础属性
+        /// </summary>
+        /// <param name="health"></param>
+        /// <param name="damage"></param>
+        /// <param name="speed"></param>
+        /// <param name="armor"></param>
+        /// <param name="magic"></param>
         public void setBasicStats(int health, int damage, int speed, int armor, int magic = 0)
         {
             this.baseStats.health = health;
@@ -111,17 +151,34 @@ namespace Cultivation_Way
             this.baseStats.armor = armor;
             this.magic = magic;
         }
+        /// <summary>
+        /// 返回BaseStats
+        /// </summary>
+        /// <returns></returns>
+        public BaseStats GetBaseStats()
+        {
+            return this.baseStats;
+        }
+        /// <summary>
+        /// 设置特殊属性
+        /// </summary>
+        /// <param name="maxAge"></param>
+        /// <param name="soul"></param>
+        /// <param name="talent"></param>
         public void setSpecialStats(int maxAge, int soul, int talent)
         {
             this.maxAge = maxAge;
             this.soul = soul;
             this.talent = talent;
         }
+        /// <summary>
+        /// 清空
+        /// </summary>
         public void clear()
         {
             baseStats = new BaseStats();
             spells = new List<ExtensionSpell>();
-            spellRange = 0;
+            spellRange = 1f;
             magic = 5;
             vampire = 0f;
             antiInjury = 0f;
@@ -130,12 +187,18 @@ namespace Cultivation_Way
             talent = 0;
             maxAge = 0;
         }
-        public static MoreStats operator* (float num,MoreStats moreStats)
+        /// <summary>
+        /// 数乘
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="moreStats"></param>
+        /// <returns></returns>
+        public static MoreStats operator *(float num, MoreStats moreStats)
         {
             MoreStats result = new MoreStats();
-            result.vampire=moreStats.vampire* num;
-            result.antiInjury=moreStats.antiInjury * num;
-            result.spellRange=moreStats.spellRange *num;
+            result.vampire = moreStats.vampire * num;
+            result.antiInjury = moreStats.antiInjury * num;
+            //result.spellRange = moreStats.spellRange * num;
             result.spellRelief = moreStats.spellRelief * num;
             result.magic = (int)(moreStats.magic * num);
             result.soul = (int)(moreStats.soul * num);
@@ -146,13 +209,12 @@ namespace Cultivation_Way
         {
             baseStats = new BaseStats();
             spells = new List<ExtensionSpell>();
-            spellRange = 0;
+            spellRange = 1f;
             magic = 5;
             vampire = 0f;
             antiInjury = 0f;
             spellRelief = 0f;
             soul = 0;
-            cultisystem = "default";
             element = GetElementRandomly();
             talent = 0;
             maxAge = 0;

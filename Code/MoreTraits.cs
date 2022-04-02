@@ -1,5 +1,9 @@
-﻿using HarmonyLib;
+﻿using CultivationWay;
+using HarmonyLib;
+using ReflectionUtility;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
@@ -22,30 +26,30 @@ namespace Cultivation_Way
                 birth = 0f
             }).id);
 
-            AssetManager.traits.add(new ActorTrait
+            addTraits.Add(AssetManager.traits.add(new ActorTrait
             {
                 id = "realm",
                 birth = 0f,
-                icon = "normal_1"
-            });
-            AssetManager.traits.add(new ActorTrait 
-            { 
+                icon = "default_1"
+            }).id);
+            addTraits.Add(AssetManager.traits.add(new ActorTrait
+            {
                 id = "cultivationBook",
                 birth = 0f,
                 icon = "cultivationBook"
-            });
-            AssetManager.traits.add(new ActorTrait
+            }).id);
+            addTraits.Add(AssetManager.traits.add(new ActorTrait
             {
                 id = "element",
                 birth = 0f,
-                icon = "All"
-            });
-            AssetManager.traits.add(new ActorTrait
+                icon = "element"
+            }).id);
+            addTraits.Add(AssetManager.traits.add(new ActorTrait
             {
                 id = "race",
                 birth = 0f,
-                icon = "race"
-            });
+                icon = "human"
+            }).id);
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ActionLibrary), "giveCursed")]
@@ -53,6 +57,20 @@ namespace Cultivation_Way
         {
             if (pActor.haveTrait("cursed_immune"))
             {
+                return false;
+            }
+            return true;
+        }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(TraitButton), "load")]
+        public static bool load_Prefix(TraitButton __instance, string pTrait)
+        {
+            if (Main.instance.MoreTraits.addTraits.Contains(pTrait))
+            {
+                ActorTrait trait = AssetManager.traits.get(pTrait);
+                Reflection.SetField(__instance, "trait", trait);
+                Sprite sprite = NCMS.Utils.Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/traits/" + trait.icon + ".png");
+                __instance.GetComponent<Image>().sprite = sprite;
                 return false;
             }
             return true;

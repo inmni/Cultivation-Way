@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using CultivationWay;
+﻿using CultivationWay;
 
 namespace Cultivation_Way
 {
@@ -16,7 +10,7 @@ namespace Cultivation_Way
         //时间按年来算
         internal int leftTime;
         internal int punishTime;
-        public BonusStatsManager(Actor actor,MoreStats bonusStats, int leftTime,MoreStats punishStats = null, int punishTime = 0)
+        public BonusStatsManager(Actor actor, MoreStats bonusStats, int leftTime, MoreStats punishStats = null, int punishTime = 0)
         {
             this.actor = actor;
             this.bonusStats = bonusStats;

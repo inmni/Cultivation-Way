@@ -5,7 +5,7 @@
         public override void init()
         {
             base.init();
-            
+
             #region 单属性 五行
             //金
             this.add(new ChineseElementAsset
@@ -15,7 +15,7 @@
                 content = new int[5] { 100, 0, 0, 0, 0 },
                 oppositeElementId = new string[] { "Wood" },
                 promoteElementId = new string[] { "Water" },
-                rarity =3
+                rarity = 3
             });
             //木
             this.add(new ChineseElementAsset
@@ -143,6 +143,15 @@
             //混沌
             this.add(new ChineseElementAsset
             {
+                id = "AllElement",
+                name = "混沌",
+                content = new int[5] { 20, 20, 20, 20, 20 },
+                oppositeElementId = new string[] { "*" },//星号表示所有，指在实现时
+                promoteElementId = new string[] { },//无
+                rarity = 10
+            });
+            this.add(new ChineseElementAsset
+            {
                 id = "All",
                 name = "杂",
                 content = new int[5] { 20, 20, 20, 20, 20 },
@@ -157,6 +166,7 @@
         public void reset()
         {
             this.dict.Clear();
+            this.list.Clear();
             this.init();
         }
     }

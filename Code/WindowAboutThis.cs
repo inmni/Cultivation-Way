@@ -1,18 +1,17 @@
-﻿using NCMS.Utils;
+﻿using CultivationWay;
+using NCMS.Utils;
 using UnityEngine;
 using UnityEngine.UI;
-using NCMS;
-using CultivationWay;
 namespace Cultivation_Way
 {
     class WindowAboutThis
     {
         internal static void init()
         {
-            ScrollWindow window_AboutThis = Windows.CreateNewWindow("AboutThis", "修真之路");
+            ScrollWindow window_AboutThis = Windows.CreateNewWindow("window_AboutThis", "修真之路");
             window_AboutThis.transform.Find("Background").Find("Scroll View").gameObject.SetActive(true);
 
-            GameObject aboutThisContent = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/AboutThis/Background/Scroll View/Viewport/Content");
+            GameObject aboutThisContent = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/window_AboutThis/Background/Scroll View/Viewport/Content");
 
             #region 内容设置
             string content =
@@ -46,21 +45,24 @@ namespace Cultivation_Way
                 .Find("Viewport")
                 .Find("Content"));
             //添加图片
-            PowerButton button = PowerButtons.CreateButton("Coder1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconRenJian.png"),
+            PowerButton button = PowerButtons.CreateButton("Coder1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconRenJian.png"),
                 "人间", "代码", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(-20f, -160f);
-            button = PowerButtons.CreateButton("Coder2", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconINMNI.png"),
+            button = PowerButtons.CreateButton("Coder2", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconINMNI.png"),
                 "一米", "代码", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(20f, -160f);
-            button = PowerButtons.CreateButton("Coder3", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconQiPan.png"),
+            button = PowerButtons.CreateButton("Coder3", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconQiPan.png"),
                 "星棋盘", "代码", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(60f, -160f);
-            button = PowerButtons.CreateButton("Propagandist", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconMengZhu.png"),
+            button = PowerButtons.CreateButton("Propagandist", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconMengZhu.png"),
                 "変態盟主", "美工、宣传\nB站关注71563146", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(0f, -180f);
-            button = PowerButtons.CreateButton("Planner1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/iconQingSi.png"),
+            button = PowerButtons.CreateButton("Planner1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconQingSi.png"),
                 "青丝", "策划", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
             button.transform.localPosition = new Vector3(40f, -180f);
+            button = PowerButtons.CreateButton("Contributor1", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconXingJian.png"),
+                "星剑", "贡献", Vector3.zero, ButtonType.Click, contentComponent.transform, null);
+            button.transform.localPosition = new Vector3(20f, -200f);
             contentComponent.SetActive(true);
 
             //设置滚轮

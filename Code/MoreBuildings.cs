@@ -1,9 +1,8 @@
 ﻿using Cultivation_Way.Utils;
-using CultivationWay;
+using HarmonyLib;
+using ReflectionUtility;
 using System.Collections.Generic;
 using UnityEngine;
-using ReflectionUtility;
-using HarmonyLib;
 namespace Cultivation_Way
 {
     class MoreBuildings
@@ -18,26 +17,110 @@ namespace Cultivation_Way
                     humanBuildings.Add(humanBuilding);
                 }
             }
-            addRaceNormalBuildings();
+            addRaceNormalBuildings("Tian");
+            addRaceNormalBuildings("Ming");
+            addRaceNormalBuildings("EasternHuman");
+            clone("Yao", "orc");
             addOthers();
             setSpecial();
         }
-        private void addRaceNormalBuildings()
+        private void addRaceNormalBuildings(string race)
         {
-
-            foreach (string race in Main.instance.moreRaces)
+            foreach (BuildingAsset humanBuilding in humanBuildings)
             {
-                foreach (BuildingAsset humanBuilding in humanBuildings)
+                BuildingAsset newBuilding = AssetManager.buildings.clone(humanBuilding.id.Replace("human", race), humanBuilding.id);
+                newBuilding.race = race;
+                newBuilding.shadow = false;
+                if (humanBuilding.canBeUpgraded)
                 {
-                    BuildingAsset newBuilding = AssetManager.buildings.clone(humanBuilding.id.Replace("human", race), humanBuilding.id);
-                    newBuilding.race = race;
-                    newBuilding.shadow = false;
-                    if (humanBuilding.canBeUpgraded)
-                    {
-                        newBuilding.upgradeTo = humanBuilding.upgradeTo.Replace("human", race);
-                    }
-                    loadSprites(newBuilding);
+                    newBuilding.upgradeTo = humanBuilding.upgradeTo.Replace("human", race);
                 }
+                loadSprites(newBuilding);
+            }
+        }
+        private void clone(string race, string from = "human")
+        {
+            List<BuildingAsset> fromList = new List<BuildingAsset>();
+            foreach (BuildingAsset building in AssetManager.buildings.list)
+            {
+                if (building.race == from)
+                {
+                    fromList.Add(building);
+                }
+            }
+            foreach (BuildingAsset building in fromList)
+            {
+                BuildingAsset newBuilding = AssetManager.buildings.clone(building.id.Replace(from, race), building.id);
+                newBuilding.race = race;
+                if (building.canBeUpgraded)
+                {
+                    newBuilding.upgradeTo = building.upgradeTo.Replace(from, race);
+                }
+                loadNormalSprites(newBuilding, building.id);
+            }
+
+        }
+        private void loadNormalSprites(BuildingAsset pTemplate, string normalID)
+        {
+            Sprite[] array = Resources.LoadAll<Sprite>("buildings/" + normalID);
+            pTemplate.sprites = new BuildingSprites();
+            foreach (Sprite sprite in array)
+            {
+                string[] array2 = sprite.name.Split(new char[] { '_' });
+                string text = array2[0];
+                int num = int.Parse(array2[1]);
+                if (array2.Length == 3)
+                {
+                    int.Parse(array2[2]);
+                }
+                while (pTemplate.sprites.animationData.Count < num + 1)
+                {
+                    pTemplate.sprites.animationData.Add(null);
+                }
+                if (pTemplate.sprites.animationData[num] == null)
+                {
+                    pTemplate.sprites.animationData[num] = new BuildingAnimationDataNew();
+                }
+                BuildingAnimationDataNew buildingAnimationDataNew = pTemplate.sprites.animationData[num];
+                if (text.Equals("main"))
+                {
+                    buildingAnimationDataNew.list_main.Add(sprite);
+                    if (buildingAnimationDataNew.list_main.Count > 1)
+                    {
+                        buildingAnimationDataNew.animated = true;
+                    }
+                }
+                else if (text.Equals("ruin"))
+                {
+                    buildingAnimationDataNew.list_ruins.Add(sprite);
+                }
+                else if (text.Equals("shadow"))
+                {
+                    buildingAnimationDataNew.list_shadows.Add(sprite);
+                }
+                else if (text.Equals("construction"))
+                {
+                    pTemplate.sprites.construction = sprite;
+                }
+                else if (text.Equals("constructionShadow"))
+                {
+                    pTemplate.sprites.construction_shadow = sprite;
+                }
+                else if (text.Equals("special"))
+                {
+                    buildingAnimationDataNew.list_special.Add(sprite);
+                }
+                else if (text.Equals("mini"))
+                {
+                    pTemplate.sprites.mapIcon = new BuildingMapIcon(sprite);
+                }
+            }
+            foreach (BuildingAnimationDataNew buildingAnimationDataNew2 in pTemplate.sprites.animationData)
+            {
+                buildingAnimationDataNew2.main = buildingAnimationDataNew2.list_main.ToArray();
+                buildingAnimationDataNew2.ruins = buildingAnimationDataNew2.list_ruins.ToArray();
+                buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
+                buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
             }
         }
         private void loadSprites(BuildingAsset pTemplate)
@@ -106,7 +189,33 @@ namespace Cultivation_Way
 
         private void addOthers()
         {
-
+            BuildingAsset Tian1 = AssetManager.buildings.clone("Barrack1_Tian", "!building");
+            Tian1.baseStats.health = 100;
+            Tian1.priority = 50;
+            Tian1.tech = "building_barracks";
+            Tian1.fundament = new BuildingFundament(3, 3, 4, 0);
+            Tian1.cost = new ConstructionCost(20, 30, 50, 100);
+            Tian1.type = "barracks";
+            Tian1.race = "Tian";
+            Tian1.canBePlacedOnLiquid = false;
+            Tian1.ignoreBuildings = false;
+            Tian1.checkForCloseBuilding = false;
+            Tian1.canBeLivingHouse = false;
+            Tian1.burnable = false;
+            Tian1.spawnUnits = true;
+            Tian1.spawnUnits_asset = "summonTian2";
+            Tian1.shadow = false;
+            loadSprites(Tian1);
+            CityBuildOrder.list.Add(new CityBuildOrderElement
+            {
+                buildingID = "Barrack1",
+                priority = 80,
+                limitID =2 ,
+                requiredPop = 50,
+                addRace = true,
+                usedByRacesCheck = true,
+                usedByRaces = "Tian"
+            });
         }
         private void setSpecial()
         {
@@ -118,23 +227,33 @@ namespace Cultivation_Way
             p.tower_projectile = "lightning_orb";
             p.tower_projectile_amount = 1;
             p.tower_projectile_offset = 7f;
+            BuildingAsset hall_EH = AssetManager.buildings.get("hall_EasternHuman");
+            hall_EH.fundament = new BuildingFundament(5, 5, 6, 0);
+            BuildingAsset hall1_EH = AssetManager.buildings.get("1hall_EasternHuman");
+            hall1_EH.fundament = new BuildingFundament(6, 6, 9, 0);
+            BuildingAsset hall2_EH = AssetManager.buildings.get("2hall_EasternHuman");
+            hall2_EH.fundament = new BuildingFundament(7, 7, 12, 0);
+            BuildingAsset house4_EH = AssetManager.buildings.get("4house_EasternHuman");
+            house4_EH.fundament = new BuildingFundament(5, 5, 7, 0);
+            BuildingAsset house5_EH = AssetManager.buildings.get("5house_EasternHuman");
+            house5_EH.fundament = new BuildingFundament(5, 5, 7, 0);
         }
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(Building),"applyScale")]
+        [HarmonyPatch(typeof(Building), "applyScale")]
         public static bool applyScale_Postfix(Building __instance)
         {
-            if(((BuildingAsset)Reflection.GetField(typeof(Building),__instance,"stats")).id== "windmill_Tian")
+            if (((BuildingAsset)Reflection.GetField(typeof(Building), __instance, "stats")).id == "windmill_Tian")
             {
-                __instance.currentScale =new Vector3(0.23f,0.23f,0.23f);
+                __instance.currentScale = new Vector3(0.23f, 0.23f, 0.23f);
             }
             return true;
         }
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(BuildingTower),"checkEnemies")]
+        [HarmonyPatch(typeof(BuildingTower), "checkEnemies")]
         public static bool checkEnemies_Prefix(BuildingTower __instance)
         {
             Building b = Reflection.GetField(typeof(BuildingTower), __instance, "building") as Building;
-            if (b.kingdom.id=="abandoned")
+            if (b.kingdom.id == "abandoned")
             {
                 return false;
             }
@@ -157,13 +276,13 @@ namespace Cultivation_Way
                 if (num >= 0 && num < MapBox.width && num2 >= 0 && num2 < MapBox.height)
                 {
                     WorldTile tileSimple = MapBox.instance.GetTileSimple(num, num2);
-        
+
                     if (tileSimple.units.Count > 0)
                     {
                         for (int k = 0; k < tileSimple.units.Count; k++)
                         {
                             Actor actor = tileSimple.units[k];
-                            if (actor.kingdom==null||(b.kingdom.enemies.ContainsKey(actor.kingdom)&&b.kingdom.enemies[actor.kingdom]==true))
+                            if (actor.kingdom == null || (b.kingdom.enemies.ContainsKey(actor.kingdom) && b.kingdom.enemies[actor.kingdom] == true))
                             {
                                 targets.Add(actor);
                             }
@@ -173,7 +292,7 @@ namespace Cultivation_Way
             }
             if (targets.Count == 0)
             {
-                
+
                 return false;
             }
             BaseSimObject baseSimObject = targets.GetRandom();
@@ -181,8 +300,29 @@ namespace Cultivation_Way
 
             Reflection.SetField(__instance, "_shootingActive", true);
             Reflection.SetField(__instance, "_shootingTarget", baseSimObject);
-            Reflection.SetField(__instance, "_shootingAmount",ba.tower_projectile_amount);
+            Reflection.SetField(__instance, "_shootingAmount", ba.tower_projectile_amount);
             return false;
+        }
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(UnitSpawner),"setUnitFromHere")]
+        public static void setUnitFromHere(UnitSpawner __instance,Actor pActor)
+        {
+            Building building = __instance.GetComponent<Building>();
+            if (building.city != null)
+            {
+                building.city.addNewUnit(pActor, true);
+                pActor.CallMethod("setProffesion", UnitProfession.Warrior);
+                int level = building.city.getArmyMaxCity() / 10;
+                CityData data = Reflection.GetField(typeof(City), building.city, "data") as CityData;
+                if (data.storage.get("gold") < level * 30)
+                {
+                    level = data.storage.get("gold") / 30;
+                }
+                data.storage.change("gold", level * 30);
+                pActor.GetData().level = level;
+                pActor.GetData().health = int.MaxValue >> 2;
+                pActor.setStatsDirty();
+            }
         }
     }
 }

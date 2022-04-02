@@ -17,10 +17,11 @@ namespace Cultivation_Way
 
         public static void addAsset()
         {
-            Main.instance.MoreItem.init();
+            //顺序尽量不要调整
+            Main.instance.MoreItems.init();
             Main.instance.MoreTraits.init();
-            Main.instance.MoreGodPowers.init();
             Main.instance.MoreActors.init();
+            Main.instance.MoreGodPowers.init();
             Main.instance.MoreRaces.init();
             Main.instance.MoreKingdoms.init();
             Main.instance.MoreBuildings.init();

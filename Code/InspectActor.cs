@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class InspectActor:MonoBehaviour
+    class InspectActor : MonoBehaviour
     {
         private static Sprite OnIcon;
 
@@ -26,12 +21,12 @@ namespace Cultivation_Way
             OffIcon = Resources.Load<Sprite>("ui/icons/iconInspect");
 
         }
-		private void clickInspect()
-		{
-			Sfx.play("click");
+        private void clickInspect()
+        {
+            Sfx.play("click");
             Config.selectedUnit = this.actor;
             ScrollWindow.moveAllToLeftAndRemove(true);
             ScrollWindow.showWindow("inspect_unit");
         }
-	}
+    }
 }

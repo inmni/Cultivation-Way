@@ -13,15 +13,15 @@ namespace Cultivation_Way
                 name = "仙路",
                 bannedRace = new string[] { "orc"},
                 realms = new string[20] { "练气境","筑基境","金丹境","元婴境","化神境","炼虚境","合体境","大乘境","渡劫境","登仙境",
-                                        "地仙","真仙","天仙","玄仙","太乙金仙","大罗金仙","混元大罗金仙","仙王","仙尊","仙帝"},
+                                        "地仙","真仙","玄仙","灵仙","金仙","太乙玉仙","大罗金仙","仙王","仙尊","仙帝"},
                 moreStats = new MoreStats[20]
             });
             for (int i = 0; i < 20; i++)
             {
                 this.t.moreStats[i] = new MoreStats();
-                this.t.moreStats[i].baseStats.knockbackReduction = i*2;
-                this.t.moreStats[i].setBasicStats(50 * (i + 1), 10 * (i + 1), (int)(0.1 * (i + 1)), i + 1);
-                this.t.moreStats[i].setSpecialStats(150 * (i + 1), 2 * (i + 1), 0);
+                this.t.moreStats[i].baseStats.knockbackReduction = i * 2;
+                this.t.moreStats[i].setBasicStats(i * i << 4, (int)(0.9 * (i * i)), i + 1, (int)(0.1 * (i + 19)), i << 1);
+                this.t.moreStats[i].setSpecialStats(30 * i * i, i >> 1, 0);
             }
             this.add(new CultisystemAsset
             {
@@ -29,15 +29,15 @@ namespace Cultivation_Way
                 name = "仙路",
                 bannedRace = new string[] { },
                 realms = new string[20] { "练气境","筑基境","金丹境","元婴境","化神境","炼虚境","合体境","大乘境","渡劫境","登仙境",
-                                        "地仙","真仙","天仙","玄仙","太乙金仙","大罗金仙","混元大罗金仙","仙王","仙尊","仙帝"},
+                                        "地仙","真仙","玄仙","灵仙","金仙","太乙玉仙","大罗金仙","仙王","仙尊","仙帝"},
                 moreStats = new MoreStats[20]
             });
             for (int i = 0; i < 20; i++)
             {
                 this.t.moreStats[i] = new MoreStats();
                 this.t.moreStats[i].baseStats.knockbackReduction = i*2;
-                this.t.moreStats[i].setBasicStats(50 * (i + 1), 10* (i + 1), (int)(0.1 * (i + 1)), i + 1);
-                this.t.moreStats[i].setSpecialStats(150 * (i + 1), 2 * (i + 1), 0);
+                this.t.moreStats[i].setBasicStats(i * i<<4, (int)(0.9 * (i * i)), i + 1, (int)(0.1 * (i + 19)),i<<1);
+                this.t.moreStats[i].setSpecialStats(30*i*i, i>>1, 0);
             }
             this.add(new CultisystemAsset
             {
@@ -51,9 +51,9 @@ namespace Cultivation_Way
             for (int i = 0; i < 20; i++)
             {
                 this.t.moreStats[i] = new MoreStats();
-                this.t.moreStats[i].baseStats.knockbackReduction = i*8;
-                this.t.moreStats[i].setBasicStats(20 * (i + 1) * (i + 1), 2*(i + 1), (int)(0.05 * (i + 1)), 3 * (i + 1));
-                this.t.moreStats[i].setSpecialStats(100*(i + 1) * (i + 1), i, 0);
+                this.t.moreStats[i].baseStats.knockbackReduction = i*2;
+                this.t.moreStats[i].setBasicStats(i * i * i*3, (int)(0.45 * (i * i)), i + 1, (int)(0.15 * (i + 19)));
+                this.t.moreStats[i].setSpecialStats(100*i * i, i, 0);
             }
 
             this.add(new CultisystemAsset
@@ -68,9 +68,9 @@ namespace Cultivation_Way
             for (int i = 0; i < 20; i++)
             {
                 this.t.moreStats[i] = new MoreStats();
-                this.t.moreStats[i].baseStats.knockbackReduction = i * 6;
-                this.t.moreStats[i].setBasicStats(3 * (i + 1) * (i + 1), 5 * (i + 1), (int)(0.08 * (i + 1)), 5 * (i + 1));
-                this.t.moreStats[i].setSpecialStats(25*(i+1) * (i + 1), i, 0);
+                this.t.moreStats[i].baseStats.knockbackReduction = i * 2;
+                this.t.moreStats[i].setBasicStats(i * i * i<<1, (int)(0.65 * (i * i)), i + 1, (int)(0.12* (i + 19)));
+                this.t.moreStats[i].setSpecialStats((int)(i*i * i*1.6), i, 0);
             }
 
             bannedCultisystemsForRace();

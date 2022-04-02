@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NCMS;
+﻿using CultivationWay;
 using NCMS.Utils;
-using CultivationWay;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,10 +19,10 @@ namespace Cultivation_Way
         private static MapChunk chunk;
         internal static void init()
         {
-            window = Windows.CreateNewWindow("chunkInfo", "区块信息");
+            window = Windows.CreateNewWindow("window_ChunkInfo", "区块信息");
             window.transform.Find("Background").Find("Scroll View").gameObject.SetActive(true);
 
-            chunkInfoContent = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/chunkInfo/Background/Scroll View/Viewport/Content");
+            chunkInfoContent = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/window_ChunkInfo/Background/Scroll View/Viewport/Content");
 
             contentComponent = window.transform
                                 .Find("Background")
@@ -67,14 +62,14 @@ namespace Cultivation_Way
         private static string getContent()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append("区块编号：" + chunk.id+"\n");
-            stringBuilder.Append("元素纯度：" + (int)(125/ Main.instance.chunkToElement[chunk.id].getPurity()-25) + "%\n");
-            string[] t = new string[5] { "金", "木", "水", "火", "土" };
+            stringBuilder.Append("区块编号：" + chunk.id + "\n");
+            stringBuilder.Append("元素纯度：" + (int)(125 / Main.instance.chunkToElement[chunk.id].getImPurity() - 25) + "%\n");
+            string[] t = new string[5] { "elementGold", "elementWood", "elementWater", "elementFire", "elementGround" };
             for (int i = 0; i < 5; i++)
             {
                 if (Main.instance.chunkToElement[chunk.id].baseElementContainer[i] > 9)
                 {
-                    stringBuilder.Append(t[i] + "                   " + Main.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
+                    stringBuilder.Append(Localization.getLocalization(t[i]) + "                   " + Main.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
                 }
                 else
                 {
