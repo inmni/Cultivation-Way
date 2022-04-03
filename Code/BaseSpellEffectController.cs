@@ -37,7 +37,7 @@ namespace Cultivation_Way
 
         internal float timer;//计时器
 
-        internal List<BaseSpellEffect> list;//图像列表
+        internal List<BaseSpellEffect> list;//动画列表
 
         private BaseSpellEffect switchObject;//下个对象
 

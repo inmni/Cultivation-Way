@@ -145,7 +145,7 @@ namespace Cultivation_Way
             {
                 realm = (realm + 9) / 10 + 9;
             }
-            value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).realms[realm - 1]);
+            value.Add(Config.selectedUnit.getRealmName());
 
             item.Add("magic");
             value.Add(Main.instance.actorToMoreData[data.actorID].magic + "/" + stats.magic);

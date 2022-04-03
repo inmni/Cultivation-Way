@@ -12,8 +12,6 @@ namespace Cultivation_Way
                 id = "normal",
                 name = "仙路",
                 bannedRace = new string[] { "orc"},
-                realms = new string[20] { "练气境","筑基境","金丹境","元婴境","化神境","炼虚境","合体境","大乘境","渡劫境","登仙境",
-                                        "地仙","真仙","玄仙","灵仙","金仙","太乙玉仙","大罗金仙","仙王","仙尊","仙帝"},
                 moreStats = new MoreStats[20]
             });
             for (int i = 0; i < 20; i++)
@@ -28,8 +26,6 @@ namespace Cultivation_Way
                 id = "default",
                 name = "仙路",
                 bannedRace = new string[] { },
-                realms = new string[20] { "练气境","筑基境","金丹境","元婴境","化神境","炼虚境","合体境","大乘境","渡劫境","登仙境",
-                                        "地仙","真仙","玄仙","灵仙","金仙","太乙玉仙","大罗金仙","仙王","仙尊","仙帝"},
                 moreStats = new MoreStats[20]
             });
             for (int i = 0; i < 20; i++)
@@ -44,8 +40,6 @@ namespace Cultivation_Way
                 id = "bodying",
                 name = "炼体",
                 bannedRace = new string[] { },
-                realms = new string[20] { "固元期","凝血期","淬骨期","洗髓期","通脉境","易经期","磐石境","金身境","超凡境","千山境",
-                                        "万象","神力","神勇","天人","涅槃","纳界","破虚","开天","灵城","帝疆"},
                 moreStats = new MoreStats[20]
             });
             for (int i = 0; i < 20; i++)
@@ -61,8 +55,6 @@ namespace Cultivation_Way
                 id = "bushido",
                 name = "武道",
                 bannedRace = new string[] { "orc"},
-                realms = new string[20] { "炼体","引气","开脉","真元","气海","通窍","空冥","神游","破碎","涅槃",
-                                        "超脱","地极","天极","神藏","法相","通天","入圣","问道","准帝","大帝"},
                 moreStats = new MoreStats[20]
             });
             for (int i = 0; i < 20; i++)

@@ -1034,7 +1034,7 @@ namespace Cultivation_Way
                 return false;
             }
 
-            //人对人伤害减免
+            //人对人伤害增益
             if (pAttacker.objectType == MapObjectType.Actor)
             {
                 ActorStatus data2 = ((Actor)pAttacker).GetData();

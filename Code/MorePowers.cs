@@ -132,7 +132,6 @@ namespace Cultivation_Way
             #region 生物
             button = PowerButtons.CreateButton("spawnEasternHuman", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconEasternHuman.png"),
                 "东方人族", "", Vector3.zero, ButtonType.GodPower, null, null);
-
             Utils.TabHelper.AddButtonToTab(button);
 
             button = PowerButtons.CreateButton("spawnTian", Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/iconTian.png"),
@@ -244,28 +243,19 @@ namespace Cultivation_Way
             Config.timeScale -= 1;
             WorldTip.showNow("当前时间流速为" + Config.timeScale + "倍", false, "top");
 
-            //int chunkID = Main.instance.chunkToElement.Keys.ToList().GetRandom();
-            //MonoBehaviour.print("尝试清理:"+Main.instance.actorToMoreData.Count);
+            foreach(string id in Main.instance.actorToMoreData.Keys)
+            {
+                Actor a = MapBox.instance.getActorByID(id);
+                if (a== null)
+                {
+                    MonoBehaviour.print("[MorePowers]actorToMoreData存在未删除数据"+id);
+                }
+                else
+                {
+                    MonoBehaviour.print("[MorePowers]actorToMoreData过早删除数据"+id+"\n"+a.GetData().statsID);
 
-            //Dictionary<string, MoreActorData> actorToMoreData = new Dictionary<string, MoreActorData>(MapBox.instance.units.Count+500);
-            //foreach (string id in Main.instance.actorToMoreData.Keys)
-            //{
-            //    if (MapBox.instance.getActorByID(id) != null)
-            //    {
-            //        actorToMoreData.Add(id, Main.instance.actorToMoreData[id]);
-            //    }
-            //}
-            //Main.instance.actorToMoreData = actorToMoreData;
-            //GC.Collect();
-            //MonoBehaviour.print("=>" + Main.instance.actorToMoreData.Count);
-            //MonoBehaviour.print("**************************");
-
-            //MonoBehaviour.print("[修真之路Cultivation Way]:某区块五行元素含量依次为:");
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    MonoBehaviour.print(Main.instance.chunkToElement[chunkID].baseElementContainer[i]);
-            //}
-            //MonoBehaviour.print("**************************");
+                }
+            }
         }
         public static void clickForWindow_AboutThis()
         {
