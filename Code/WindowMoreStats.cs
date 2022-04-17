@@ -65,7 +65,6 @@ namespace Cultivation_Way
         }
         private static void clickForWindow_MoreStats()
         {
-            Main.instance.actorToMoreStats[Config.selectedUnit.GetData().actorID].magic++;
 
             setWindowContent();
 
@@ -113,8 +112,9 @@ namespace Cultivation_Way
             //}
             //Debug.Log(properties.Length);
             ActorStatus data = Config.selectedUnit.GetData();
-            MoreStats stats = Config.selectedUnit.GetMoreStats();
+            
             MoreActorData moredata = Config.selectedUnit.GetMoreData();
+            MoreStats stats = moredata.currStats;
             item.Add("family");
             value.Add(moredata.familyID + "氏");
             item.Add("cultivationBook");

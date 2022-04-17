@@ -272,6 +272,7 @@
     <Compile Include="Code\MoreMapModes.cs" />
     <Compile Include="Code\PowerActionLibrary.cs" />
     <Compile Include="Code\RaceFeature.cs" />
+    <Compile Include="Code\ResourcesBuffer.cs" />
     <Compile Include="Code\SaveAndLoadManager.cs" />
     <Compile Include="Code\Main.cs" />
     <Compile Include="Code\MoreActorData.cs" />

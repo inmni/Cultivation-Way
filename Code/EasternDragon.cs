@@ -307,7 +307,7 @@ namespace Cultivation_Way
                         this.actorToAttack = targets.GetRandom();
                     }
                 }
-                foreach (ExtensionSpell spell in this.actor.GetMoreStats().spells)
+                foreach (ExtensionSpell spell in this.actor.GetMoreData().currStats.spells)
                 {
                     if (actor.GetMoreData().magic > spell.cost && actor.GetMoreData().coolDown[spell.spellAssetID] == 1)
                     {

@@ -34,7 +34,6 @@ namespace Cultivation_Way
         private int curHeight;
 
         private const int maxWidth = 1938;
-
         private const int maxHeight = 1038;
         [DllImport("User32.dll", EntryPoint = "FindWindow")]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -130,6 +129,10 @@ namespace Cultivation_Way
                         {
                             return 1;
                         }
+                        else if(data1.kills==data2.kills)
+                        {
+                            return data1.GetHashCode() > data2.GetHashCode() ? 1 : -1;
+                        }
                         else
                         {
                             return -1;
@@ -192,6 +195,10 @@ namespace Cultivation_Way
                         {
                             return 1;
                         }
+                        else if (data1.kills == data2.kills)
+                        {
+                            return data1.GetHashCode() > data2.GetHashCode() ? -1 : 1;
+                        }
                         else
                         {
                             return -1;
@@ -232,15 +239,23 @@ namespace Cultivation_Way
                 ChineseElement element2 = a2.GetMoreData().element;
                 int bodyRank1 = a1.GetSpecialBody().rank;
                 int bodyRank2 = a2.GetSpecialBody().rank;
-                if (element1.GetAsset().rarity*bodyRank1 > element2.GetAsset().rarity*bodyRank2)
+                float e1 = element1.GetAsset().rarity * bodyRank1;
+                float e2 = element2.GetAsset().rarity * bodyRank2;
+                if (e1 > e2)
                 {
                     return -1;
                 }
-                else if (element1.GetAsset().rarity*bodyRank1 == element2.GetAsset().rarity*bodyRank2)
+                else if (e1 == e2)
                 {
-                    if (element1.getImPurity()*bodyRank2 < element2.getImPurity()*bodyRank1)
+                    e1 = element1.getImPurity() * bodyRank2;
+                    e2 = element2.getImPurity() * bodyRank1;
+                    if ( e1< e2)
                     {
                         return -1;
+                    }
+                    else if(e1== e2)
+                    {
+                        return a1.GetHashCode() > a2.GetHashCode() ? -1 : 1;
                     }
                     else
                     {

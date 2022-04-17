@@ -27,20 +27,26 @@ namespace Cultivation_Way
 
         public void create()
         {
-            familys.Clear();
-            actorToMoreData.Clear();
-            specialBodies.Clear();
-            creatureLimit.Clear();
-            kingdomBindActors.Clear();
-            actorToMoreData.Clear();
-            chunkToElement.Clear();
+            SmoothLoader.add(delegate
+            {
+                familys.Clear();
+                actorToMoreData.Clear();
+                specialBodies.Clear();
+                creatureLimit.Clear();
+                kingdomBindActors.Clear();
+                actorToMoreData.Clear();
+                chunkToElement.Clear();
+            }, "Prepare Mod Data(1/3): Clear old data", true);
             prepare();
-            Main instance = Main.instance;
-            specialBodyLimit = instance.SpecialBodyLimit;
-            creatureLimit = instance.creatureLimit;
-            familys = instance.familys.Values.ToList();
-            chunkToElement = instance.chunkToElement;
-            specialBodies = AddAssetManager.specialBodyLibrary.list;
+            SmoothLoader.add(delegate
+            {
+                Main instance = Main.instance;
+                specialBodyLimit = instance.SpecialBodyLimit;
+                creatureLimit = instance.creatureLimit;
+                familys = instance.familys.Values.ToList();
+                chunkToElement = instance.chunkToElement;
+                specialBodies = AddAssetManager.specialBodyLibrary.list;
+            }, "Prepare Mod Data(3/3): Assign new data", true);
         }
         public string toJson()
         {
@@ -74,32 +80,38 @@ namespace Cultivation_Way
         }
         private void prepare()
         {
-            foreach (Actor actor in MapBox.instance.units)
+            SmoothLoader.add(delegate
             {
-                if (actor != null)
+                foreach (Actor actor in MapBox.instance.units)
                 {
-                    MoreActorData moreData = new MoreActorData();
-                    MoreActorData copyFrom = actor.GetMoreData();
-                    moreData.cultisystem = copyFrom.cultisystem;
-                    moreData.element = copyFrom.element;
-                    moreData.familyID = copyFrom.familyID;
-                    moreData.familyName = copyFrom.familyName;
-                    moreData.magic = copyFrom.magic;
-                    moreData.bonusStats = copyFrom.bonusStats;
-                    moreData.coolDown = copyFrom.coolDown;
-                    moreData.canCultivate = copyFrom.canCultivate;
-                    moreData.specialBody = copyFrom.specialBody;
-                    actorToMoreData.Add(actor.GetData().actorID, moreData);
+                    if (actor != null)
+                    {
+                        MoreActorData moreData = new MoreActorData();
+                        MoreActorData copyFrom = actor.GetMoreData();
+                        moreData.cultisystem = copyFrom.cultisystem;
+                        moreData.element = copyFrom.element;
+                        moreData.familyID = copyFrom.familyID;
+                        moreData.familyName = copyFrom.familyName;
+                        moreData.magic = copyFrom.magic;
+                        moreData.bonusStats = copyFrom.bonusStats;
+                        moreData.coolDown = copyFrom.coolDown;
+                        moreData.canCultivate = copyFrom.canCultivate;
+                        moreData.specialBody = copyFrom.specialBody;
+                        actorToMoreData.Add(actor.GetData().actorID, moreData);
+                    }
                 }
-            }
-            foreach(string kingdomID in Main.instance.kingdomBindActors.Keys)
+            }, "Prepare Mod Data(2/3): Prepare units data", false);
+            SmoothLoader.add(delegate
             {
-                kingdomBindActors[kingdomID] = new List<string>();
-                foreach(Actor actor in Main.instance.kingdomBindActors[kingdomID])
+                foreach (string kingdomID in Main.instance.kingdomBindActors.Keys)
                 {
-                    kingdomBindActors[kingdomID].Add(actor.GetData().actorID);
+                    kingdomBindActors[kingdomID] = new List<string>();
+                    foreach (Actor actor in Main.instance.kingdomBindActors[kingdomID])
+                    {
+                        kingdomBindActors[kingdomID].Add(actor.GetData().actorID);
+                    }
                 }
-            }
+            }, "Prepare Mod Data(2/3): Prepare kingdoms data", false);
         }
         public SavedModData() { }
     }

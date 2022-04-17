@@ -4,7 +4,7 @@ namespace Cultivation_Way
 {
     class MoreActorData
     {
-        public ChineseElement element;          //元素
+        public ChineseElement element = new ChineseElement();          //元素
         /// <summary>
         /// 修炼体系
         /// </summary>
@@ -24,7 +24,7 @@ namespace Cultivation_Way
         /// <summary>
         /// 法术冷却
         /// </summary>
-        public Dictionary<string, int> coolDown;              //冷却
+        public Dictionary<string, int> coolDown = new Dictionary<string, int>();              //冷却
         /// <summary>
         /// 当前蓝量
         /// </summary>
@@ -37,5 +37,6 @@ namespace Cultivation_Way
         /// 是否可以修炼
         /// </summary>
         public bool canCultivate = true;               //可修炼
+        public MoreStats currStats = new MoreStats();
     }
 }

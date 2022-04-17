@@ -174,7 +174,7 @@ namespace Cultivation_Way
             //功法贴图固定
             //灵根贴图固定
             //其他待定
-            MoreStats moreStats = actor.GetMoreStats();
+            MoreStats moreStats = actor.GetMoreData().currStats;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
             if (moreStats.spells.Count != 0)

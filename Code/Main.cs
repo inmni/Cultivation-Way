@@ -48,7 +48,7 @@ namespace CultivationWay
         #region 映射词典
         public List<MapChunk> chunks = new List<MapChunk>();//方便获取区块
 
-        public Dictionary<string, MoreStats> actorToMoreStats = new Dictionary<string, MoreStats>();//单位编号与更多属性映射词典
+        //public Dictionary<string, MoreStats> actorToMoreStats = new Dictionary<string, MoreStats>();//单位编号与更多属性映射词典
 
         //public Dictionary<Actor, string> actorToID = new Dictionary<Actor, string>();//单位与编号映射词典
 
@@ -226,7 +226,7 @@ namespace CultivationWay
             Harmony.CreateAndPatchAll(typeof(WorldLawHelper));
             MonoBehaviour.print("Create and patch all:WorldLawHelper");
         }
-        
+
         //  因添加文字材质，废弃
         //
         //void addForLocalization()
@@ -341,14 +341,12 @@ namespace CultivationWay
         }
         public void resetActorMore()
         {
-            instance.actorToMoreStats.Clear();
             instance.actorToMoreData.Clear();
             foreach (Actor actor in MapBox.instance.units)
             {
                 MoreStats moreStats = new MoreStats();
                 MoreActorData moreData = new MoreActorData();
                 instance.actorToMoreData.Add(actor.GetData().actorID, moreData);
-                instance.actorToMoreStats.Add(actor.GetData().actorID, moreStats);
                 string name = actor.GetData().firstName;
                 foreach (string fn in ChineseNameAsset.familyNameTotal)
                 {
@@ -435,24 +433,28 @@ namespace CultivationWay
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();
         }
+        delegate bool checker<T>(T key);
+        bool checkAlive(string actorID){
+            if (MapBox.instance.getActorByID(actorID) == null)
+            {
+                return false;
+            }
+            return true;
+        }
         void clearMemory()
         {
-            Dictionary<string, MoreStats> TactorToMoreStats = new Dictionary<string, MoreStats>();//单位编号与更多属性映射词典
             Dictionary<int, ActorStatus> TactorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
             Dictionary<int, BaseStats> TactorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
             Dictionary<string, MoreActorData> TactorToMoreData = new Dictionary<string, MoreActorData>();//单位编号与更多数据映射词典
 
-            valueClone(actorToMoreStats, TactorToMoreStats);
-            valueClone(actorToData, TactorToData);
-            valueClone(actorToCurStats, TactorToCurStats);
-            valueClone(actorToMoreData, TactorToMoreData);
+            //valueClone(actorToData, TactorToData);
+            //valueClone(actorToCurStats, TactorToCurStats);
+            valueClone(actorToMoreData, TactorToMoreData,this.checkAlive);
 
-            actorToMoreStats.Clear();
             actorToData.Clear();
             actorToCurStats.Clear();
             actorToMoreData.Clear();
 
-            actorToMoreStats = TactorToMoreStats;
             actorToData = TactorToData;
             actorToCurStats = TactorToCurStats;
             actorToMoreData = TactorToMoreData;
@@ -460,11 +462,11 @@ namespace CultivationWay
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();
         }
-        void valueClone<T1, T2>(Dictionary<T1, T2> from, Dictionary<T1, T2> to)
+        void valueClone<T1, T2>(Dictionary<T1, T2> from, Dictionary<T1, T2> to,checker<T1> checker = null)
         {
             foreach (T1 key in from.Keys)
             {
-                if (key != null)
+                if (key != null && (checker==null || checker(key)))
                 {
                     to.Add(key, from[key]);
                 }
@@ -501,7 +503,6 @@ namespace CultivationWay
             instance.SpecialBodyLimit = 200;
             AddAssetManager.specialBodyLibrary.reset();
             instance.actorToCurStats = new Dictionary<int, BaseStats>();
-            instance.actorToMoreStats = new Dictionary<string, MoreStats>();
             instance.actorToMoreData = new Dictionary<string, MoreActorData>();
             instance.actorToData = new Dictionary<int, ActorStatus>();
             foreach (string key in WorldLawHelper.originLaws.Keys)
@@ -557,14 +558,16 @@ namespace CultivationWay
             {
                 return true;
             }
-            if (instance.creatureLimit.ContainsKey(pActor.stats.id))
-            {
-                instance.creatureLimit[pActor.stats.id]++;
+            try {
+                instance.creatureLimit[pActor.stats.id]++; 
             }
-            MoreActorData moreData = null;
-            instance.actorToMoreData.TryGetValue(pActor.GetData().actorID, out moreData);
-            if (moreData != null)
+            catch(KeyNotFoundException)
             {
+                
+            }
+            try
+            {
+                MoreActorData moreData = pActor.GetMoreData();
                 Family family = instance.familys[moreData.familyID];
                 family.num--;
                 if (family.num <= 0)
@@ -572,24 +575,21 @@ namespace CultivationWay
                     instance.familys[moreData.familyID] = new Family(moreData.familyID);
                 }
             }
-            if (pActor.kingdom != null)
+            catch
             {
-                try
-                {
-                    instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
-                }
-                catch
-                {
-                    //直接用于排除非智慧国家，以及与killhimself重叠部分
-                    //This paragraph is used to exclude non-intelligent kingdoms and the overlap with "killHimself".
-                }
+
             }
-            instance.actorToCurStats.Remove(pActor.GetInstanceID());
-            instance.actorToData.Remove(pActor.GetInstanceID());
-            instance.actorToMoreData.Remove(pActor.GetData().actorID);
-            instance.actorToMoreStats.Remove(pActor.GetData().actorID);
+            try
+            {
+                instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
+            }
+            catch
+            {
+                //直接用于排除非智慧国家，以及与killhimself重叠部分
+                //This paragraph is used to exclude non-intelligent kingdoms and the overlap with "killHimself".
+            }
             return true;
-        }
+            }
         //百年事件（更新灵气，清理内存，以及其他
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox), "updateObjectAge")]

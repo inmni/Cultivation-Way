@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
+using ReflectionUtility;
 
 namespace Cultivation_Way
 {
@@ -15,6 +16,8 @@ namespace Cultivation_Way
     {
         internal const string name_main_save = "cultivation.wb";
         private static SavedModData savedModData;
+        private static string pFolder = "";
+        private static bool pCompress = false;
         //获取即将存入的数据
         public static SavedModData getSavedModData()
         {
@@ -23,28 +26,36 @@ namespace Cultivation_Way
             return savedModData;
         }
 
-        public static void writeIn(object pFolder, object pCompress)
+        public static void writeIn()
         {
-            string folder = pFolder as string;
-            bool compress = true;
-            if (pCompress != null)
+            SavedModData savedModData = null;
+            savedModData = getSavedModData();
+            SmoothLoader.add(delegate
             {
-                compress = (bool)pCompress;
-            }
-            SavedModData savedModData = getSavedModData();
-            string path = folder + name_main_save;
-            if (compress)
-            {
-                File.Delete(path + "ox");
-                byte[] bytes = savedModData.toZip();
-                File.WriteAllBytes(path + "ox", bytes);
-            }
-            else
-            {
-                File.Delete(path + "ax");
-                string contents = savedModData.toJson();
-                File.WriteAllText(path + "ax", contents);
-            }
+                string folder = pFolder;
+                bool compress = true;
+                compress = pCompress;
+                string path = folder + name_main_save;
+                if (compress)
+                {
+                    File.Delete(path + "ox");
+                    byte[] bytes = savedModData.toZip();
+                    File.WriteAllBytes(path + "ox", bytes);
+                }
+                else
+                {
+                    File.Delete(path + "ax");
+                    string contents = savedModData.toJson();
+                    File.WriteAllText(path + "ax", contents);
+                }
+            }, "Write mod data", true);
+        }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(SaveManager), "saveMapData")]
+        public static bool saveModData_pre()
+        {
+            SmoothLoader.prepare();
+            return true;
         }
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SaveManager), "saveMapData")]
@@ -52,7 +63,10 @@ namespace Cultivation_Way
         {
             //Thread t = new Thread(() => writeIn(pFolder, pCompress));
             //t.Start();
-            writeIn(pFolder, pCompress);
+            SaveAndLoadManager.pFolder = pFolder;
+            SaveAndLoadManager.pCompress = pCompress;
+            MapBox.instance.transitionScreen.CallMethod("startTransition", new LoadingScreen.TransitionAction(writeIn));
+            
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(SaveManager), "loadWorld", typeof(string), typeof(bool))]
@@ -116,7 +130,6 @@ namespace Cultivation_Way
             Main instance = Main.instance;
             instance.actorToData.Clear();
             instance.actorToCurStats.Clear();
-            instance.actorToMoreStats.Clear();
             instance.actorToMoreData.Clear(); 
             instance.familys.Clear();
             AddAssetManager.specialBodyLibrary.clear();
@@ -206,9 +219,7 @@ namespace Cultivation_Way
                 {
                     #region 处理mod特色
                     string id = actor.status.actorID;
-                    MoreStats moreStats = new MoreStats();
                     MoreActorData moreData = new MoreActorData();
-                    instance.actorToMoreStats.Add(id, moreStats);
                     instance.actorToMoreData.Add(id, moreData);
                     moreData.cultisystem = "default";
                     moreData.element = new ChineseElement();
@@ -219,7 +230,6 @@ namespace Cultivation_Way
                     moreData.canCultivate = true;
                     moreData.familyID = "甲";
                     moreData.familyName = "甲";
-                    moreStats.element = moreData.element;
                     #endregion
                 }
                 #endregion
@@ -235,7 +245,6 @@ namespace Cultivation_Way
             }
             instance.SpecialBodyLimit = savedModData.specialBodyLimit;
             instance.familys = new Dictionary<string, Family>();
-            instance.actorToMoreStats = new Dictionary<string, MoreStats>();
             instance.actorToMoreData = new Dictionary<string, MoreActorData>();
             #region 加载家族
             foreach (Family family in savedModData.familys)
@@ -263,7 +272,6 @@ namespace Cultivation_Way
                 MoreStats moreStats = new MoreStats();
                 MoreActorData moreData = new MoreActorData();
                 MoreActorData saved = savedModData.actorToMoreData[id];
-                instance.actorToMoreStats.Add(id, moreStats);
                 instance.actorToMoreData.Add(id, moreData);
 
                 if (saved.cultisystem == string.Empty || saved.cultisystem == null)

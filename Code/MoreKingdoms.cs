@@ -267,7 +267,7 @@ namespace Cultivation_Way
             MoreActorData moreData = new MoreActorData();
             MoreStats moreStats = new MoreStats();
             actorData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
-            Main.instance.actorToMoreStats[actorData.status.actorID] = moreStats;
+            moreData.currStats = moreStats;
             Main.instance.actorToMoreData[actorData.status.actorID] = moreData;
             moreData.bonusStats = new MoreStats();
             moreData.coolDown = new Dictionary<string, int>();
@@ -363,18 +363,11 @@ namespace Cultivation_Way
                     }
                     tempMoreData.familyName = tempMoreData.familyID;
                 }
-                if(!Main.instance.actorToMoreStats.TryGetValue(pData.status.actorID,out tempMoreStats))
-                {
-                    tempMoreStats = new MoreStats();
-                    tempMoreStats.element = tempMoreData.element;
-                }
                 string nextID = "u_" + MapBox.instance.mapStats.id_unit;
 
-                Main.instance.actorToMoreStats.Remove(pData.status.actorID);
                 Main.instance.actorToMoreData.Remove(pData.status.actorID);
 
                 Main.instance.actorToMoreData[nextID] = tempMoreData;
-                Main.instance.actorToMoreStats[nextID] = tempMoreStats;
             }
             else
             {//特殊情况
@@ -382,7 +375,6 @@ namespace Cultivation_Way
                 MoreActorData moreData = new MoreActorData();
                 string nextID = "u_" + MapBox.instance.mapStats.id_unit;
                 Main.instance.actorToMoreData.Add(nextID, moreData);
-                Main.instance.actorToMoreStats.Add(nextID, moreStats);
                 string name = pData.status.firstName;
                 ActorStats stats = AssetManager.unitStats.get(pData.status.statsID);
                 foreach (string fn in ChineseNameAsset.familyNameTotal)

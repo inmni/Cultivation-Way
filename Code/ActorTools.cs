@@ -62,18 +62,18 @@ namespace Cultivation_Way
         /// <returns></returns>
         public static MoreStats GetMoreStats(this Actor actor)
         {
-            if (actor == null||actor.GetData()==null)
+            if (actor == null || actor.GetData() == null)
             {
                 return null;
             }
             try
             {
-                MoreStats moreStats = Main.instance.actorToMoreStats[actor.GetData().actorID];
+                MoreStats moreStats = Main.instance.actorToMoreData[actor.GetData().actorID].currStats;
                 return moreStats;
             }
             catch (KeyNotFoundException e)
             {
-                MonoBehaviour.print("["+e.StackTrace+"]");
+                MonoBehaviour.print("[" + e.StackTrace + "]");
                 MonoBehaviour.print(actor.GetData().actorID + "(" + actor.stats.race + ")的MoreStats不存在");
                 MonoBehaviour.print("name:" + actor.GetData().firstName);
                 MonoBehaviour.print("age:" + actor.GetData().age);
@@ -353,7 +353,7 @@ namespace Cultivation_Way
         public static void copyMore(Actor from, Actor to)
         {
             MoreActorData originMoreActorData = from.GetMoreData();
-            MoreStats originMoreStats = from.GetMoreStats();
+            MoreStats originMoreStats = originMoreActorData.currStats;
 
             MoreActorData newMoreActorData = new MoreActorData();
             MoreStats newMoreStats = new MoreStats();
@@ -368,15 +368,14 @@ namespace Cultivation_Way
             newMoreActorData.specialBody = originMoreActorData.specialBody;
             newMoreActorData.canCultivate = originMoreActorData.canCultivate;
 
-            newMoreStats.baseStats = originMoreStats.baseStats;
-            newMoreStats.magic = originMoreStats.magic;
-            newMoreStats.element = originMoreStats.element;
-            newMoreStats.spells = originMoreStats.spells;
-            newMoreStats.talent = originMoreStats.talent;
-            newMoreStats.maxAge = originMoreStats.maxAge;
+            newMoreActorData.currStats.baseStats = originMoreStats.baseStats;
+            newMoreActorData.currStats.magic = originMoreStats.magic;
+            newMoreActorData.currStats.element = originMoreStats.element;
+            newMoreActorData.currStats.spells = originMoreStats.spells;
+            newMoreActorData.currStats.talent = originMoreStats.talent;
+            newMoreActorData.currStats.maxAge = originMoreStats.maxAge;
 
             Main.instance.actorToMoreData[to.GetData().actorID] = newMoreActorData;
-            Main.instance.actorToMoreStats[to.GetData().actorID] = newMoreStats;
             //MonoBehaviour.print("successfully copy " + to.GetData().actorID + "'s more...");
         }
         public static int getRealm(this Actor actor)
@@ -405,8 +404,9 @@ namespace Cultivation_Way
         public static void dealStatsHelper1(Actor actor)
         {
             ActorStatus data = actor.GetData();
-            MoreStats morestats = actor.GetMoreStats();
+            
             MoreActorData moredata = actor.GetMoreData();
+            MoreStats morestats = moredata.currStats;
             #region 种族法术与各类属性
             morestats.clear();
                 morestats.spells.AddRange(Main.instance.raceFeatures[actor.stats.id].raceSpells);
@@ -525,9 +525,9 @@ namespace Cultivation_Way
             {
                 actor.GetCurStats().armor = maxArmor;
             }
-            if (moredata.magic > actor.GetMoreStats().magic)
+            if (moredata.magic > moredata.currStats.magic)
             {
-                moredata.magic = actor.GetMoreStats().magic;
+                moredata.magic = moredata.currStats.magic;
             }
             return;
         }

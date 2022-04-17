@@ -756,10 +756,9 @@ namespace Cultivation_Way
             }
             ActorStatus dataA = ((Actor)pAttacker).GetData();
             MoreActorData moreData = Main.instance.actorToMoreData[dataA.actorID];
-            MoreStats morestats = Main.instance.actorToMoreStats[dataA.actorID];
-            if (morestats.spells.Count != 0)
+            if (moreData.currStats.spells.Count != 0)
             {
-                int count = morestats.spells.Count;
+                int count = moreData.currStats.spells.Count;
                 int max = dataA.level / 20 + 1;
                 List<int> index = new List<int>(count);
                 for (int i = 0; i < count; i++)
@@ -773,7 +772,7 @@ namespace Cultivation_Way
                     {
                         return true;
                     }
-                    ExtensionSpell spell = morestats.spells[index[i]];
+                    ExtensionSpell spell = moreData.currStats.spells[index[i]];
                     //进行蓝耗和冷却检查
                     if (moreData.coolDown[spell.spellAssetID] == 1 && moreData.magic >= spell.cost
                         && spell.GetSpellAsset().type.attacking && spell.GetSpellAsset().type.requiredLevel <= dataA.level)
@@ -800,7 +799,7 @@ namespace Cultivation_Way
                 return;
             }
             MoreActorData moredata = __instance.GetMoreData();
-            MoreStats morestats = __instance.GetMoreStats();
+            MoreStats morestats = moredata.currStats;
             float rangeLimit = Mathf.Max(__instance.GetCurStats().range, morestats.spellRange) + ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pObject, "curStats")).size;
             foreach (ExtensionSpell spell in morestats.spells)
             {
@@ -847,8 +846,9 @@ namespace Cultivation_Way
                 }
             }
             ActorStatus data = __instance.GetData();
-            MoreStats moreStats = __instance.GetMoreStats();
+            
             MoreActorData moreData = __instance.GetMoreData();
+            MoreStats moreStats = moreData.currStats;
             if (!moreData.canCultivate)
             {
                 return false;
@@ -983,7 +983,7 @@ namespace Cultivation_Way
             //法术释放
             string actorID = data.actorID;
             int level = data.level;
-            foreach (ExtensionSpell spell in Main.instance.actorToMoreStats[actorID].spells)
+            foreach (ExtensionSpell spell in Main.instance.actorToMoreData[actorID].currStats.spells)
             {
                 if (__instance != null && data != null && data.alive &&
                     AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).type.levelUp
@@ -1083,8 +1083,9 @@ namespace Cultivation_Way
                 return true;
             }
             ActorStatus data = __instance.GetData();
-            MoreStats moreStats = __instance.GetMoreStats();
+            
             MoreActorData moreData = __instance.GetMoreData();
+            MoreStats moreStats = moreData.currStats;
             if (!updateAge(AssetManager.raceLibrary.get(__instance.stats.race), data, __instance) && !__instance.haveTrait("immortal"))
             {
                 __instance.killHimself(false, AttackType.Age, true, true);
@@ -1184,7 +1185,7 @@ namespace Cultivation_Way
                 return true;
             }
             int num = actorStats.maxAge;
-            MoreStats morestats = pActor.GetMoreStats();
+            MoreStats morestats = pActor.GetMoreData().currStats;
             if (morestats.maxAge == 0 && pData.level > 1)
             {
                 pActor.CallMethod("updateStats");
@@ -1277,7 +1278,7 @@ namespace Cultivation_Way
             int maxAge = AssetManager.unitStats.get(data.statsID).maxAge;
             if (!data.statsID.StartsWith("summon"))
             {
-                maxAge += Main.instance.actorToMoreStats[data.actorID].maxAge;
+                maxAge += Main.instance.actorToMoreData[data.actorID].currStats.maxAge;
             }
             if (data.age * 5 >= maxAge << 2)
             {
@@ -1550,14 +1551,12 @@ namespace Cultivation_Way
         {
             #region 设置出生属性
             MoreActorData moreData = new MoreActorData();
-            MoreStats moreStats = new MoreStats();
             ActorStatus status = Reflection.GetField(typeof(ActorBase), __instance, "data") as ActorStatus;
-            Main.instance.actorToMoreStats[status.actorID] = moreStats;
             Main.instance.actorToMoreData[status.actorID] = moreData;
             moreData.bonusStats = new MoreStats();
             moreData.coolDown = new Dictionary<string, int>();
             moreData.element = new ChineseElement();
-            moreStats.maxAge = __instance.stats.maxAge;
+            moreData.currStats.maxAge = __instance.stats.maxAge;
             //获取修炼体系
             if (__instance.getCulture() != null)
             {
