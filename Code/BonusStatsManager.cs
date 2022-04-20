@@ -31,7 +31,7 @@ namespace Cultivation_Way
         {
             if (actor != null)
             {
-                Main.instance.actorToMoreData[actor.GetData().actorID].bonusStats.deleteAnotherStats(bonusStats);
+                ((ExtendedActor)actor).extendedData.status.bonusStats.deleteAnotherStats(bonusStats);
                 actor.setStatsDirty();
 
                 if (punishStats != null)

@@ -324,5 +324,45 @@ namespace Cultivation_Way
                 pActor.setStatsDirty();
             }
         }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MapBox),"addBuilding")]
+        public static bool addBuilding_Prefix(ref Building __result,string pID, WorldTile pTile, BuildingData pData = null, bool pCheckForBuild = false, bool pSfx = false, BuildPlacingType pType = BuildPlacingType.New)
+        {
+            if (pCheckForBuild && !((bool)MapBox.instance.CallMethod("canBuildFrom",pTile, AssetManager.buildings.get(pID), null, pType)))
+            {
+                __result = null;
+                return false;
+            }
+            ExtendedBuilding building = Object.Instantiate(CultivationWay.Main.instance.prefabs.ExtendedBuildingPrefab).GetComponent<ExtendedBuilding>();
+            building.gameObject.SetActive(true);
+            building.CallMethod("create");
+            building.CallMethod("setBuilding",pTile, AssetManager.buildings.get(pID), pData);
+            if (pData != null)
+            {
+                building.CallMethod("finishScaleTween");
+                building.setAnimData(pData.frameID);
+                building.applyAnimDataToAnimation();
+                building.gameObject.GetComponent<SpriteAnimation>().forceUpdateFrame();
+            }
+            building.transform.parent = Reflection.GetField(typeof(MapBox),MapBox.instance,"transformBuildings") as Transform;
+            BuildingAsset stats = Reflection.GetField(typeof(Building), building, "stats") as BuildingAsset;
+            if (stats.buildingType == BuildingType.Tree)
+            {
+                building.transform.parent = building.transform.parent.Find("Trees");
+            }
+            building.resetShadow();
+            MapBox.instance.buildings.Add(building);
+            if (pSfx && stats.sfx != "none")
+            {
+                Sfx.play(stats.sfx, true, -1f, -1f);
+            }
+            if (Config.timeScale > 10f)
+            {
+                building.CallMethod("finishScaleTween");
+            }
+            __result = building;
+
+            return false;
+        }
     }
 }

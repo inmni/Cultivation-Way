@@ -60,9 +60,9 @@ namespace Cultivation_Way
             {
                 MapBox.instance.stackEffects.CallMethod("startSpawnEffect", pTile, godPower.showSpawnEffect);
             }
-            Actor Sheng = MapBox.instance.spawnNewUnit(godPower.actorStatsId, pTile, "", godPower.actorSpawnHeight);
+            ExtendedActor Sheng = (ExtendedActor)MapBox.instance.spawnNewUnit(godPower.actorStatsId, pTile, "", godPower.actorSpawnHeight);
             Sheng.GetData().level = 50;
-            Sheng.GetMoreData().magic = int.MaxValue >> 2;
+            Sheng.extendedData.status.magic = int.MaxValue >> 2;
             Sheng.GetData().health = int.MaxValue >> 2;
 
             Sheng.CallMethod("setProfession", UnitProfession.Unit);
@@ -76,7 +76,7 @@ namespace Cultivation_Way
                 return false;
             }
             pTile = pActor.currentTile;
-            Actor actor = (Actor)pActor;
+            ExtendedActor actor = (ExtendedActor)pActor;
             int rank = (((Actor)pActor).GetData().level - 1) / 10;
             if (rank > 9)
             {
@@ -106,7 +106,7 @@ namespace Cultivation_Way
             int num = 0;
             for(int i = 0; i < 5; i++)
             {
-                num += actor.GetMoreData().element.baseElementContainer[i] * actor.GetMoreData().element.baseElementContainer[i];
+                num += actor.extendedCurStats.element.baseElementContainer[i] * actor.extendedCurStats.element.baseElementContainer[i];
             }
             damage *= num / 2000f;
             actor.CallMethod("getHit",damage, true, AttackType.None, null, true);

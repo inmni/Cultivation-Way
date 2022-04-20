@@ -38,7 +38,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            string realSpell = OthersHelper.getRealBaseSpell(((Actor)pUser).GetMoreData().element);
+            string realSpell = OthersHelper.getRealBaseSpell(((ExtendedActor)pUser).extendedCurStats.element);
             Projectile p = Utils.OthersHelper.startProjectile(realSpell, pUser, pTarget);
             Reflection.SetField(p, "byWho", (Actor)pUser);
             p.setStats(((Actor)pUser).GetCurStats());
@@ -294,7 +294,7 @@ namespace Cultivation_Way
                 BaseSpellEffect baseEffect = ((baseEffectController != null) ? baseEffectController.spawnAt(start, 0.1f, true, (Actor)pUser, time, 0, 2f) : null);
             }
 
-            MoreActorData moredata = Main.instance.actorToMoreData[((Actor)pUser).GetData().actorID];
+            MoreStatus moredata = ((ExtendedActor)pUser).extendedData.status;
             MoreStats bonusStats = new MoreStats();
             bonusStats.magic = 0;
             bonusStats.baseStats.mod_damage += body.mod_damage;

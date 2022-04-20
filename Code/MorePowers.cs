@@ -242,20 +242,6 @@ namespace Cultivation_Way
         {
             Config.timeScale -= 1;
             WorldTip.showNow("当前时间流速为" + Config.timeScale + "倍", false, "top");
-
-            foreach(string id in Main.instance.actorToMoreData.Keys)
-            {
-                Actor a = MapBox.instance.getActorByID(id);
-                if (a== null)
-                {
-                    MonoBehaviour.print("[MorePowers]actorToMoreData存在未删除数据"+id);
-                }
-                else
-                {
-                    MonoBehaviour.print("[MorePowers]actorToMoreData过早删除数据"+id+"\n"+a.GetData().statsID);
-
-                }
-            }
         }
         public static void clickForWindow_AboutThis()
         {

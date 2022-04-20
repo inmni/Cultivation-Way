@@ -18,6 +18,7 @@ namespace Cultivation_Way
         public static void addAsset()
         {
             //顺序尽量不要调整
+            ChineseNameGenerator.init();
             Main.instance.MoreItems.init();
             Main.instance.MoreTraits.init();
             Main.instance.MoreActors.init();

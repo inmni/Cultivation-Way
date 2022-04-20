@@ -26,8 +26,8 @@ namespace Cultivation_Way
             int count = temp_map_objects.Count;
             for (int i = 0; i < count; i++)
             {
-                Actor actor = (Actor)temp_map_objects[i];
-                actor.GetMoreData().canCultivate = true;
+                ExtendedActor actor = (ExtendedActor)temp_map_objects[i];
+                actor.extendedData.status.canCultivate = true;
                 actor.CallMethod("addExperience", actor.getExpToLevelup());
                 actor.startShake(0.3f, 0.1f, true, true);
                 actor.startColorEffect("white");

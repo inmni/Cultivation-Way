@@ -220,7 +220,7 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(CityBehProduceUnit), "produceNewCitizen")]
         public static bool produceNewCitizen_Prefix(CityBehProduceUnit __instance, bool __result, Building pBuilding, City pCity)
         {
-            Actor randomParent = pCity.getRandomParent(null);
+            ExtendedActor randomParent = (ExtendedActor)pCity.getRandomParent(null);
             if (randomParent == null)
             {
                 __result = false;
@@ -231,7 +231,7 @@ namespace Cultivation_Way
                 __result = false;
                 return false;
             }
-            Actor randomParent2 = pCity.getRandomParent(randomParent);
+            ExtendedActor randomParent2 = (ExtendedActor)pCity.getRandomParent(randomParent);
             randomParent.GetData().children++;
             pCity.status.homesFree--;
             CityData cityData = Reflection.GetField(typeof(City), pCity, "data") as CityData;
@@ -264,16 +264,10 @@ namespace Cultivation_Way
                 actorData.status.level = babyCulture.getBornLevel();
             }
             #region 设置出生属性
-            MoreActorData moreData = new MoreActorData();
-            MoreStats moreStats = new MoreStats();
+            MoreData moreData = new MoreData();
             actorData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
-            moreData.currStats = moreStats;
-            Main.instance.actorToMoreData[actorData.status.actorID] = moreData;
-            moreData.bonusStats = new MoreStats();
-            moreData.coolDown = new Dictionary<string, int>();
-            moreData.element = new ChineseElement();
-            moreStats.maxAge = stats.maxAge;
-            moreStats.element = moreData.element;
+            Main.instance.tempMoreData[actorData.status.actorID] = moreData;
+            moreData.status.element = new ChineseElement().baseElementContainer;
             //获取修炼体系
             if (babyCulture != null)
             {
@@ -287,52 +281,34 @@ namespace Cultivation_Way
                 }
                 if (cultisystem.Count > 0)
                 {
-                    moreData.cultisystem = cultisystem.GetRandom().Remove(0, 6);
+                    moreData.status.cultisystem = cultisystem.GetRandom().Remove(0, 6);
                 }
             }
             //继承体质
             int bodyRank = randomParent.GetSpecialBody().rank;
             if (Toolbox.randomChance(1f / (bodyRank * (bodyRank + 1))))
             {
-                moreData.specialBody = randomParent.GetSpecialBody().id;
+                moreData.status.specialBody = randomParent.GetSpecialBody().id;
             }
             if (Toolbox.randomChance(0.001f))
             {
-                moreData.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                moreData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
             }
             //继承家族
-            moreData.familyID = randomParent.GetFamily().id;
+            moreData.status.familyID = randomParent.GetFamily().id;
             if (Toolbox.randomChance(0.05f))
             {
-                if (stats.unit)
-                {
-                    moreData.familyID = AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom();
-                }
-                else
-                {
-                    moreData.familyID = AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
-                }
+                moreData.status.familyID = stats.unit?AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom(): AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
             }
-            Family family = Main.instance.familys[moreData.familyID];
+            Family family = Main.instance.familys[moreData.status.familyID];
             family.num++;
             //设置名字
-            moreData.familyName = randomParent.GetMoreData().familyName;
-            if (stats.unit)
-            {
+            moreData.status.familyName = randomParent.extendedData.status.familyName;
                 if (Toolbox.randomChance(0.02f))
                 {
-                    moreData.familyName = AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom();
+                    moreData.status.familyName = stats.unit?AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom(): AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
                 }
-                actorData.status.firstName = ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.familyName, true);
-            }
-            else
-            {
-                if (Toolbox.randomChance(0.02f))
-                {
-                    moreData.familyName = AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
-                }
-                actorData.status.firstName = ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.familyName, false);
-            }
+                actorData.status.firstName = stats.unit ? ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, true) : ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, false);
             #endregion
             cityData.popPoints.Add(actorData);
             __result = true;
@@ -340,64 +316,36 @@ namespace Cultivation_Way
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(City), "spawnPopPoint")]
-        public static bool spawnPopPoint(ActorData pData)
+        public static bool spawnPopPoint(ActorData pData,WorldTile pTile)
         {
-            if (pData.status.actorID != "")
-            {//一般情况
-                MoreActorData tempMoreData = null;
-                MoreStats tempMoreStats = null;
-                if(!Main.instance.actorToMoreData.TryGetValue(pData.status.actorID,out tempMoreData))
-                {
-                    tempMoreData = new MoreActorData();
-                    tempMoreData.bonusStats = new MoreStats();
-                    tempMoreData.coolDown = new Dictionary<string, int>();
-                    tempMoreData.element = new ChineseElement();
-                    ActorStats stats = AssetManager.unitStats.get(pData.status.statsID);
-                    if (stats.unit)
-                    {
-                        tempMoreData.familyID = AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom();
-                    }
-                    else
-                    {
-                        tempMoreData.familyID = AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
-                    }
-                    tempMoreData.familyName = tempMoreData.familyID;
-                }
-                string nextID = "u_" + MapBox.instance.mapStats.id_unit;
-
-                Main.instance.actorToMoreData.Remove(pData.status.actorID);
-
-                Main.instance.actorToMoreData[nextID] = tempMoreData;
+            
+            if (pData.status.age <= 8)
+            {
+                pData.status.statsID = pData.status.statsID.Replace("unit_", "baby_");
+                pData.status.profession = UnitProfession.Baby;
             }
-            else
-            {//特殊情况
-                MoreStats moreStats = new MoreStats();
-                MoreActorData moreData = new MoreActorData();
-                string nextID = "u_" + MapBox.instance.mapStats.id_unit;
-                Main.instance.actorToMoreData.Add(nextID, moreData);
-                string name = pData.status.firstName;
-                ActorStats stats = AssetManager.unitStats.get(pData.status.statsID);
-                foreach (string fn in ChineseNameAsset.familyNameTotal)
+            ActorStats actorStats = AssetManager.unitStats.get(pData.status.statsID);
+            for (int i = 0; i < actorStats.traits.Count; i++)
+            {
+                string item = actorStats.traits[i];
+                if (!pData.status.traits.Contains(item))
                 {
-                    if (stats.unit && name.StartsWith(fn))
-                    {
-                        moreData.familyID = fn;
-                        break;
-                    }
-                    else if (!stats.unit && name.EndsWith(fn))
-                    {
-                        moreData.familyID = fn;
-                    }
+                    pData.status.traits.Add(item);
                 }
-                moreData.cultisystem = "default";
-                moreData.specialBody = "FT";
-                moreData.element = new ChineseElement();
-                moreData.bonusStats = new MoreStats();
-                moreData.coolDown = new Dictionary<string, int>();
-                moreData.canCultivate = true;
-                moreStats.element = moreData.element;
             }
-            return true;
+            ExtendedActor actor = (ExtendedActor)MapBox.instance.spawnAndLoadUnit(pData.status.statsID, pData, pTile);
+            actor.setStatsDirty();
+            if (actor.stats.baby)
+            {
+                actor.GetComponent<Baby>().timerGrow = (float)actor.stats.timeToGrow;
+            }
+
+            actor.extendedData = Main.instance.tempMoreData[pData.status.actorID];
+            actor.extendedCurStats.element = new ChineseElement(actor.extendedData.status.element);
+
+            Main.instance.tempMoreData.Remove(pData.status.actorID);
+            pData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
+            return false;
         }
         //国家创建时事件
         [HarmonyPostfix]

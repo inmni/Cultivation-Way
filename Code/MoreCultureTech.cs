@@ -22,7 +22,30 @@ namespace Cultivation_Way
                 });
             }
             AssetManager.culture_tech.get("culti_default").enabled = false;
-
+            //城墙1级
+            AssetManager.culture_tech.add(new CultureTechAsset
+            {
+                id = "Circumvallation_1",
+                icon = "Circumvallation_1",
+                type = TechType.Common,
+                enabled = true,
+            });
+            //城墙2级
+            AssetManager.culture_tech.add(new CultureTechAsset
+            {
+                id = "Circumvallation_2",
+                icon = "Circumvallation_2",
+                type = TechType.Common,
+                enabled = true,
+            });
+            //城墙3级
+            AssetManager.culture_tech.add(new CultureTechAsset
+            {
+                id = "Circumvallation_3",
+                icon = "Circumvallation_3",
+                type = TechType.Common,
+                enabled = true,
+            });
         }
 
         //贴图

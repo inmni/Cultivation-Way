@@ -21,7 +21,7 @@ namespace Cultivation_Way
 
         private static List<GameObject> elements = new List<GameObject>();
 
-        private static List<Actor> actors = new List<Actor>();
+        private static List<ExtendedActor> actors = new List<ExtendedActor>();
 
         private static List<PowerButton> buttons = new List<PowerButton>();
 
@@ -235,8 +235,8 @@ namespace Cultivation_Way
             instance.clear();
             actors.Sort((a1, a2) =>
             {
-                ChineseElement element1 = a1.GetMoreData().element;
-                ChineseElement element2 = a2.GetMoreData().element;
+                ChineseElement element1 = a1.extendedCurStats.element;
+                ChineseElement element2 = a2.extendedCurStats.element;
                 int bodyRank1 = a1.GetSpecialBody().rank;
                 int bodyRank2 = a2.GetSpecialBody().rank;
                 float e1 = element1.GetAsset().rarity * bodyRank1;
@@ -295,19 +295,14 @@ namespace Cultivation_Way
         private void getActors()
         {
             actors.Clear();
-            actors = new List<Actor>(MapBox.instance.units.Count+50);
+            actors = new List<ExtendedActor>(MapBox.instance.units.Count+50);
             foreach (Actor actor in MapBox.instance.units)
             {
                 if (actor.stats.id.StartsWith("summon") || !actor.GetData().alive)
                 {
                     continue;
                 }
-                MoreActorData tmp = null;
-                if (!Main.instance.actorToMoreData.TryGetValue(actor.GetData().actorID, out tmp))
-                {
-                    continue;
-                }
-                actors.Add(actor);
+                actors.Add((ExtendedActor)actor);
             }
         }
         private void showElement(Actor pActor, int index)

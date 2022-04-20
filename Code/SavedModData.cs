@@ -19,9 +19,12 @@ namespace Cultivation_Way
 
         public List<Family> familys = new List<Family>();//家族表
 
+        public List<MoreData> moreActorData = new List<MoreData>();
+        public List<MoreData> moreBuildingData = new List<MoreData>();
+
         public Dictionary<string, List<string>> kingdomBindActors = new Dictionary<string, List<string>>();//国家与绑定的生物
 
-        public Dictionary<string, MoreActorData> actorToMoreData = new Dictionary<string, MoreActorData>();//单位与更多数据映射词典
+        public Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//单位与更多数据映射词典
 
         public Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
 
@@ -30,11 +33,10 @@ namespace Cultivation_Way
             SmoothLoader.add(delegate
             {
                 familys.Clear();
-                actorToMoreData.Clear();
                 specialBodies.Clear();
                 creatureLimit.Clear();
                 kingdomBindActors.Clear();
-                actorToMoreData.Clear();
+                tempMoreData.Clear();
                 chunkToElement.Clear();
             }, "Prepare Mod Data(1/3): Clear old data", true);
             prepare();
@@ -82,25 +84,51 @@ namespace Cultivation_Way
         {
             SmoothLoader.add(delegate
             {
-                foreach (Actor actor in MapBox.instance.units)
+                foreach (string id in Main.instance.tempMoreData.Keys)
                 {
-                    if (actor != null)
-                    {
-                        MoreActorData moreData = new MoreActorData();
-                        MoreActorData copyFrom = actor.GetMoreData();
-                        moreData.cultisystem = copyFrom.cultisystem;
-                        moreData.element = copyFrom.element;
-                        moreData.familyID = copyFrom.familyID;
-                        moreData.familyName = copyFrom.familyName;
-                        moreData.magic = copyFrom.magic;
-                        moreData.bonusStats = copyFrom.bonusStats;
-                        moreData.coolDown = copyFrom.coolDown;
-                        moreData.canCultivate = copyFrom.canCultivate;
-                        moreData.specialBody = copyFrom.specialBody;
-                        actorToMoreData.Add(actor.GetData().actorID, moreData);
-                    }
+                    tempMoreData[id] = Main.instance.tempMoreData[id];
                 }
-            }, "Prepare Mod Data(2/3): Prepare units data", false);
+                foreach(Actor actor in MapBox.instance.units.getSimpleList())
+                {
+                    if(actor.GetData().alive==false || actor.stats.skipSave)
+                    {
+                        continue;
+                    }
+                    ExtendedActor extendedActor = (ExtendedActor)actor;
+                    extendedActor.extendedData.status.element = extendedActor.extendedCurStats.element.baseElementContainer;
+                    extendedActor.extendedData.status.compositionsID = new string[extendedActor.compositions.Count];
+                    for(int i=0;i<extendedActor.compositions.Count;i++)
+                    {
+                        if (extendedActor.compositions[i].objectType == MapObjectType.Building)
+                        {
+                            extendedActor.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building),(Building)(extendedActor.compositions[i]),"data") as BuildingData).objectID;
+                        }
+                        else if (extendedActor.compositions[i].objectType == MapObjectType.Actor)
+                        {
+                            extendedActor.extendedData.status.compositionsID[i] = ((Actor)(extendedActor.compositions[i])).GetData().actorID;
+                        }
+                    }
+                    moreActorData.Add(extendedActor.extendedData);
+                }
+                foreach (Building building in MapBox.instance.buildings.getSimpleList())
+                {
+                    ExtendedBuilding extendedBuilding = (ExtendedBuilding)building;
+                    extendedBuilding.extendedData.status.element = extendedBuilding.extendedCurStats.element.baseElementContainer;
+                    extendedBuilding.extendedData.status.compositionsID = new string[extendedBuilding.compositions.Count];
+                    for (int i = 0; i < extendedBuilding.compositions.Count; i++)
+                    {
+                        if (extendedBuilding.compositions[i].objectType == MapObjectType.Building)
+                        {
+                            extendedBuilding.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building), (Building)(extendedBuilding.compositions[i]), "data") as BuildingData).objectID;
+                        }
+                        else if (extendedBuilding.compositions[i].objectType == MapObjectType.Actor)
+                        {
+                            extendedBuilding.extendedData.status.compositionsID[i] = ((Actor)(extendedBuilding.compositions[i])).GetData().actorID;
+                        }
+                    }
+                    moreBuildingData.Add(extendedBuilding.extendedData);
+                }
+            }, "Prepare Mod Data(2/3): Prepare units and buildings data", false);
             SmoothLoader.add(delegate
             {
                 foreach (string kingdomID in Main.instance.kingdomBindActors.Keys)

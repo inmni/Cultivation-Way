@@ -16,6 +16,7 @@ namespace Cultivation_Way
     {
         internal const string name_main_save = "cultivation.wb";
         private static SavedModData savedModData;
+        private static SavedMap savedMap;
         private static string pFolder = "";
         private static bool pCompress = false;
         //获取即将存入的数据
@@ -125,12 +126,114 @@ namespace Cultivation_Way
             codes.Insert(offset, new CodeInstruction(OpCodes.Starg, 1));
             return codes;
         }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(SaveManager),"loadActors")]
+        public static bool loadActors_Prefix(SaveManager __instance,int startIndex =0,int pAmount = 0)
+        {
+            Main.instance.tempMoreData = new Dictionary<string, MoreData>();
+            foreach (string id in savedModData.tempMoreData.Keys)
+            {
+                Main.instance.tempMoreData[id] = savedModData.tempMoreData[id];
+            }
+            savedMap = Reflection.GetField(typeof(SaveManager), __instance, "data") as SavedMap;
+            int num = savedMap.actors.Count;
+            if (pAmount > 0)
+            {
+                num = Mathf.Min(startIndex + pAmount, savedMap.actors.Count);
+            }
+            for (int i = startIndex; i < num; i++)
+            {
+                ActorData actorData = savedMap.actors[i];
+                MoreData moreActorData = null;
+                if (savedModData == null)
+                {
+                    moreActorData = new MoreData();
+                }
+                else
+                {
+                    moreActorData = savedModData.moreActorData[i];
+                }
+                WorldTile tile = MapBox.instance.GetTile(actorData.x, actorData.y);
+                ExtendedActor actor = null;
+                if (actorData.status.alive)
+                {
+                    if (actorData.inventory.resource == "food")
+                    {
+                        actorData.inventory.resource = "wheat";
+                    }
+                    if (actorData.status.gender == ActorGender.Unknown)
+                    {
+                        if (Toolbox.randomBool())
+                        {
+                            actorData.status.gender = ActorGender.Male;
+                        }
+                        else
+                        {
+                            actorData.status.gender = ActorGender.Female;
+                        }
+                    }
+                    
+                    if ((!(actorData.status.statsID == "livingPlants") && !(actorData.status.statsID == "livingHouse")) || !string.IsNullOrEmpty(actorData.status.special_graphics))
+                    {
+                        actor = (ExtendedActor)MapBox.instance.spawnAndLoadUnit(actorData.status.statsID, actorData, tile);
+                        if (!(actor == null) && savedMap.saveVersion < 6)
+                        {
+                            foreach (string pTrait in actor.stats.traits)
+                            {
+                                actor.addTrait(pTrait);
+                            }
+                        }
+                    }
+                }
+                if (actor != null)
+                {
+                    actor.extendedData = moreActorData;
+                    actor.extendedCurStats.element = new ChineseElement(moreActorData.status.element);
+                }
+                else
+                {
+                    Main.instance.tempMoreData[actorData.status.actorID] = moreActorData;
+                }
+            }
+            return false;
+        }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(SaveManager),"loadBuildings")]
+        public static bool loadBuildings_Prefix()
+        {
+            for (int i = 0; i < savedMap.buildings.Count; i++)
+            {
+                BuildingData buildingData = savedMap.buildings[i];
+                if (buildingData.templateID.Contains("ork"))
+                {
+                    buildingData.templateID = buildingData.templateID.Replace("ork", "orc");
+                }
+                if (AssetManager.buildings.get(buildingData.templateID) != null)
+                {
+                    ExtendedBuilding building = (ExtendedBuilding)MapBox.instance.CallMethod("loadBuilding",buildingData);
+                    if (building == null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if (savedModData != null)
+                        {
+                            building.extendedData = savedModData.moreBuildingData[i];
+                            building.extendedCurStats.element = new ChineseElement(building.extendedData.status.element);
+                        }
+                    }
+                }
+            }
+            MapBox.instance.buildings.checkAddRemove();
+            return false;
+        }
         public static SavedMap loadModData(SavedMap pData)
         {
             Main instance = Main.instance;
             instance.actorToData.Clear();
             instance.actorToCurStats.Clear();
-            instance.actorToMoreData.Clear(); 
+            instance.tempMoreData.Clear(); 
             instance.familys.Clear();
             AddAssetManager.specialBodyLibrary.clear();
             instance.resetCreatureLimit();
@@ -213,26 +316,6 @@ namespace Cultivation_Way
                 instance.createOrResetFamily();
                 instance.SpecialBodyLimit = 200;
                 instance.resetCreatureLimit();
-
-                #region 生物处理
-                foreach (ActorData actor in pData.actors)
-                {
-                    #region 处理mod特色
-                    string id = actor.status.actorID;
-                    MoreActorData moreData = new MoreActorData();
-                    instance.actorToMoreData.Add(id, moreData);
-                    moreData.cultisystem = "default";
-                    moreData.element = new ChineseElement();
-                    moreData.magic = 0;
-                    moreData.bonusStats = new MoreStats();
-                    moreData.coolDown = new Dictionary<string, int>();
-                    moreData.specialBody = "FT";
-                    moreData.canCultivate = true;
-                    moreData.familyID = "甲";
-                    moreData.familyName = "甲";
-                    #endregion
-                }
-                #endregion
                 return pData;
             }
             if (savedModData.creatureLimit == null)
@@ -244,8 +327,7 @@ namespace Cultivation_Way
                 instance.creatureLimit = savedModData.creatureLimit;
             }
             instance.SpecialBodyLimit = savedModData.specialBodyLimit;
-            instance.familys = new Dictionary<string, Family>();
-            instance.actorToMoreData = new Dictionary<string, MoreActorData>();
+            
             #region 加载家族
             foreach (Family family in savedModData.familys)
             {
@@ -262,56 +344,6 @@ namespace Cultivation_Way
                     continue;
                 }
                 instance.familys.Add(missing, new Family(missing));
-            }
-            #endregion
-            #region 加载人物数据
-            foreach (ActorData actor in pData.actors)
-            {
-                string id = actor.status.actorID;
-                
-                MoreStats moreStats = new MoreStats();
-                MoreActorData moreData = new MoreActorData();
-                MoreActorData saved = savedModData.actorToMoreData[id];
-                instance.actorToMoreData.Add(id, moreData);
-
-                if (saved.cultisystem == string.Empty || saved.cultisystem == null)
-                {
-                    saved.cultisystem = "default";
-                }
-                if (saved.element == null || saved.element.baseElementContainer == null)
-                {
-                    saved.element = new ChineseElement();
-                }
-                if (saved.bonusStats == null)
-                {
-                    saved.bonusStats = new MoreStats();
-                }
-                if (saved.coolDown == null)
-                {
-                    saved.coolDown = new Dictionary<string, int>();
-                }
-                if (saved.specialBody == null || saved.specialBody == string.Empty)
-                {
-                    saved.specialBody = "FT";
-                }
-                if (saved.familyID == null || saved.familyID == string.Empty)
-                {
-                    saved.familyID = "甲";
-                }
-                if (saved.familyName == null || saved.familyName == string.Empty)
-                {
-                    saved.familyName = "甲";
-                }
-                moreData.cultisystem = saved.cultisystem;
-                moreData.element = new ChineseElement(saved.element.baseElementContainer);
-                moreData.magic = saved.magic;
-                moreData.bonusStats = new MoreStats();
-                moreData.coolDown = saved.coolDown;
-                moreData.specialBody = saved.specialBody;
-                moreData.canCultivate = saved.canCultivate;
-                moreData.familyID = saved.familyID;
-                moreData.familyName = saved.familyName;
-                moreStats.element = moreData.element;
             }
             #endregion
             #region 加载国家与人物绑定关系

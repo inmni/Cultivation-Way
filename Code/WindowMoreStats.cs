@@ -113,8 +113,8 @@ namespace Cultivation_Way
             //Debug.Log(properties.Length);
             ActorStatus data = Config.selectedUnit.GetData();
             
-            MoreActorData moredata = Config.selectedUnit.GetMoreData();
-            MoreStats stats = moredata.currStats;
+            MoreStatus moredata = ((ExtendedActor)Config.selectedUnit).extendedData.status;
+            MoreStats stats = ((ExtendedActor)Config.selectedUnit).extendedCurStats;
             item.Add("family");
             value.Add(moredata.familyID + "氏");
             item.Add("cultivationBook");
@@ -126,17 +126,17 @@ namespace Cultivation_Way
             item.Add("madeBy");
             value.Add(Config.selectedUnit.GetSpecialBody().madeBy);
             item.Add("elementType");
-            value.Add(moredata.element.name + "灵根");
+            value.Add(stats.element.name + "灵根");
             item.Add("elementGold");
-            value.Add(moredata.element.baseElementContainer[0] + "%");
+            value.Add(stats.element.baseElementContainer[0] + "%");
             item.Add("elementWood");
-            value.Add(moredata.element.baseElementContainer[1] + "%");
+            value.Add(stats.element.baseElementContainer[1] + "%");
             item.Add("elementWater");
-            value.Add(moredata.element.baseElementContainer[2] + "%");
+            value.Add(stats.element.baseElementContainer[2] + "%");
             item.Add("elementFire");
-            value.Add(moredata.element.baseElementContainer[3] + "%");
+            value.Add(stats.element.baseElementContainer[3] + "%");
             item.Add("elementGround");
-            value.Add(moredata.element.baseElementContainer[4] + "%");
+            value.Add(stats.element.baseElementContainer[4] + "%");
             item.Add("cultisystem");
             value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).name);
             item.Add("realm");
@@ -148,7 +148,7 @@ namespace Cultivation_Way
             value.Add(Config.selectedUnit.getRealmName());
 
             item.Add("magic");
-            value.Add(Main.instance.actorToMoreData[data.actorID].magic + "/" + stats.magic);
+            value.Add(moredata.magic + "/" + stats.magic);
             return toFormat(item, value);
         }
         private static string toFormat(List<string> item, List<string> value)

@@ -7,6 +7,7 @@
         public int cost;//蓝耗
 
         public int cooldown;//冷却（年
+        public int leftCool;//剩余
 
         public float might;//威力因子
 
@@ -17,6 +18,7 @@
             ExtensionSpellAsset spellAsset = AddAssetManager.extensionSpellLibrary.get(spellAssetID);
             cost = spellAsset.baseCost;
             cooldown = spellAsset.coolDown;
+            leftCool = 0;
             might = spellAsset.might;
         }
         public ExtensionSpell(string spellID)
@@ -25,6 +27,7 @@
             ExtensionSpellAsset spellAsset = AddAssetManager.extensionSpellLibrary.get(spellAssetID);
             cost = spellAsset.baseCost;
             cooldown = spellAsset.coolDown;
+            leftCool = 0;
             might = spellAsset.might;
         }
         public ExtensionSpellAsset GetSpellAsset()

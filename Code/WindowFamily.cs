@@ -105,7 +105,7 @@ namespace Cultivation_Way
 
             List<string> item = new List<string>();
             List<string> value = new List<string>();
-            MoreActorData moredata = Config.selectedUnit.GetMoreData();
+            MoreStatus moredata = ((ExtendedActor)Config.selectedUnit).extendedData.status;
             Family family = Main.instance.familys[moredata.familyID];
             item.Add("family");
             value.Add(family.id + "氏");

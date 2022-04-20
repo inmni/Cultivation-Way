@@ -7,7 +7,7 @@ namespace Cultivation_Way
     class EasternDragon : BaseActorComponent
     {
 
-        internal Actor actor;
+        internal ExtendedActor actor;
 
         internal bool created;
 
@@ -46,7 +46,7 @@ namespace Cultivation_Way
         }
         internal void create()
         {
-            this.actor = base.gameObject.GetComponent<Actor>();
+            this.actor = (ExtendedActor)base.gameObject.GetComponent<Actor>();
             this.created = true;
             this.m_gameObject = base.gameObject;
             this.m_transform = this.m_gameObject.transform;
@@ -307,9 +307,9 @@ namespace Cultivation_Way
                         this.actorToAttack = targets.GetRandom();
                     }
                 }
-                foreach (ExtensionSpell spell in this.actor.GetMoreData().currStats.spells)
+                foreach (ExtensionSpell spell in this.actor.extendedCurStats.spells)
                 {
-                    if (actor.GetMoreData().magic > spell.cost && actor.GetMoreData().coolDown[spell.spellAssetID] == 1)
+                    if (actor.extendedData.status.magic > spell.cost && spell.leftCool == 0)
                     {
                         if (spell.GetSpellAsset().type.attacking)
                         {

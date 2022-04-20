@@ -5,6 +5,7 @@ using ReflectionUtility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -755,15 +756,15 @@ namespace Cultivation_Way
                 return true;
             }
             ActorStatus dataA = ((Actor)pAttacker).GetData();
-            MoreActorData moreData = Main.instance.actorToMoreData[dataA.actorID];
-            if (moreData.currStats.spells.Count != 0)
+            ExtendedActor pa = (ExtendedActor)pAttacker;
+            if (pa.extendedCurStats.spells.Count != 0)
             {
-                int count = moreData.currStats.spells.Count;
+                int count = pa.extendedCurStats.spells.Count;
                 int max = dataA.level / 20 + 1;
-                List<int> index = new List<int>(count);
+                int[] index = new int[count];
                 for (int i = 0; i < count; i++)
                 {
-                    index.Add(i);
+                    index[i] = i;
                 }
                 index.Shuffle();
                 for (int i = 0, num = 0; i < count && num < max; i++)
@@ -772,15 +773,15 @@ namespace Cultivation_Way
                     {
                         return true;
                     }
-                    ExtensionSpell spell = moreData.currStats.spells[index[i]];
+                    ExtensionSpell spell = pa.extendedCurStats.spells[index[i]];
                     //进行蓝耗和冷却检查
-                    if (moreData.coolDown[spell.spellAssetID] == 1 && moreData.magic >= spell.cost
+                    if (spell.leftCool == 0 && pa.extendedData.status.magic >= spell.cost
                         && spell.GetSpellAsset().type.attacking && spell.GetSpellAsset().type.requiredLevel <= dataA.level)
                     {
                         if (spell.castSpell(pAttacker, pTarget))
                         {
-                            moreData.coolDown[spell.spellAssetID] = spell.cooldown;
-                            moreData.magic -= spell.cost;
+                            spell.leftCool = spell.cooldown;
+                            pa.extendedData.status.magic -= spell.cost;
                             num++;
                         }
                     }
@@ -798,13 +799,12 @@ namespace Cultivation_Way
             {
                 return;
             }
-            MoreActorData moredata = __instance.GetMoreData();
-            MoreStats morestats = moredata.currStats;
+            MoreStatus moredata = ((ExtendedActor)__instance).extendedData.status;
+            MoreStats morestats =((ExtendedActor)__instance).extendedCurStats;
             float rangeLimit = Mathf.Max(__instance.GetCurStats().range, morestats.spellRange) + ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pObject, "curStats")).size;
             foreach (ExtensionSpell spell in morestats.spells)
             {
-                if (moredata.coolDown[spell.spellAssetID] == 1 && moredata.magic >= spell.cost
-                    && spell.GetSpellAsset().type.attacking)
+                if (((ExtendedActor)__instance).canCastSpell(spell)&& spell.GetSpellAsset().type.attacking)
                 {
                     if (Toolbox.DistVec3(__instance.currentPosition, pObject.currentPosition) < rangeLimit)
                     {
@@ -825,7 +825,8 @@ namespace Cultivation_Way
                 __result = int.MaxValue;
                 return false;
             }
-            __result = (int)((100 + (data.level - 1) * (data.level - 1) * 50) * __instance.GetMoreData().element.getImPurity()/__instance.GetMoreData().element.GetAsset().rarity);
+            ChineseElement element = ((ExtendedActor)__instance).extendedCurStats.element;
+            __result = (int)((100 + (data.level - 1) * (data.level - 1) * 50) *element.getImPurity()/element.GetAsset().rarity);
             return false;
         }
         //升级修改
@@ -846,10 +847,8 @@ namespace Cultivation_Way
                 }
             }
             ActorStatus data = __instance.GetData();
-            
-            MoreActorData moreData = __instance.GetMoreData();
-            MoreStats moreStats = moreData.currStats;
-            if (!moreData.canCultivate)
+            ExtendedActor actor = (ExtendedActor)__instance;
+            if (!actor.extendedData.status.canCultivate)
             {
                 return false;
             }
@@ -859,14 +858,10 @@ namespace Cultivation_Way
             if (data.experience >= __instance.getExpToLevelup())
             {
                 //回蓝，回冷却
-                moreData.magic = moreStats.magic;//待调整与元素相关
-                foreach (ExtensionSpell spell in moreStats.spells)
+                actor.extendedData.status.magic = actor.extendedCurStats.magic;//待调整与元素相关
+                foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
                 {
-                    if (!moreData.coolDown.ContainsKey(spell.spellAssetID))
-                    {
-                        moreData.coolDown[spell.spellAssetID] = spell.cooldown;
-                    }
-                    moreData.coolDown[spell.spellAssetID] = 1;
+                    spell.leftCool -= spell.leftCool > 0 ? 1 : 0;
                 }
                 __instance.setStatsDirty();
             }
@@ -881,9 +876,9 @@ namespace Cultivation_Way
                 {
                     data.experience -= __instance.getExpToLevelup();
                     ChineseElement element1 = new ChineseElement();
-                    if (element1.getImPurity() < moreData.element.getImPurity())
+                    if (element1.getImPurity() < actor.extendedCurStats.element.getImPurity())
                     {
-                        moreData.element = element1;
+                        actor.extendedCurStats.element = element1;
                     }
                 }
             }
@@ -916,16 +911,16 @@ namespace Cultivation_Way
                     realm = (realm + 9) / 10 + 9;
                 }
                 //家族升级
-                Family family = Main.instance.familys[moreData.familyID];
+                Family family = Main.instance.familys[actor.extendedData.status.familyID];
                 if (data.level > family.maxLevel)
                 {
                     int count = 0;
                     while (count < family.maxLevel / 10)
                     {
                         ChineseElement element1 = new ChineseElement();
-                        if (element1.getImPurity() < moreData.element.getImPurity())
+                        if (element1.getImPurity() < actor.extendedCurStats.element.getImPurity())
                         {
-                            moreData.element = element1;
+                            actor.extendedCurStats.element = element1;
                             break;
                         }
                         count++;
@@ -935,9 +930,9 @@ namespace Cultivation_Way
                 else if (data.level == family.maxLevel)
                 {
                     ChineseElement element1 = new ChineseElement();
-                    if (element1.getImPurity() < moreData.element.getImPurity())
+                    if (element1.getImPurity() < actor.extendedCurStats.element.getImPurity())
                     {
-                        moreData.element = element1;
+                        actor.extendedCurStats.element = element1;
                     }
                 }
                 //国家和城市领导人变化
@@ -983,11 +978,10 @@ namespace Cultivation_Way
             //法术释放
             string actorID = data.actorID;
             int level = data.level;
-            foreach (ExtensionSpell spell in Main.instance.actorToMoreData[actorID].currStats.spells)
+            foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
             {
                 if (__instance != null && data != null && data.alive &&
-                    AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).type.levelUp
-                    && AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).type.requiredLevel <= level)
+                    spell.GetSpellAsset().type.levelUp&& spell.GetSpellAsset().type.requiredLevel <= level)
                 {
                     spell.castSpell(__instance, __instance);
                     break;
@@ -1083,33 +1077,24 @@ namespace Cultivation_Way
                 return true;
             }
             ActorStatus data = __instance.GetData();
-            
-            MoreActorData moreData = __instance.GetMoreData();
-            MoreStats moreStats = moreData.currStats;
+            ExtendedActor actor = (ExtendedActor)__instance;
             if (!updateAge(AssetManager.raceLibrary.get(__instance.stats.race), data, __instance) && !__instance.haveTrait("immortal"))
             {
                 __instance.killHimself(false, AttackType.Age, true, true);
                 return false;
             }
             //回蓝，回冷却
-            moreData.magic += data.level;//待调整与元素相关
-            if (moreData.magic > moreStats.magic + 1)
+            actor.extendedData.status.magic += data.level;//待调整与元素相关
+            if (actor.extendedData.status.magic > actor.extendedCurStats.magic + 1)
             {
-                moreData.magic = moreStats.magic + 1;
+                actor.extendedData.status.magic = actor.extendedCurStats.magic + 1;
             }
-            foreach (ExtensionSpell spell in moreStats.spells)
+            foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
             {
-                if (!moreData.coolDown.ContainsKey(spell.spellAssetID))
-                {
-                    moreData.coolDown[spell.spellAssetID] = spell.cooldown;
-                }
-                if (moreData.coolDown[spell.spellAssetID] > 1)
-                {
-                    moreData.coolDown[spell.spellAssetID]--;
-                }
+                spell.leftCool -= spell.leftCool > 0 ? 1 : 0;
             }
             ChineseElement chunkElement = Main.instance.chunkToElement[__instance.currentTile.chunk.id];
-            ChineseElement actorElement = moreData.element;
+            ChineseElement actorElement = actor.extendedCurStats.element;
 
             float exp = 5 + __instance.GetFamily().cultivationBook.rank;
             float mod = 0f;
@@ -1135,12 +1120,13 @@ namespace Cultivation_Way
             List<CodeInstruction> codes = instructions.ToList();
             #region 绑定函数
             MethodInfo getCity = AccessTools.Method(typeof(ActorTools), "GetCity");
-            MethodInfo getMoreStats = AccessTools.Method(typeof(ActorTools), "GetMoreStats");
             MethodInfo getCurStats = AccessTools.Method(typeof(ActorTools), "GetCurStats");
             MethodInfo getBsFromMoreStats = AccessTools.Method(typeof(MoreStats), "GetBaseStats");
             MethodInfo part1 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper1");
             MethodInfo part2 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper2");
             MethodInfo addStats = AccessTools.Method(typeof(BaseStats), "addStats", new System.Type[] { typeof(BaseStats) });
+
+            FieldInfo extendedCurStats = AccessTools.Field(typeof(ExtendedActor), "extendedCurStats");
             //MethodInfo addStats = typeof(BaseStats).GetMethod("addStats", BindingFlags.Instance | BindingFlags.NonPublic);
             #endregion
             #region 属性添加处理
@@ -1155,7 +1141,7 @@ namespace Cultivation_Way
             offset++;//获取并将CurStats压入栈
             codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
-            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, getMoreStats));
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldfld, extendedCurStats));
             offset++;
             codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, getBsFromMoreStats));
             offset++;//获取MoreStats的BaseStats并压入栈
@@ -1185,7 +1171,7 @@ namespace Cultivation_Way
                 return true;
             }
             int num = actorStats.maxAge;
-            MoreStats morestats = pActor.GetMoreData().currStats;
+            MoreStats morestats = ((ExtendedActor)pActor).extendedCurStats;
             if (morestats.maxAge == 0 && pData.level > 1)
             {
                 pActor.CallMethod("updateStats");
@@ -1278,7 +1264,7 @@ namespace Cultivation_Way
             int maxAge = AssetManager.unitStats.get(data.statsID).maxAge;
             if (!data.statsID.StartsWith("summon"))
             {
-                maxAge += Main.instance.actorToMoreData[data.actorID].currStats.maxAge;
+                maxAge += ((ExtendedActor)selectedUnit).extendedCurStats.maxAge;
             }
             if (data.age * 5 >= maxAge << 2)
             {
@@ -1527,7 +1513,7 @@ namespace Cultivation_Way
         public static IEnumerable<CodeInstruction> update_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
-            MethodInfo copyMore = AccessTools.Method(typeof(ActorTools), "copyMore", new System.Type[] { typeof(Actor), typeof(Actor) });
+            MethodInfo copyMore = AccessTools.Method(typeof(ActorTools), "copyMore", new System.Type[] { typeof(Actor), typeof(Actor),typeof(bool) });
             MethodInfo getActor = AccessTools.Method(typeof(ActorTools), "getActor", new System.Type[] { typeof(Egg) });
             Label ret = new Label();
 
@@ -1537,6 +1523,8 @@ namespace Cultivation_Way
             codes.Insert(81 + offset, new CodeInstruction(OpCodes.Callvirt, getActor));
             offset++;
             codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldloc_0));
+            offset++;
+            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldc_I4_0));
             offset++;
             codes.Insert(81 + offset, new CodeInstruction(OpCodes.Call, copyMore));
             offset++;
@@ -1550,13 +1538,9 @@ namespace Cultivation_Way
         public static void generatePersonality_Postfix(ActorBase __instance)
         {
             #region 设置出生属性
-            MoreActorData moreData = new MoreActorData();
             ActorStatus status = Reflection.GetField(typeof(ActorBase), __instance, "data") as ActorStatus;
-            Main.instance.actorToMoreData[status.actorID] = moreData;
-            moreData.bonusStats = new MoreStats();
-            moreData.coolDown = new Dictionary<string, int>();
-            moreData.element = new ChineseElement();
-            moreData.currStats.maxAge = __instance.stats.maxAge;
+            ExtendedActor actor = (ExtendedActor)__instance;
+            actor.extendedCurStats.maxAge = __instance.stats.maxAge;
             //获取修炼体系
             if (__instance.getCulture() != null)
             {
@@ -1571,38 +1555,118 @@ namespace Cultivation_Way
                 }
                 if (cultisystem.Count > 0)
                 {
-                    moreData.cultisystem = cultisystem.GetRandom().Remove(0, 6);
+                    actor.extendedData.status.cultisystem = cultisystem.GetRandom().Remove(0, 6);
                 }
             }
             if (!MoreRaces.isCitizen((Actor)__instance))
             {
                 if (Toolbox.randomChance(0.6f))
                 {
-                    moreData.canCultivate = false;
+                    actor.extendedData.status.canCultivate = false;
                 }
             }
             if (Toolbox.randomChance(0.001f))
             {
-                moreData.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                actor.extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
             }
             //设置名字
-            if (!__instance.stats.unit)
-            {
-                moreData.familyName = AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_endList.GetRandom();
-                moreData.familyID = moreData.familyName;
-                status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, moreData.familyName, false);
-            }
-            else
-            {
-                moreData.familyName = AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_startList.GetRandom();
-                moreData.familyID = moreData.familyName;
-                status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, moreData.familyName, true);
-            }
-            Family family = Main.instance.familys[moreData.familyID];
+            actor.extendedData.status.familyName = __instance.stats.unit? AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_startList.GetRandom():AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_endList.GetRandom();
+            actor.extendedData.status.familyID = actor.extendedData.status.familyName;
+            status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, actor.extendedData.status.familyName, __instance.stats.unit);
+            Family family = Main.instance.familys[actor.extendedData.status.familyID];
             family.num++;
             #endregion
         }
 
         #endregion
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MapBox),"createNewUnit")]
+        public static bool createNewUnit_Prefix(ref Actor __result,string pStatsID, WorldTile pTile, string pJob = null, float pZHeight = 0f, ActorData pData = null)
+        {
+            ActorStats actorStats = AssetManager.unitStats.get(pStatsID);
+            
+            if (actorStats == null)
+            {
+                __result = null;
+                return false;
+            }
+            ExtendedActor component;
+            //Actor component;
+            try
+            {
+                //component = UnityEngine.Object.Instantiate((GameObject)Resources.Load("actors/" + actorStats.prefab, typeof(GameObject))).gameObject.GetComponent<Actor>();
+                component = UnityEngine.Object.Instantiate(Main.instance.prefabs.ExtendedActorPrefab).GetComponent<ExtendedActor>();
+            }
+            catch (Exception)
+            {
+                UnityEngine.Debug.Log("Tried to create actor: " + actorStats.id);
+                UnityEngine.Debug.Log("Failed to load prefab for actor: " + actorStats.prefab);
+                __result = null;
+                return false;
+            }
+            
+            component.transform.name = actorStats.id;
+            component.new_creature = true;
+            if (pData != null)
+            {
+                component.new_creature = false;
+            }
+            component.setWorld();
+            component.loadStats(actorStats);
+            if (pData != null)
+            {
+                Reflection.SetField(component,"data",pData.status);
+                Reflection.SetField(component,"professionAsset",AssetManager.professions.get(pData.status.profession));
+            }
+            if (component.new_creature)
+            {
+                component.CallMethod("newCreature",(int)((Reflection.GetField(typeof(GameStats),MapBox.instance.gameStats,"data") as GameStatsData).gameTime + (double)MapBox.instance.units.Count));
+            }
+            component.transform.position = pTile.posV3;
+            component.CallMethod("spawnOn",pTile, pZHeight);
+            component.CallMethod("create");
+            if (component.stats.kingdom != "")
+            {
+                component.CallMethod("setKingdom",MapBox.instance.kingdoms.dict_hidden[component.stats.kingdom]);
+            }
+            if (component.stats.hideOnMinimap)
+            {
+                component.transform.parent = Reflection.GetField(typeof(MapBox),MapBox.instance,"transformUnits") as Transform;
+            }
+            else
+            {
+                component.transform.parent = Reflection.GetField(typeof(MapBox), MapBox.instance, "transformCreatures") as Transform;
+            }
+            MapBox.instance.units.Add(component);
+            __result = component;
+            return false;
+        }
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(Actor), "spawnParticle")]
+        public static IEnumerable<CodeInstruction> spawnParticle_Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> codes = instructions.ToList();
+            MethodInfo get_sprite = AccessTools.Method(typeof(SpriteRenderer), "get_sprite");
+            MethodInfo op_Inequality = AccessTools.Method(typeof(UnityEngine.Object), "op_Inequality");
+            FieldInfo spriteRenderer = AccessTools.Field(typeof(Actor), "spriteRenderer");
+
+            Label label = new Label();
+            int offset = 0;
+            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            offset++;
+            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Ldfld, spriteRenderer));
+            offset++;
+            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Callvirt, get_sprite));
+            offset++;
+            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Ldnull));
+            offset++;
+            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Call, op_Inequality));
+            offset++;
+            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Brfalse_S, label));
+            offset++;
+            codes[34 + offset].labels.Add(label);
+            return codes.AsEnumerable();
+        }
     }
 }

@@ -209,8 +209,8 @@ namespace Cultivation_Way.Utils
                 float num1 = 0f;
                 try
                 {
-                    int[] elementU = ((Actor)pUser).GetMoreData().element.baseElementContainer;
-                    int[] elementT = ((Actor)pTarget).GetMoreData().element.baseElementContainer;
+                    int[] elementU = ((ExtendedActor)pUser).extendedCurStats.element.baseElementContainer;
+                    int[] elementT = ((ExtendedActor)pTarget).extendedCurStats.element.baseElementContainer;
                     int[] elementS = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).chineseElement.baseElementContainer;
                     //考虑属性克制
                     for (int i = 0; i < 5; i++)
@@ -222,9 +222,9 @@ namespace Cultivation_Way.Utils
                 }
                 catch (NullReferenceException e)
                 {
-                    MonoBehaviour.print("攻击方：" + ((Actor)pUser).GetData().firstName + ":" + ((Actor)pUser).GetMoreData().currStats);
+                    MonoBehaviour.print("攻击方：" + ((Actor)pUser).GetData().firstName + ":" + ((ExtendedActor)pUser).extendedCurStats);
                     MonoBehaviour.print("存活状态：" + ((Actor)pUser).GetData().alive);
-                    MonoBehaviour.print("被攻击方：" + ((Actor)pTarget).GetData().firstName + ":" + ((Actor)pTarget).GetMoreData().currStats);
+                    MonoBehaviour.print("被攻击方：" + ((Actor)pTarget).GetData().firstName + ":" + ((ExtendedActor)pTarget).extendedCurStats);
                     MonoBehaviour.print("存活状态：" + ((Actor)pTarget).GetData().alive);
                     MonoBehaviour.print("*******************");
                     return 1000000f;
@@ -234,7 +234,7 @@ namespace Cultivation_Way.Utils
             {
                 float oriDamage = ((Actor)pUser).GetCurStats().damage * spell.might;
                 float num1 = 0f;
-                int[] elementU = ((Actor)pUser).GetMoreData().element.baseElementContainer;
+                int[] elementU = ((ExtendedActor)pUser).extendedCurStats.element.baseElementContainer;
                 int[] elementS = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).chineseElement.baseElementContainer;
                 //考虑属性克制
                 for (int i = 0; i < 5; i++)

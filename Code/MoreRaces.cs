@@ -135,27 +135,27 @@ namespace Cultivation_Way
             RaceFeature orcFeature = Main.instance.raceFeatures["unit_orc"];
 
             RaceFeature TianFeature = Main.instance.raceFeatures["unit_Tian"];
-            TianFeature.raceSpells.Add(new ExtensionSpell("summonTian"));
-            TianFeature.raceSpells.Add(new ExtensionSpell("summonTian1"));
+            TianFeature.raceSpells.Add("summonTian");
+            TianFeature.raceSpells.Add("summonTian1");
             RaceFeature MingFeature = Main.instance.raceFeatures["unit_Ming"];
-            MingFeature.raceSpells.Add(new ExtensionSpell("summon") { might = 2f });
+            MingFeature.raceSpells.Add("summon");
             RaceFeature YaoFeature = Main.instance.raceFeatures["unit_Yao"];
         }
         internal void setOtherRaceFeature()
         {
             RaceFeature JiaoDragonFeature = Main.instance.raceFeatures["JiaoDragon"];
-            JiaoDragonFeature.raceSpells.Add(new ExtensionSpell("JiaoDragon_laser"));
+            JiaoDragonFeature.raceSpells.Add("JiaoDragon_laser");
 
             RaceFeature EasternDragonFeature = Main.instance.raceFeatures["EasternDragon"];
-            EasternDragonFeature.raceSpells.Add(new ExtensionSpell("JiaoDragon_laser"));
+            EasternDragonFeature.raceSpells.Add("JiaoDragon_laser");
 
             RaceFeature MengZhuFeature = Main.instance.raceFeatures["MengZhu"];
-            MengZhuFeature.raceSpells.Add(new ExtensionSpell("lightning"));
-            MengZhuFeature.raceSpells.Add(new ExtensionSpell("summonTian"));
+            MengZhuFeature.raceSpells.Add("lightning");
+            MengZhuFeature.raceSpells.Add("summonTian");
 
             RaceFeature MonkeySheng1 = Main.instance.raceFeatures["MonkeySheng1"];
-            MonkeySheng1.raceSpells.Add(new ExtensionSpell("goldBar"));
-            MonkeySheng1.raceSpells.Add(new ExtensionSpell("goldBarDown"));
+            MonkeySheng1.raceSpells.Add("goldBar");
+            MonkeySheng1.raceSpells.Add("goldBarDown");
 
         }
 
@@ -240,8 +240,9 @@ namespace Cultivation_Way
         {
             List<CodeInstruction> codes = instructions.ToList();
             MethodInfo isCitizen = AccessTools.Method(typeof(MoreRaces), "isCitizen");
-            codes[20] = new CodeInstruction(OpCodes.Callvirt, isCitizen);
-            codes[21] = new CodeInstruction(OpCodes.Nop);
+            int offset = 0;
+            codes[20+offset] = new CodeInstruction(OpCodes.Callvirt, isCitizen);
+            codes[21+offset] = new CodeInstruction(OpCodes.Nop);
             return codes.AsEnumerable();
         }
         public static bool isCitizen(Actor actor)
@@ -301,7 +302,6 @@ namespace Cultivation_Way
                         sprites.Add(names[i] + "_item", sprite);
                     }
                 }
-
                 //framedata重新生成
 
                 Reflection.SetField(animationDataUnit, "frameData", new Dictionary<string, AnimationFrameData>());

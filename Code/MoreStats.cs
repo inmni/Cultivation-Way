@@ -101,7 +101,7 @@ namespace Cultivation_Way
         /// 加法
         /// </summary>
         /// <param name="another"></param>
-        public void addAnotherStats(MoreStats another)
+        public MoreStats addAnotherStats(MoreStats another)
         {
             baseStats.CallMethod("addStats", another.baseStats);
 
@@ -114,6 +114,7 @@ namespace Cultivation_Way
             this.talent += another.talent;
             this.soul += another.soul;
             this.maxAge += another.maxAge;
+            return this;
         }
         /// <summary>
         /// 减法

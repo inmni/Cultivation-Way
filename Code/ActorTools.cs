@@ -3,7 +3,6 @@ using ReflectionUtility;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Microsoft.CSharp.RuntimeBinder;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 
@@ -56,58 +55,6 @@ namespace Cultivation_Way
 
         }
         /// <summary>
-        /// 返回MoreStats
-        /// </summary>
-        /// <param name="actor"></param>
-        /// <returns></returns>
-        public static MoreStats GetMoreStats(this Actor actor)
-        {
-            if (actor == null || actor.GetData() == null)
-            {
-                return null;
-            }
-            try
-            {
-                MoreStats moreStats = Main.instance.actorToMoreData[actor.GetData().actorID].currStats;
-                return moreStats;
-            }
-            catch (KeyNotFoundException e)
-            {
-                MonoBehaviour.print("[" + e.StackTrace + "]");
-                MonoBehaviour.print(actor.GetData().actorID + "(" + actor.stats.race + ")的MoreStats不存在");
-                MonoBehaviour.print("name:" + actor.GetData().firstName);
-                MonoBehaviour.print("age:" + actor.GetData().age);
-                actor.GetData().favorite = true;
-            }
-            return null;
-        }
-        /// <summary>
-        /// 返回MoreActorData
-        /// </summary>
-        /// <param name="actor"></param>
-        /// <returns></returns>
-        public static MoreActorData GetMoreData(this Actor actor)
-        {
-            if (actor == null||actor.GetData()==null)
-            {
-                return null;
-            }
-            try
-            {
-                MoreActorData moreData = Main.instance.actorToMoreData[actor.GetData().actorID];
-                return moreData;
-            }
-            catch (KeyNotFoundException e)
-            {
-                MonoBehaviour.print("[" + e.StackTrace + "]");
-                MonoBehaviour.print(actor.GetData().actorID + "(" + actor.stats.race + ")的MoreData不存在");
-                MonoBehaviour.print("name:" + actor.GetData().firstName);
-                MonoBehaviour.print("age:" + actor.GetData().age);
-                actor.GetData().favorite = true;
-            }
-            return null;
-        }
-        /// <summary>
         /// 返回actor的体质
         /// </summary>
         /// <param name="actor"></param>
@@ -115,7 +62,7 @@ namespace Cultivation_Way
         public static SpecialBody GetSpecialBody(this Actor actor)
         {
             SpecialBodyLibrary specialBodyLibrary = AddAssetManager.specialBodyLibrary;
-            return specialBodyLibrary.get(actor.GetMoreData().specialBody);
+            return specialBodyLibrary.get(((ExtendedActor)actor).extendedData.status.specialBody);
         }
         /// <summary>
         /// 返回actor的家族
@@ -124,16 +71,11 @@ namespace Cultivation_Way
         /// <returns></returns>
         public static Family GetFamily(this Actor actor)
         {
-            try
-            {
-                return Main.instance.familys[actor.GetMoreData().familyID];
-            }
-            catch (KeyNotFoundException e)
-            {
-                MonoBehaviour.print(actor.GetMoreData().familyID);
-                MonoBehaviour.print(e.StackTrace);
-                return Main.instance.familys["甲"];
-            }
+            return Main.instance.familys[((ExtendedActor)actor).extendedData.status.familyID];
+        }
+        public static bool canCastSpell(this ExtendedActor actor,ExtensionSpell spell)
+        {
+            return actor.extendedData.status.magic > spell.cost && spell.leftCool == 0;
         }
         //"haveOppsiteTrait"完全来自游戏内部，拷贝目的是为了减少反射带来额外开销
         public static bool haveOppositeTrait(this ActorStatus data, ActorTrait pTraitMain)
@@ -180,9 +122,9 @@ namespace Cultivation_Way
         public static void generateNewBody(this Actor actor)
         {
             SpecialBody newBody = new SpecialBody();
-            if (actor.GetMoreData().specialBody == null || actor.GetMoreData().specialBody == string.Empty)
+            if (((ExtendedActor)actor).extendedData.status.specialBody == null || ((ExtendedActor)actor).extendedData.status.specialBody == string.Empty)
             {
-                actor.GetMoreData().specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                ((ExtendedActor)actor).extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
             }
             newBody.id = actor.GetData().actorID;
             newBody.madeBy = actor.GetData().firstName;
@@ -190,7 +132,7 @@ namespace Cultivation_Way
             newBody.rank = Toolbox.randomInt(1, 7);
             if (newBody.rank > actor.GetSpecialBody().rank)
             {
-                actor.GetMoreData().specialBody = newBody.id;
+                ((ExtendedActor)actor).extendedData.status.specialBody = newBody.id;
             }
             newBody.name = ChineseNameGenerator.getName("specialBody_name"+newBody.rank)+ChineseNameAsset.rankName1[newBody.rank-1];
             newBody.mod_damage = Toolbox.randomInt(0, 20 * newBody.rank);
@@ -350,32 +292,26 @@ namespace Cultivation_Way
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        public static void copyMore(Actor from, Actor to)
+        public static void copyMore(Actor from, Actor to,bool compositionCopied = false)
         {
-            MoreActorData originMoreActorData = from.GetMoreData();
-            MoreStats originMoreStats = originMoreActorData.currStats;
-
-            MoreActorData newMoreActorData = new MoreActorData();
-            MoreStats newMoreStats = new MoreStats();
-
-            newMoreActorData.cultisystem = originMoreActorData.cultisystem;
-            newMoreActorData.bonusStats = originMoreActorData.bonusStats;
-            newMoreActorData.coolDown = originMoreActorData.coolDown;
-            newMoreActorData.element = originMoreActorData.element;
-            newMoreActorData.familyID = originMoreActorData.familyID;
-            newMoreActorData.familyName = originMoreActorData.familyName;
-            newMoreActorData.magic = originMoreActorData.magic;
-            newMoreActorData.specialBody = originMoreActorData.specialBody;
-            newMoreActorData.canCultivate = originMoreActorData.canCultivate;
-
-            newMoreActorData.currStats.baseStats = originMoreStats.baseStats;
-            newMoreActorData.currStats.magic = originMoreStats.magic;
-            newMoreActorData.currStats.element = originMoreStats.element;
-            newMoreActorData.currStats.spells = originMoreStats.spells;
-            newMoreActorData.currStats.talent = originMoreStats.talent;
-            newMoreActorData.currStats.maxAge = originMoreStats.maxAge;
-
-            Main.instance.actorToMoreData[to.GetData().actorID] = newMoreActorData;
+            ExtendedActor fromActor = (ExtendedActor)from;
+            ExtendedActor toActor = (ExtendedActor)to;
+            toActor.extendedCurStats.element = new ChineseElement(fromActor.extendedCurStats.element.baseElementContainer);
+            toActor.extendedData.status.bonusStats = new MoreStats().addAnotherStats(fromActor.extendedData.status.bonusStats);
+            toActor.extendedData.status.familyID = fromActor.extendedData.status.familyID;
+            toActor.extendedData.status.familyName = fromActor.extendedData.status.familyName;
+            toActor.extendedData.status.magic = fromActor.extendedData.status.magic;
+            toActor.extendedData.status.specialBody = fromActor.extendedData.status.specialBody;
+            toActor.extendedData.status.cultisystem = fromActor.extendedData.status.cultisystem;
+            toActor.extendedData.status.canCultivate = fromActor.extendedData.status.canCultivate;
+            if (compositionCopied)
+            {
+                toActor.extendedData.status.compositionSetting = fromActor.extendedData.status.compositionSetting;
+                foreach(BaseSimObject baseSimObject in fromActor.compositions)
+                {
+                    ComposeTools.composeTwo(toActor, baseSimObject);
+                }
+            }
             //MonoBehaviour.print("successfully copy " + to.GetData().actorID + "'s more...");
         }
         public static int getRealm(this Actor actor)
@@ -394,7 +330,7 @@ namespace Cultivation_Way
         public static string getRealmName(this Actor actor)
         {
             int realm = actor.getRealm();
-            return LocalizedTextManager.getText(actor.GetMoreData().cultisystem + realm);
+            return LocalizedTextManager.getText(((ExtendedActor)actor).extendedData.status.cultisystem + realm);
         }
         #region updateStats所用
         /// <summary>
@@ -404,12 +340,15 @@ namespace Cultivation_Way
         public static void dealStatsHelper1(Actor actor)
         {
             ActorStatus data = actor.GetData();
-            
-            MoreActorData moredata = actor.GetMoreData();
-            MoreStats morestats = moredata.currStats;
+            ExtendedActor actor1 = (ExtendedActor)actor;
+            MoreStats morestats = actor1.extendedCurStats;
+            MoreStatus moredata = actor1.extendedData.status;
             #region 种族法术与各类属性
             morestats.clear();
-                morestats.spells.AddRange(Main.instance.raceFeatures[actor.stats.id].raceSpells);
+            foreach(string id in Main.instance.raceFeatures[actor.stats.id].raceSpells)
+            {
+                morestats.spells.Add(new ExtensionSpell(id));
+            }
             int realm = actor.getRealm();
             //每个境界属性均加上
                 for (int i = 0; i < realm; i++)
@@ -489,19 +428,6 @@ namespace Cultivation_Way
             morestats.spells.Clear();
             morestats.spells = fixedSpells;
             #endregion
-            #region 冷却实现
-                if (morestats.spells.Count > 0)
-                {
-                    foreach (ExtensionSpell spell in morestats.spells)
-                    {
-                        if (moredata.coolDown.ContainsKey(spell.spellAssetID))
-                        {
-                            continue;
-                        }
-                        moredata.coolDown[spell.spellAssetID] = spell.cooldown;
-                    }
-                }
-            #endregion
             morestats.addAnotherStats(moredata.bonusStats);
         }
         /// <summary>
@@ -512,7 +438,8 @@ namespace Cultivation_Way
         public static void dealStatsHelper2(Actor actor)
         {
             int maxArmor = 80 + actor.GetData().level / 6;
-            MoreActorData moredata = actor.GetMoreData();
+            ExtendedActor actor1 = (ExtendedActor)actor;
+            MoreStatus moredata = actor1.extendedData.status;
             if (moredata.cultisystem == "bodying")
             {
                 maxArmor += 5;
@@ -525,9 +452,9 @@ namespace Cultivation_Way
             {
                 actor.GetCurStats().armor = maxArmor;
             }
-            if (moredata.magic > moredata.currStats.magic)
+            if (moredata.magic > actor1.extendedCurStats.magic)
             {
-                moredata.magic = moredata.currStats.magic;
+                moredata.magic = actor1.extendedCurStats.magic;
             }
             return;
         }
@@ -544,9 +471,10 @@ namespace Cultivation_Way
         #endregion
         public static float getCombat(this Actor actor)
         {
+            ExtendedActor actor1 = (ExtendedActor)actor;
             float result = 1f;
-            float element = actor.GetMoreData().element.getImPurity();
-            float spellCount = actor.GetMoreData().coolDown.Count;
+            float element = actor1.extendedCurStats.element.getImPurity();
+            float spellCount = actor1.extendedCurStats.spells.Count;
             float specialBody = actor.GetSpecialBody().rank;
             float baseStats = (actor.GetCurStats().health >> 7) * (actor.GetCurStats().damage >> 5) / (100-actor.GetCurStats().armor)*actor.GetCurStats().attackSpeed;
             result = element * spellCount * specialBody * baseStats / 4;

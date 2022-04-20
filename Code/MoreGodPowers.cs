@@ -138,12 +138,12 @@ namespace Cultivation_Way
                     return false;
                 }
                 Main.instance.creatureLimit[easterDragon.actorStatsId]--;
-                Actor actor = MapBox.instance.spawnNewUnit("EasternDragon", pTile, "", 3f);
+                ExtendedActor actor = (ExtendedActor)MapBox.instance.spawnNewUnit("EasternDragon", pTile, "", 3f);
                 actor.GetData().firstName = "龙王";
-                actor.GetMoreData().element.baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
-                actor.GetMoreData().element.setType();
                 actor.GetData().level = 11;
                 actor.GetData().health = int.MaxValue >> 2;
+                actor.extendedCurStats.element.baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
+                actor.extendedCurStats.element.setType();
                 return true;
             });
             AssetManager.powers.add(easterDragon);
@@ -256,10 +256,10 @@ namespace Cultivation_Way
                     return false;
                 }
                 Main.instance.creatureLimit[Nian.actorStatsId]--;
-                Actor actor = MapBox.instance.spawnNewUnit("Nian", pTile, "", 3f);
+                ExtendedActor actor = (ExtendedActor)MapBox.instance.spawnNewUnit("Nian", pTile, "", 3f);
                 actor.GetData().firstName = "夕";
-                actor.GetMoreData().element.baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
-                actor.GetMoreData().element.setType();
+                actor.extendedCurStats.element.baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
+                actor.extendedCurStats.element.setType();
                 int level = MapBox.instance.mapStats.year / 2022 * 10 + 1;
                 if (level > 110)
                 {
