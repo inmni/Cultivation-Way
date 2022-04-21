@@ -121,7 +121,7 @@ namespace Cultivation_Way
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
 
             Reflection.SetField(traitButton, "trait", AssetManager.traits.get(pID));
-            Sprite sprite = Sprites.LoadSprite(Main.mainPath + $"/EmbededResources/icons/traits/{ AssetManager.traits.get(pID).icon}.png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + $"/EmbededResources/icons/traits/{ AssetManager.traits.get(pID).icon}.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
@@ -152,7 +152,7 @@ namespace Cultivation_Way
             {
                 Localization.setLocalization("trait_race", LocalizedTextManager.getText(AssetManager.raceLibrary.dict[raceID].nameLocale));
             }
-            Sprite sprite = Sprites.LoadSprite(Main.mainPath + $"/EmbededResources/icons/traits/{raceID}.png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + $"/EmbededResources/icons/traits/{raceID}.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
@@ -191,7 +191,7 @@ namespace Cultivation_Way
 
             Reflection.SetField(traitButton, "trait", AssetManager.traits.get("realm"));
 
-            Sprite sprite = Sprites.LoadSprite(Main.mainPath + "/EmbededResources/icons/traits/" + ((ExtendedActor)actor).extendedData.status.cultisystem + "_" + 1 + ".png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/" + ((ExtendedActor)actor).extendedData.status.cultisystem + "_" + 1 + ".png");
             traitButton.GetComponent<Image>().sprite = sprite;
             Localization.setLocalization("trait_realm", actor.getRealmName());
 
@@ -226,7 +226,7 @@ namespace Cultivation_Way
             Localization.setLocalization("trait_cultivationBook_info", description.ToString());
 
             Reflection.SetField(traitButton, "trait", AssetManager.traits.get("cultivationBook"));
-            Sprite sprite = Sprites.LoadSprite(Main.mainPath + "/EmbededResources/icons/traits/cultivationBook.png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/cultivationBook.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
@@ -250,7 +250,7 @@ namespace Cultivation_Way
             Localization.setLocalization("trait_element_info", "");
 
             Reflection.SetField(traitButton, "trait", AssetManager.traits.get("element"));
-            Sprite sprite = Sprites.LoadSprite(Main.mainPath + "/EmbededResources/icons/traits/element.png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/element.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();

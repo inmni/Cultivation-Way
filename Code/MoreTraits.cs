@@ -69,7 +69,7 @@ namespace Cultivation_Way
             {
                 ActorTrait trait = AssetManager.traits.get(pTrait);
                 Reflection.SetField(__instance, "trait", trait);
-                Sprite sprite = NCMS.Utils.Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/traits/" + trait.icon + ".png");
+                Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/traits/" + trait.icon + ".png");
                 __instance.GetComponent<Image>().sprite = sprite;
                 return false;
             }

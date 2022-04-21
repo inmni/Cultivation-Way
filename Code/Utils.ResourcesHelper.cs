@@ -8,6 +8,17 @@ namespace Cultivation_Way.Utils
 {
     class ResourcesHelper
     {
+        public static Sprite loadSprite(string path, float offsetX = 0f, float offsetY = 0f)
+        {
+            Sprite sprite = Main.resourcesBuffer.getSprite(path);
+            if (sprite != null)
+            {
+                return sprite;
+            }
+            sprite = Sprites.LoadSprite(path, offsetX, offsetY);
+            Main.resourcesBuffer.addSprite(path, sprite);
+            return sprite;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -23,7 +34,7 @@ namespace Cultivation_Way.Utils
             List<Sprite> res = new List<Sprite>();
             foreach (FileInfo file in folder.GetFiles("*.png"))
             {
-                Sprite sprite = Sprites.LoadSprite($"{file.FullName}", offsetX, offsetY);
+                Sprite sprite = Utils.ResourcesHelper.loadSprite($"{file.FullName}", offsetX, offsetY);
                 sprite.name = file.Name.Replace(".png", "");
                 res.Add(sprite);
             }
@@ -31,7 +42,7 @@ namespace Cultivation_Way.Utils
             {
                 foreach(FileInfo file in cFolder.GetFiles("*.png"))
                 {
-                    Sprite sprite = Sprites.LoadSprite($"{file.FullName}", offsetX, offsetY);
+                    Sprite sprite = Utils.ResourcesHelper.loadSprite($"{file.FullName}", offsetX, offsetY);
                     sprite.name = file.Name.Replace(".png", "");
                     res.Add(sprite);
                 }

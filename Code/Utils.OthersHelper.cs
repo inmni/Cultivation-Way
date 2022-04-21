@@ -8,6 +8,7 @@ namespace Cultivation_Way.Utils
 {
     class OthersHelper
     {
+        public delegate bool checker<T>(T key);
         private static int[][] pureElementColor = new int[5][]
         {
             new int[3]{ 255,238,0},
@@ -459,6 +460,16 @@ namespace Cultivation_Way.Utils
             start.y += 0.5f+yOffset;
 
             return (Projectile)MapBox.instance.stackEffects.CallMethod("startProjectile", start, end, id, pZ);
+        }
+        public static void valueClone<T1, T2>(Dictionary<T1, T2> from, Dictionary<T1, T2> to, checker<T1> checker = null)
+        {
+            foreach (T1 key in from.Keys)
+            {
+                if (key != null && (checker == null || checker(key)))
+                {
+                    to.Add(key, from[key]);
+                }
+            }
         }
     }
     class BiDictionary<TFirst, TSecond>

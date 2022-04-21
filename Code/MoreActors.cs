@@ -716,6 +716,7 @@ namespace Cultivation_Way
         }
 
         #region 拦截
+
         //龙的攻击逻辑
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Actor), "canFight")]
@@ -1577,9 +1578,6 @@ namespace Cultivation_Way
             family.num++;
             #endregion
         }
-
-        #endregion
-
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MapBox),"createNewUnit")]
         public static bool createNewUnit_Prefix(ref Actor __result,string pStatsID, WorldTile pTile, string pJob = null, float pZHeight = 0f, ActorData pData = null)
@@ -1642,6 +1640,46 @@ namespace Cultivation_Way
             __result = component;
             return false;
         }
+        //解除绑定
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(MapBox), "destroyActor", new Type[] { typeof(Actor) })]
+        public static bool unBindActorToMoreStats(Actor pActor)
+        {
+            //if (!instance.actorToID.ContainsKey(pActor))
+            //{
+            //    print(pActor+"不存在");
+            //}
+            if (pActor == null || pActor.GetData() == null)
+            {
+                return true;
+            }
+            try
+            {
+                Main.instance.creatureLimit[pActor.stats.id]++;
+            }
+            catch (KeyNotFoundException)
+            {
+
+            }
+            MoreStatus moreData = ((ExtendedActor)pActor).extendedData.status;
+            Family family = Main.instance.familys[moreData.familyID];
+            family.num--;
+            if (family.num <= 0)
+            {
+                Main.instance.familys[moreData.familyID] = new Family(moreData.familyID);
+            }
+            try
+            {
+                Main.instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
+            }
+            catch
+            {
+                //直接用于排除非智慧国家，以及与killhimself重叠部分
+                //This paragraph is used to exclude non-intelligent kingdoms and the overlap with "killHimself".
+            }
+            return true;
+        }
+
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(Actor), "spawnParticle")]
         public static IEnumerable<CodeInstruction> spawnParticle_Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -1668,5 +1706,6 @@ namespace Cultivation_Way
             codes[34 + offset].labels.Add(label);
             return codes.AsEnumerable();
         }
+        #endregion
     }
 }

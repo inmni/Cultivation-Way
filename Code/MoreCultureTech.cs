@@ -62,7 +62,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + pAsset.icon + ".png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + pAsset.icon + ".png");
             __instance.GetComponent<Image>().sprite = sprite;
             return false;
         }
@@ -115,7 +115,7 @@ namespace Cultivation_Way
                 }
                 else
                 {
-                    sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + cultureTechAsset.icon + ".png");
+                    sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + cultureTechAsset.icon + ".png");
                 }
                 __instance.iconCurrentTech.GetComponent<Image>().sprite = sprite;
                 __instance.iconCurrentTech.gameObject.SetActive(true);

@@ -165,7 +165,29 @@ namespace Cultivation_Way
             KingdomManager kingdomManager = MapBox.instance.kingdoms;
             kingdomManager.addKingdom(kingdom, false);
         }
-        
+        //城市给予物品修复
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(City), "giveItem")]
+        public static bool giveItem_Prefix(ref bool __result, Actor pActor, ActorEquipmentSlot pSlot, City pCity)
+        {
+            if (pActor == null || pActor.equipment == null || pSlot == null || pCity == null)
+            {
+                __result = false;
+                return false;
+            }
+            return true;
+        }
+        //城市获取死亡人口的装备修复
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(City), "giveItemsToCity")]
+        public static bool giveItemsToCity_Prefix(City pCity, Actor pDeadActor)
+        {
+            if (pDeadActor.stats.use_items)
+            {
+                return true;
+            }
+            return false;
+        }
         //设置投降条件
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(City), "updateCapture")]

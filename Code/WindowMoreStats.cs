@@ -44,7 +44,7 @@ namespace Cultivation_Way
 
             checkMoreStats.GetComponent<RectTransform>().sizeDelta = new Vector2(60f, 60f);
             checkMoreStats.transform.Find("Icon").GetComponent<RectTransform>().sizeDelta = new Vector2(36f, 36f);
-            checkMoreStats.GetComponent<Image>().sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/backButtonRight.png");
+            checkMoreStats.GetComponent<Image>().sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/backButtonRight.png");
             #endregion
 
             window_MoreStats = Windows.CreateNewWindow("window_MoreStats", "详细信息");

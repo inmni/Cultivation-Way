@@ -266,7 +266,29 @@ namespace Cultivation_Way
             }
             if (Main.instance.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
             {
-                __instance.icon.sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/icons/actors/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
+                __instance.icon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
+            }
+        }
+        //国家列表
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(KingdomListWindow),"showElement")]
+        public static void showElement_KingdomList(KingdomListWindow __instance,Kingdom pKingdom)
+        {
+            KingdomElement element = (Reflection.GetField(typeof(KingdomListWindow), __instance, "elements") as List<KingdomElement>).Last();
+            if (element.iconRace.sprite == null)
+            {
+                element.iconRace.sprite =Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/icon{pKingdom.raceID}.png");
+            }
+        }
+        //城市列表
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(CitiesListWindow), "showElement")]
+        public static void showElement_CitiesList(CitiesListWindow __instance, City pObject)
+        {
+            CitiesListElement element = (Reflection.GetField(typeof(CitiesListWindow), __instance, "elements") as List<CitiesListElement>).Last();
+            if (element.raceIcon.sprite == null)
+            {
+                element.raceIcon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/{(Reflection.GetField(typeof(City), pObject, "race") as Race).icon}.png");
             }
         }
         //主贴图加载
@@ -284,7 +306,7 @@ namespace Cultivation_Way
                 string[] names = new string[8] { "swim_0", "swim_1", "swim_2", "swim_3", "walk_0", "walk_1", "walk_2", "walk_3" };
                 foreach (string name in names)
                 {
-                    Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{name}.png", ActorBase.spriteOffset.x);
+                    Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{name}.png", ActorBase.spriteOffset.x);
                     sprite.name = name;
                     sprites.Add(name, sprite);
                 }
@@ -297,7 +319,7 @@ namespace Cultivation_Way
                         {
                             extraOffset = 0.5f;
                         }
-                        Sprite sprite = Sprites.LoadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{names[i] + "_item"}.png", ActorBase.spriteOffset.x, ActorBase.spriteOffset.y * (3.5f + extraOffset));
+                        Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/{pSheetPath}/{names[i] + "_item"}.png", ActorBase.spriteOffset.x, ActorBase.spriteOffset.y * (3.5f + extraOffset));
                         sprite.name = names[i] + "_item";
                         sprites.Add(names[i] + "_item", sprite);
                     }

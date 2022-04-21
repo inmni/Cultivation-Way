@@ -30,6 +30,8 @@ namespace CultivationWay
 
         public static Main instance;
 
+        public static ResourcesBuffer resourcesBuffer = new ResourcesBuffer();
+
         public StackSpellEffects spellEffects;
 
         public CustomPrefabs prefabs = new CustomPrefabs();
@@ -319,22 +321,14 @@ namespace CultivationWay
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();
         }
-        delegate bool checker<T>(T key);
-        bool checkAlive(string actorID){
-            if (MapBox.instance.getActorByID(actorID) == null)
-            {
-                return false;
-            }
-            return true;
-        }
         void clearMemory()
         {
             Dictionary<int, ActorStatus> TempactorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
 
             Dictionary<int, BaseStats> TempactorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
 
-            valueClone(actorToCurStats, TempactorToCurStats);
-            valueClone(actorToData, TempactorToData);
+            OthersHelper.valueClone(actorToCurStats, TempactorToCurStats);
+            OthersHelper.valueClone(actorToData, TempactorToData);
 
             actorToCurStats.Clear();
             actorToData.Clear();
@@ -345,16 +339,7 @@ namespace CultivationWay
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();      
         }
-        void valueClone<T1, T2>(Dictionary<T1, T2> from, Dictionary<T1, T2> to,checker<T1> checker = null)
-        {
-            foreach (T1 key in from.Keys)
-            {
-                if (key != null && (checker==null || checker(key)))
-                {
-                    to.Add(key, from[key]);
-                }
-            }
-        }
+        
         #endregion
 
         #region 一些不知道放哪的拦截
@@ -409,52 +394,7 @@ namespace CultivationWay
             }
             return true;
         }
-
-        //解除绑定
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(MapBox), "destroyActor", new Type[] { typeof(Actor) })]
-        public static bool unBindActorToMoreStats(Actor pActor)
-        {
-            //if (!instance.actorToID.ContainsKey(pActor))
-            //{
-            //    print(pActor+"不存在");
-            //}
-            if (pActor == null || pActor.GetData() == null)
-            {
-                return true;
-            }
-            try {
-                instance.creatureLimit[pActor.stats.id]++; 
-            }
-            catch(KeyNotFoundException)
-            {
-                
-            }
-            try
-            {
-                MoreStatus moreData = ((ExtendedActor)pActor).extendedData.status;
-                Family family = instance.familys[moreData.familyID];
-                family.num--;
-                if (family.num <= 0)
-                {
-                    instance.familys[moreData.familyID] = new Family(moreData.familyID);
-                }
-            }
-            catch
-            {
-
-            }
-            try
-            {
-                instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
-            }
-            catch
-            {
-                //直接用于排除非智慧国家，以及与killhimself重叠部分
-                //This paragraph is used to exclude non-intelligent kingdoms and the overlap with "killHimself".
-            }
-            return true;
-            }
+        
         //百年事件（更新灵气，清理内存，以及其他
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox), "updateObjectAge")]
@@ -533,29 +473,7 @@ namespace CultivationWay
                 WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning,true)}>年兽入侵！</color>", "iconKingslayer",tile);
             }
         }
-        //城市给予物品修复
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(City), "giveItem")]
-        public static bool giveItem_Prefix(ref bool __result, Actor pActor, ActorEquipmentSlot pSlot, City pCity)
-        {
-            if (pActor == null || pActor.equipment == null || pSlot == null || pCity == null)
-            {
-                __result = false;
-                return false;
-            }
-            return true;
-        }
-        //城市获取死亡人口的装备修复
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(City), "giveItemsToCity")]
-        public static bool giveItemsToCity_Prefix(City pCity, Actor pDeadActor)
-        {
-            if (pDeadActor.stats.use_items)
-            {
-                return true;
-            }
-            return false;
-        }
+        
         #endregion
 
         #region 乱七八糟的初始化
