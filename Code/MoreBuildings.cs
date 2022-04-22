@@ -216,6 +216,34 @@ namespace Cultivation_Way
                 usedByRacesCheck = true,
                 usedByRaces = "Tian"
             });
+
+            BuildingAsset Circumvallation_1_EasternHuman = AssetManager.buildings.add(new BuildingAsset
+            {
+                id = "Circumvallation_1_EasternHuman",
+                tech = "Circumvallation_1",
+                race = "EasternHuman",
+                cost = new ConstructionCost(20, 30, 50, 100),
+                canBeAbandoned=false,
+                canBeDamagedByTornado = false,
+                canBeLivingHouse = false,
+                canBeLivingPlant = false,
+                canBePlacedOnBlocks  =true,
+                canBePlacedOnLiquid = true,
+                canBeUpgraded = false,
+                affectedByAcid = false,
+                affectedByLava = false,
+                buildingPlacement = CityBuildingPlacement.Borders,
+                burnable = false
+            });
+            CityBuildOrder.list.Add(new CityBuildOrderElement
+            {
+                buildingID = "Circumvallation_1_EasternHuman",
+                priority = 100,
+                requiredPop = 50,
+                waitForResources = false,
+                usedByRacesCheck = false
+            });
+            loadSprites(Circumvallation_1_EasternHuman);
         }
         private void setSpecial()
         {

@@ -996,8 +996,9 @@ namespace Cultivation_Way
         //境界压制
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Actor), "getHit")]
-        public static bool getHit_Prefix(Actor __instance, ref float pDamage, AttackType pType = AttackType.None, BaseSimObject pAttacker = null)
+        public static bool getHit_Prefix(Actor __instance, ref float pDamage, AttackType pType, BaseSimObject pAttacker,ref bool pSkipIfShake)
         {
+            pSkipIfShake = false;
             if (__instance == null)
             {
                 return true;

@@ -264,6 +264,7 @@
     <Compile Include="Code\EasternDragonAssetContainer.cs" />
     <Compile Include="Code\EasternDragonState.cs" />
     <Compile Include="Code\ElementBaseType.cs" />
+    <Compile Include="Code\ExtendedAiBehaviours.CityBehBuildWall.cs" />
     <Compile Include="Code\ExtensionSpellActionLibrary.cs" />
     <Compile Include="Code\ExtensionSpellAsset.cs" />
     <Compile Include="Code\ExtensionSpellLibrary.cs" />

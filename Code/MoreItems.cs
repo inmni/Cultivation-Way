@@ -11,10 +11,10 @@ namespace Cultivation_Way
             ItemAsset t1 = AssetManager.items.clone("summonTian1", "shotgun");
             t1.projectile = "lightningFire_orb";
             t1.materials = new List<string> { "adamantine" };
-            t1.baseStats.projectiles = 1;
-            t1.baseStats.attackSpeed = 50f;
-            t1.baseStats.range = 20f;
-            t1.baseStats.damage = 500;
+            t1.baseStats.projectiles = 1;//投掷物数量
+            t1.baseStats.attackSpeed = 50f;//攻速加成
+            t1.baseStats.range = 20f;//范围加成
+            t1.baseStats.damage = 500;//伤害加成
             ItemAsset t2 = AssetManager.items.clone("summonTian", "summonTian1");
             t2.projectile = "magicArrow";
             t2.baseStats.projectiles = 2;
