@@ -19,6 +19,7 @@ namespace Cultivation_Way
         private static Race tRace;
         internal void init()
         {
+            
             #region 东方人族
             Main.instance.moreRaces.Add("EasternHuman");
             Race EasternHuman = AssetManager.raceLibrary.clone("EasternHuman", "human");
@@ -57,6 +58,7 @@ namespace Cultivation_Way
             Tian.name_template_kingdom = "Tian_kingdom";
             Tian.name_template_culture = "Tian_culture";
             Tian.culture_forbidden_tech.Add("building_roads");
+            Tian.culture_forbidden_tech.Add("Circumvallation_1");
             setPreferredStatPool("diplomacy#4,warfare#2,stewardship#2,intelligence#8");
             setPreferredFoodPool("berries#5,bread#5,fish#1,sushi#10,cider#10,tea#1");
             addPreferredWeapon("bow", 1);
@@ -86,6 +88,7 @@ namespace Cultivation_Way
             Ming.name_template_kingdom = "Ming_kingdom";
             Ming.name_template_culture = "Ming_culture";
             Ming.culture_forbidden_tech.Add("building_roads");
+            Ming.culture_forbidden_tech.Add("Circumvallation_1");
             setPreferredStatPool("diplomacy#4,warfare#2,stewardship#2,intelligence#8");
             setPreferredFoodPool("berries#5,bread#5,fish#1,sushi#10,cider#10,tea#1");
             addPreferredWeapon("bow", 1);
@@ -115,6 +118,7 @@ namespace Cultivation_Way
             Yao.name_template_kingdom = "Yao_kingdom";
             Yao.name_template_culture = "Yao_culture";
             Yao.culture_forbidden_tech.Add("building_roads");
+            Yao.culture_forbidden_tech.Add("Circumvallation_1");
             setPreferredStatPool("diplomacy#1,warfare#8,stewardship#1,intelligence#1");
             setPreferredFoodPool("meat#10,fish#5,bread#1,sushi#1,cider#1,tea#1");
             addPreferredWeapon("stick", 5);
@@ -122,7 +126,17 @@ namespace Cultivation_Way
             addPreferredWeapon("spear", 3);
             addPreferredWeapon("bow", 1);
             #endregion
+            Race human = AssetManager.raceLibrary.get("human");
+            human.culture_forbidden_tech.Add("Circumvallation_1");
 
+            Race orc = AssetManager.raceLibrary.get("orc");
+            orc.culture_forbidden_tech.Add("Circumvallation_1");
+
+            Race elf = AssetManager.raceLibrary.get("elf");
+            elf.culture_forbidden_tech.Add("Circumvallation_1");
+
+            Race dwarf = AssetManager.raceLibrary.get("dwarf");
+            dwarf.culture_forbidden_tech.Add("Circumvallation_1");
         }
         internal void setIntelligentRaceFeature()
         {

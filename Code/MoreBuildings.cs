@@ -301,15 +301,15 @@ namespace Cultivation_Way
                 canBeDamagedByTornado = false,
                 canBeLivingHouse = false,
                 canBeLivingPlant = false,
-                canBePlacedOnBlocks = true,
-                canBePlacedOnLiquid = true,
+                canBePlacedOnBlocks = false,
+                canBePlacedOnLiquid = false,
                 canBeUpgraded = false,
                 affectedByAcid = false,
                 affectedByLava = false,
                 ignoreBuildings = true,
-                ignoredByCities = true,
-                buildingPlacement = CityBuildingPlacement.Borders,
-                burnable = false
+                buildingPlacement = CityBuildingPlacement.Everywhere,
+                burnable = false,
+                shadow = false
             });
             AssetManager.buildings.clone("Circumvallation_hori_1_EasternHuman", "Circumvallation_vert_1_EasternHuman");
             AssetManager.buildings.clone("Circumvallation_node1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0,1,0,1);
