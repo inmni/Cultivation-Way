@@ -30,6 +30,14 @@
             leftCool = 0;
             might = spellAsset.might;
         }
+        public ExtensionSpell(ExtensionSpell spell)
+        {
+            spellAssetID = spell.spellAssetID;
+            cost = spell.cost;
+            cooldown = spell.cooldown;
+            leftCool = 0;
+            might = spell.might;
+        }
         public ExtensionSpellAsset GetSpellAsset()
         {
             ExtensionSpellAsset result = null;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CultivationWay;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace Cultivation_Way
         {
             initExtendedActor();
             initExtendedBuilding();
+            Main.instance.transformUnits = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformUnits") as Transform;
+            Main.instance.transformCreatures = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformCreatures") as Transform;
         }
         private void initExtendedActor()
         {

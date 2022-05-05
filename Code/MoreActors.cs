@@ -761,20 +761,14 @@ namespace Cultivation_Way
             if (pa.extendedCurStats.spells.Count != 0)
             {
                 int count = pa.extendedCurStats.spells.Count;
-                int max = dataA.level / 20 + 1;
-                int[] index = new int[count];
-                for (int i = 0; i < count; i++)
-                {
-                    index[i] = i;
-                }
-                index.Shuffle();
+                int max = dataA.level>>5 + 1;
                 for (int i = 0, num = 0; i < count && num < max; i++)
                 {
                     if (!pTarget.base_data.alive)
                     {
                         return true;
                     }
-                    ExtensionSpell spell = pa.extendedCurStats.spells[index[i]];
+                    ExtensionSpell spell = pa.extendedCurStats.spells[i];
                     //进行蓝耗和冷却检查
                     if (spell.leftCool == 0 && pa.extendedData.status.magic >= spell.cost
                         && spell.GetSpellAsset().type.attacking && spell.GetSpellAsset().type.requiredLevel <= dataA.level)
@@ -800,7 +794,6 @@ namespace Cultivation_Way
             {
                 return;
             }
-            MoreStatus moredata = ((ExtendedActor)__instance).extendedData.status;
             MoreStats morestats =((ExtendedActor)__instance).extendedCurStats;
             float rangeLimit = Mathf.Max(__instance.GetCurStats().range, morestats.spellRange) + ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pObject, "curStats")).size;
             foreach (ExtensionSpell spell in morestats.spells)
@@ -839,6 +832,7 @@ namespace Cultivation_Way
             {
                 return true;
             }
+            //限制经验加成来源
             StackTrace st = new StackTrace();
             for (int i = 2; i < 5; i++)
             {
@@ -847,6 +841,8 @@ namespace Cultivation_Way
                     return false;
                 }
             }
+
+
             ActorStatus data = __instance.GetData();
             ExtendedActor actor = (ExtendedActor)__instance;
             if (!actor.extendedData.status.canCultivate)
@@ -855,7 +851,6 @@ namespace Cultivation_Way
             }
             int num = 110;
             data.experience += pValue;
-
             if (data.experience >= __instance.getExpToLevelup())
             {
                 //回蓝，回冷却
@@ -863,6 +858,9 @@ namespace Cultivation_Way
                 foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
                 {
                     spell.leftCool -= spell.leftCool > 0 ? 1 : 0;
+                }
+                if (Toolbox.randomChance(data.level * (actor.extendedCurStats.talent + 1) / (float)num)){
+                    actor.learnNewSpell();
                 }
                 __instance.setStatsDirty();
             }
@@ -943,7 +941,7 @@ namespace Cultivation_Way
                 }
                 if (__instance.kingdom.king != null)
                 {
-                    if (data.level > __instance.kingdom.king.GetData().level)
+                    if (data.level > __instance.kingdom.king.GetData().level && data.profession == UnitProfession.Unit)
                     {
                         Actor lastKing = __instance.kingdom.king;
                         __instance.kingdom.setKing(__instance);
@@ -975,9 +973,7 @@ namespace Cultivation_Way
                     __instance.tryToUnite();
                 }
             }
-
             //法术释放
-            string actorID = data.actorID;
             int level = data.level;
             foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
             {
@@ -989,7 +985,6 @@ namespace Cultivation_Way
                 }
             }
             #endregion
-
 
             return false;
         }
@@ -1607,6 +1602,7 @@ namespace Cultivation_Way
             
             component.transform.name = actorStats.id;
             component.new_creature = true;
+            component.easyCurStats = Reflection.GetField(typeof(ExtendedActor), component, "curStats") as BaseStats;
             if (pData != null)
             {
                 component.new_creature = false;
@@ -1615,27 +1611,32 @@ namespace Cultivation_Way
             component.loadStats(actorStats);
             if (pData != null)
             {
+                component.easyData = pData.status;
                 Reflection.SetField(component,"data",pData.status);
                 Reflection.SetField(component,"professionAsset",AssetManager.professions.get(pData.status.profession));
             }
             if (component.new_creature)
             {
-                component.CallMethod("newCreature",(int)((Reflection.GetField(typeof(GameStats),MapBox.instance.gameStats,"data") as GameStatsData).gameTime + (double)MapBox.instance.units.Count));
+                component.CallMethod("newCreature",(int)(Main.instance.gameStatsData.gameTime + (double)MapBox.instance.units.Count));
             }
             component.transform.position = pTile.posV3;
             component.CallMethod("spawnOn",pTile, pZHeight);
             component.CallMethod("create");
+            if (pData == null)
+            {
+                component.easyData = Reflection.GetField(typeof(Actor), component, "data") as ActorStatus;
+            }
             if (component.stats.kingdom != "")
             {
                 component.CallMethod("setKingdom",MapBox.instance.kingdoms.dict_hidden[component.stats.kingdom]);
             }
             if (component.stats.hideOnMinimap)
             {
-                component.transform.parent = Reflection.GetField(typeof(MapBox),MapBox.instance,"transformUnits") as Transform;
+                component.transform.parent = Main.instance.transformUnits;
             }
             else
             {
-                component.transform.parent = Reflection.GetField(typeof(MapBox), MapBox.instance, "transformCreatures") as Transform;
+                component.transform.parent = Main.instance.transformCreatures;
             }
             MapBox.instance.units.Add(component);
             __result = component;
@@ -1654,14 +1655,15 @@ namespace Cultivation_Way
             {
                 return true;
             }
-            try
+            foreach(string key in Main.instance.creatureLimit.Keys)
             {
-                Main.instance.creatureLimit[pActor.stats.id]++;
+                if (pActor.stats.id == key)
+                {
+                    Main.instance.creatureLimit[key]++;
+                    break;
+                }
             }
-            catch (KeyNotFoundException)
-            {
-
-            }
+            
             MoreStatus moreData = ((ExtendedActor)pActor).extendedData.status;
             Family family = Main.instance.familys[moreData.familyID];
             family.num--;
@@ -1669,14 +1671,17 @@ namespace Cultivation_Way
             {
                 Main.instance.familys[moreData.familyID] = new Family(moreData.familyID);
             }
-            try
+            if (pActor.kingdom == null)
             {
-                Main.instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
+                return true;
             }
-            catch
+            foreach (string key in Main.instance.kingdomBindActors.Keys)
             {
-                //直接用于排除非智慧国家，以及与killhimself重叠部分
-                //This paragraph is used to exclude non-intelligent kingdoms and the overlap with "killHimself".
+                if (pActor.kingdom.id == key)
+                {
+                    Main.instance.kingdomBindActors[pActor.kingdom.id].Remove(pActor);
+                    break;
+                }
             }
             return true;
         }

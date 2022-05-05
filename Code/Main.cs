@@ -1,5 +1,6 @@
 using Cultivation_Way;
 using Cultivation_Way.Utils;
+using Cultivation_Way.ExtendedAiBehaviours;
 using HarmonyLib;
 using NCMS;
 using ReflectionUtility;
@@ -38,10 +39,12 @@ namespace CultivationWay
 
         public List<BonusStatsManager> bonusStatsManagers = new List<BonusStatsManager>();
 
+        internal Transform transformUnits;
+        internal Transform transformCreatures;
+        internal GameStatsData gameStatsData;
+        internal ZoneCalculator zoneCalculator;
         public string addMapMode = "";
         
-        
-        private bool flag = false;
         private float controlDeltTime = 0.5f;
 
         internal int SpecialBodyLimit = 200;
@@ -77,6 +80,7 @@ namespace CultivationWay
         public MoreCultureTech MoreCultureTech = new MoreCultureTech();
         public MoreMapModes MoreMapModes = new MoreMapModes();
         public MoreWorldLaws MoreWorldLaws = new MoreWorldLaws();
+        public BehaviourTaskCityLibrary MoreCityTasks = new BehaviourTaskCityLibrary();
         public List<string> moreActors = new List<string>();
         public List<string> moreItems = new List<string>();
         public List<string> moreRaces = new List<string>();
@@ -93,20 +97,16 @@ namespace CultivationWay
         void Start()
         {
             //创建按钮栏
-            print("[修真之路Cultivation Way]:创建按钮栏");
             MorePowers.createPowerTab();
             print("[修真之路Cultivation Way]:创建按钮栏成功");
             //添加Asset
-            print("[修真之路Cultivation Way]:添加Asset");
             AddAssetManager.addAsset();
             print("[修真之路Cultivation Way]:添加Asset成功");
             //加载按钮
-            print("[修真之路Cultivation Way]:加载按钮");
             MorePowers.createButtons();
             print("[修真之路Cultivation Way]:加载按钮成功");
             setLanguage_Postfix(Reflection.GetField(typeof(LocalizedTextManager), LocalizedTextManager.instance, "language") as string);
             //开启拦截
-            MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截");
             patchHarmony();
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
             spellEffects = this.transform.gameObject.AddComponent<StackSpellEffects>();
@@ -130,6 +130,9 @@ namespace CultivationWay
                 createOrResetFamily();//家族初始化
                 addRaceFeature();//添加种族特色
                 prefabs.init();//预制体初始化
+                instance.gameStatsData = Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data") as GameStatsData;
+                instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
+
                 #endregion
             }
             if (instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6)
@@ -323,19 +326,18 @@ namespace CultivationWay
         }
         void clearMemory()
         {
-            Dictionary<int, ActorStatus> TempactorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
+            //Dictionary<int, ActorStatus> TempactorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
 
-            Dictionary<int, BaseStats> TempactorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
+            //Dictionary<int, BaseStats> TempactorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
 
-            OthersHelper.valueClone(actorToCurStats, TempactorToCurStats);
-            OthersHelper.valueClone(actorToData, TempactorToData);
+            //OthersHelper.valueClone(actorToCurStats, TempactorToCurStats);
+            //OthersHelper.valueClone(actorToData, TempactorToData);
 
-            actorToCurStats.Clear();
-            actorToData.Clear();
+            //actorToCurStats.Clear();
+            //actorToData.Clear();
 
-            actorToCurStats = TempactorToCurStats;
-            actorToData = TempactorToData;
-
+            //actorToCurStats = TempactorToCurStats;
+            //actorToData = TempactorToData;
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();      
         }
@@ -354,9 +356,11 @@ namespace CultivationWay
             instance.resetCreatureLimit();
             instance.SpecialBodyLimit = 200;
             AddAssetManager.specialBodyLibrary.reset();
+            instance.gameStatsData = Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data") as GameStatsData;
+            instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
             foreach (string key in WorldLawHelper.originLaws.Keys)
             {
-                MapBox.instance.worldLaws.dict.Add(key, WorldLawHelper.originLaws[key]);
+                MapBox.instance.worldLaws.dict[key]=WorldLawHelper.originLaws[key];
             }
 
         }
@@ -437,8 +441,8 @@ namespace CultivationWay
                 }
                 if (MapBox.instance.mapStats.year % 500 == 0)
                 {
-                    Thread t = new Thread(new ThreadStart(instance.clearMemory));
-                    t.Start();
+                    //Thread t = new Thread(new ThreadStart(instance.clearMemory));
+                    //t.Start();
                     foreach (Kingdom kingdom in MapBox.instance.kingdoms.list_civs)
                     {
                         if (kingdom.raceID == "Tian" && kingdom.king != null)

@@ -42,6 +42,7 @@
   "tech_culti_normal": "仙路",
   "tech_culti_bodying": "炼体",
   "tech_culti_bushido": "武道",
+  "tech_Circumvallation_1": "城墙",
   "item_summonTian1": "",
   "baseLog": "基础文本",
   "Yao_unite": "$king$ 统一妖族，立万世妖庭——$kingdom$",

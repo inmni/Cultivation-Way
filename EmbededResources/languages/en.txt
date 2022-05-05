@@ -42,6 +42,7 @@
   "tech_culti_normal": "Common Cultivation",
   "tech_culti_bodying": "Body Refining",
   "tech_culti_bushido": "Bushido",
+  "tech_Circumvallation_1": "Circumvallation",
   "item_summonTian1": "",
   "baseLog": "",
   "Yao_unite": "$king$ unite all Yaos in $kingdom$",

@@ -12,5 +12,7 @@ namespace Cultivation_Way
         public MoreStats extendedCurStats = new MoreStats();
         public MoreData extendedData = new MoreData();
         public List<BaseSimObject> compositions = new List<BaseSimObject>();
+        public ActorStatus easyData;
+        public BaseStats easyCurStats;
     }
 }

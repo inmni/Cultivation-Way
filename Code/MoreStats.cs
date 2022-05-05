@@ -172,13 +172,37 @@ namespace Cultivation_Way
             this.soul = soul;
             this.talent = talent;
         }
+        public void addSpell(ExtensionSpell spell)
+        {
+            for(int i = 0; i < this.spells.Count; i++)
+            {
+                if (this.spells[i].spellAssetID == spell.spellAssetID)
+                {
+                    this.spells[i].might = this.spells[i].might>spell.might?this.spells[i].might:spell.might;
+                    return;
+                }
+            }
+            this.spells.Add(new ExtensionSpell(spell));
+        }
+        public ExtensionSpell addSpell(string spellID)
+        {
+            for (int i = 0; i < this.spells.Count; i++)
+            {
+                if (this.spells[i].spellAssetID == spellID)
+                {
+                    return this.spells[i];
+                }
+            }
+            ExtensionSpell spell = new ExtensionSpell(spellID);
+            this.spells.Add(spell);
+            return spell;
+        }
         /// <summary>
         /// 清空
         /// </summary>
         public void clear()
         {
             baseStats = new BaseStats();
-            spells = new List<ExtensionSpell>();
             spellRange = 1f;
             magic = 5;
             vampire = 0f;

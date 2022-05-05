@@ -21,15 +21,7 @@ namespace Cultivation_Way
             {
                 return null;
             }
-            ActorStatus data = null;
-            Main.instance.actorToData.TryGetValue(actor.GetInstanceID(), out data);
-            if (data != null)
-            {
-                return data;
-            }
-            data = Reflection.GetField(typeof(Actor), actor, "data") as ActorStatus;
-            Main.instance.actorToData[actor.GetInstanceID()] = data;
-            return data;
+            return ((ExtendedActor)actor).easyData;
         }
         /// <summary>
         /// 返回curStats(BaseStats)
@@ -42,17 +34,7 @@ namespace Cultivation_Way
             {
                 return null;
             }
-            if (Main.instance.actorToCurStats.ContainsKey(actor.GetInstanceID()))
-            {
-                return Main.instance.actorToCurStats[actor.GetInstanceID()];
-            }
-            else
-            {
-                BaseStats curStats = Reflection.GetField(typeof(Actor), actor, "curStats") as BaseStats;
-                Main.instance.actorToCurStats.Add(actor.GetInstanceID(), curStats);
-                return curStats;
-            }
-
+            return ((ExtendedActor)actor).easyCurStats;
         }
         /// <summary>
         /// 返回actor的体质
@@ -141,6 +123,19 @@ namespace Cultivation_Way
             newBody.mod_speed = Toolbox.randomInt(-10, 5 * newBody.rank);
             newBody.spellRelief = Toolbox.randomInt(0, 5 * newBody.rank);
             AddAssetManager.specialBodyLibrary.add(newBody);
+        }
+        public static void learnNewSpell(this Actor actor)
+        {
+            ExtendedActor extendedActor = (ExtendedActor)actor;
+            ExtensionSpell[] spells= Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
+            for(int i = 0; i < spells.Length; i++)
+            {
+                if (spells[i] == null)
+                {
+                    continue;
+                }
+                extendedActor.extendedCurStats.addSpell(spells[i]);
+            }
         }
         /// <summary>
         /// 返回ID为id的动物化形后的statID
@@ -339,95 +334,13 @@ namespace Cultivation_Way
         /// <param name="actor"></param>
         public static void dealStatsHelper1(Actor actor)
         {
-            ActorStatus data = actor.GetData();
             ExtendedActor actor1 = (ExtendedActor)actor;
             MoreStats morestats = actor1.extendedCurStats;
             MoreStatus moredata = actor1.extendedData.status;
-            #region 种族法术与各类属性
             morestats.clear();
-            foreach(string id in Main.instance.raceFeatures[actor.stats.id].raceSpells)
-            {
-                morestats.spells.Add(new ExtensionSpell(id));
-            }
             int realm = actor.getRealm();
-            //每个境界属性均加上
-                for (int i = 0; i < realm; i++)
-                {
-                    morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[i]);
-                    morestats.addAnotherStats(Main.instance.familys[moredata.familyID].cultivationBook.stats[i]);
-                }
-            #endregion
-            #region 法术去重
-            List<ExtensionSpell> fixedSpells = new List<ExtensionSpell>();
-            for (int i = 0; i < morestats.spells.Count; i++)
-            {
-                ExtensionSpell spell = morestats.spells[i];
-                if (spell.GetSpellAsset().type.requiredLevel > data.level&&spell.GetSpellAsset().rarity<10)
-                {
-                    continue;
-                }
-                ExtensionSpellAsset spellAsset = spell.GetSpellAsset();
-                if (!spellAsset.bannedCultisystem.Contains(moredata.cultisystem) && actor.kingdom != null && !spellAsset.bannedRace.Contains(actor.kingdom.raceID))
-                {
-                    bool flag = false;
-                    for (int j = 0; j < fixedSpells.Count; j++)
-                    {
-                        ExtensionSpell spell1 = fixedSpells[j];
-                        if (spell1.spellAssetID == spellAsset.id)
-                        {
-                            flag = true;
-                            if (spell1.might < spell.might)
-                            {
-                                fixedSpells[j] = spell;
-                            }
-                            break;
-                        }
-
-                    }
-                    if (!flag)
-                    {
-                        fixedSpells.Add(spell);
-                    }
-                }
-            }
-            fixedSpells.Sort((ExtensionSpell spell1, ExtensionSpell spell2) =>
-            {
-                ExtensionSpellAsset spellAsset1 = spell1.GetSpellAsset();
-                ExtensionSpellAsset spellAsset2 = spell2.GetSpellAsset();
-                if (spellAsset1.rarity > spellAsset2.rarity)
-                {
-                    return -1;
-                }
-                else if (spellAsset1.rarity == spellAsset2.rarity)
-                {
-                    if (spellAsset1.might > spellAsset2.might)
-                    {
-                        return -1;
-                    }
-                    else if (spellAsset1.might == spellAsset2.might)
-                    {
-                        if (spellAsset1.chineseElement.getImPurity() < spellAsset2.chineseElement.getImPurity())
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    }
-                    else
-                    {
-                        return 1;
-                    }
-                }
-                else
-                {
-                    return 1;
-                }
-            });
-            morestats.spells.Clear();
-            morestats.spells = fixedSpells;
-            #endregion
+            morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[realm-1]);
+            morestats.addAnotherStats(Main.instance.familys[moredata.familyID].cultivationBook.stats[realm-1]);
             morestats.addAnotherStats(moredata.bonusStats);
         }
         /// <summary>

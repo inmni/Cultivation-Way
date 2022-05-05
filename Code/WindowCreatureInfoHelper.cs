@@ -183,8 +183,7 @@ namespace Cultivation_Way
 
                 foreach (ExtensionSpell spell in moreStats.spells)
                 {
-                    ExtensionSpellAsset spellAsset = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID);
-                    description.Append("\n" + spellAsset.name);
+                    description.Append("\n" + spell.GetSpellAsset().name);
                 }
             }
             Localization.setLocalization("trait_realm_info", description.ToString());
@@ -213,17 +212,17 @@ namespace Cultivation_Way
             ExtendedActor extendedActor = (ExtendedActor)actor;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
-            if (Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.stats[19].spells.Count != 0)
-            {
-                description.Append("法术\n");
-
-                foreach (ExtensionSpell spell in Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.stats[19].spells)
+                ExtensionSpell[] spells = Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
+                for(int i=0;i<spells.Length;i++)
                 {
-                    ExtensionSpellAsset spellAsset = spell.GetSpellAsset();
-                    description.Append("\n" + spellAsset.name);
+                    MonoBehaviour.print(i);
+                    if (spells[i] == null)
+                    {
+                        continue;
+                    }
+                    description.Append("\n" + spells[i].GetSpellAsset().name);
                 }
-            }
-            Localization.setLocalization("trait_cultivationBook_info", description.ToString());
+            Localization.setLocalization("trait_cultivationBook_info", "法术\n"+description.ToString());
 
             Reflection.SetField(traitButton, "trait", AssetManager.traits.get("cultivationBook"));
             Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/cultivationBook.png");

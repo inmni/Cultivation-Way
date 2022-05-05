@@ -291,6 +291,17 @@ namespace Cultivation_Way
                 element.raceIcon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/{(Reflection.GetField(typeof(City), pObject, "race") as Race).icon}.png");
             }
         }
+        //文化列表
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(CulturesListWindow), "showElement")]
+        public static void showElement_CulturesList(CulturesListWindow __instance, Culture pObject)
+        {
+            CultureListElement element = (Reflection.GetField(typeof(CulturesListWindow), __instance, "elements") as List<CultureListElement>).Last();
+            if (element.iconRace.sprite == null)
+            {
+                element.iconRace.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/icon{pObject.race}.png");
+            }
+        }
         //主贴图加载
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ActorAnimationLoader), "generateAnimation")]

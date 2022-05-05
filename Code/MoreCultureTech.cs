@@ -36,7 +36,8 @@ namespace Cultivation_Way
                 id = "Circumvallation_2",
                 icon = "Circumvallation_2",
                 type = TechType.Common,
-                enabled = true,
+                requirements = new System.Collections.Generic.List<string>() { "Circumvallation_1" },
+                enabled = false,
             });
             //城墙3级
             AssetManager.culture_tech.add(new CultureTechAsset
@@ -44,7 +45,8 @@ namespace Cultivation_Way
                 id = "Circumvallation_3",
                 icon = "Circumvallation_3",
                 type = TechType.Common,
-                enabled = true,
+                requirements = new System.Collections.Generic.List<string>() { "Circumvallation_2" },
+                enabled = false,
             });
         }
 
@@ -53,15 +55,11 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(TechElement), "load", typeof(CultureTechAsset))]
         public static bool load_Prefix(CultureTechAsset pAsset, TechElement __instance)
         {
-            if (pAsset.icon.StartsWith("tech"))
+            if (pAsset.icon.StartsWith("tech")|| pAsset == null)
             {
                 return true;
             }
             Reflection.SetField(__instance, "asset", pAsset);
-            if (pAsset == null)
-            {
-                return false;
-            }
             Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + pAsset.icon + ".png");
             __instance.GetComponent<Image>().sprite = sprite;
             return false;

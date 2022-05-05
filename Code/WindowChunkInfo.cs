@@ -73,7 +73,7 @@ namespace Cultivation_Way
                 }
                 else
                 {
-                    stringBuilder.Append(t[i] + "                     " + Main.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
+                    stringBuilder.Append(Localization.getLocalization(t[i]) + "                     " + Main.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
                 }
             }
             return stringBuilder.ToString();

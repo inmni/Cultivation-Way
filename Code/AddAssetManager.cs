@@ -28,7 +28,7 @@ namespace Cultivation_Way
             Main.instance.MoreBuildings.init();
             Main.instance.MoreDrops.init();
             Main.instance.MoreProjectiles.init();
-
+            Main.instance.MoreCityTasks.init();
             chineseNameGenerator = new ChineseNameLibrary();
             chineseElementLibrary = new ChineseElementLibrary();
             cultisystemLibrary = new CultisystemLibrary();

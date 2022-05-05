@@ -8,6 +8,9 @@ namespace Cultivation_Way
     class MoreBuildings
     {
         List<BuildingAsset> humanBuildings = new List<BuildingAsset>();
+        static float[] xOffsets = new float[] { 0.25f, 0, -0.24f, -0.24f, 0, 0, 0, 0 };
+        static float[] yOffsets = new float[] { 0, 0, 0.15f, 0.15f, 0.04f, 0.04f, 0, 0 };
+        static string[] CircumvallationParts = new string[] { "hori", "vert", "horiGate1", "horiGate2", "node1","node2", "vertGate1", "vertGate2" };
         internal void init()
         {
             foreach (BuildingAsset humanBuilding in AssetManager.buildings.list)
@@ -187,6 +190,71 @@ namespace Cultivation_Way
             }
         }
 
+        private void loadCircumvallationSprites(string race,int level)
+        {
+            string folder;
+            string part;
+            for (int i =0;i<CircumvallationParts.Length;i++)
+            {
+                part = CircumvallationParts[i];
+                BuildingAsset pTemplate = AssetManager.buildings.get($"Circumvallation_{part}_{level}_{race}");
+                folder =$"{race}/{level}Circumvallation/{part}";
+                Sprite[] array = ResourcesHelper.loadAllSprite("buildings/" + folder, 0.5f+xOffsets[i],yOffsets[i]);
+
+                pTemplate.sprites = new BuildingSprites();
+                foreach (Sprite sprite in array)
+                {
+                    string[] array2 = sprite.name.Split(new char[] { '_' });
+                    string text = array2[0];
+                    int num = int.Parse(array2[1]);
+
+                    if (array2.Length == 3)
+                    {
+                        int.Parse(array2[2]);
+                    }
+                    while (pTemplate.sprites.animationData.Count < num + 1)
+                    {
+                        pTemplate.sprites.animationData.Add(null);
+                    }
+                    if (pTemplate.sprites.animationData[num] == null)
+                    {
+                        pTemplate.sprites.animationData[num] = new BuildingAnimationDataNew();
+                    }
+                    BuildingAnimationDataNew buildingAnimationDataNew = pTemplate.sprites.animationData[num];
+                    if (text.Equals("main"))
+                    {
+                        buildingAnimationDataNew.list_main.Add(sprite);
+                        if (buildingAnimationDataNew.list_main.Count > 1)
+                        {
+                            buildingAnimationDataNew.animated = true;
+                        }
+                    }
+                    else if (text.Equals("ruin"))
+                    {
+                        buildingAnimationDataNew.list_ruins.Add(sprite);
+                    }
+                    else if (text.Equals("shadow"))
+                    {
+                        buildingAnimationDataNew.list_shadows.Add(sprite);
+                    }
+                    else if (text.Equals("special"))
+                    {
+                        buildingAnimationDataNew.list_special.Add(sprite);
+                    }
+                    else if (text.Equals("mini"))
+                    {
+                        pTemplate.sprites.mapIcon = new BuildingMapIcon(sprite);
+                    }
+                }
+                foreach (BuildingAnimationDataNew buildingAnimationDataNew2 in pTemplate.sprites.animationData)
+                {
+                    buildingAnimationDataNew2.main = buildingAnimationDataNew2.list_main.ToArray();
+                    buildingAnimationDataNew2.ruins = buildingAnimationDataNew2.list_ruins.ToArray();
+                    buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
+                    buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
+                }
+            }
+        }
         private void addOthers()
         {
             BuildingAsset Tian1 = AssetManager.buildings.clone("Barrack1_Tian", "!building");
@@ -217,33 +285,40 @@ namespace Cultivation_Way
                 usedByRaces = "Tian"
             });
 
-            BuildingAsset Circumvallation_1_EasternHuman = AssetManager.buildings.add(new BuildingAsset
+            addCircumvallation();
+        }
+        private void addCircumvallation()
+        {
+            AssetManager.buildings.add(new BuildingAsset
             {
-                id = "Circumvallation_1_EasternHuman",
+                id = "Circumvallation_vert_1_EasternHuman",
                 tech = "Circumvallation_1",
                 race = "EasternHuman",
-                cost = new ConstructionCost(20, 30, 50, 100),
-                canBeAbandoned=false,
+                priority = 10000,
+                cost = new ConstructionCost(0, 0, 0, 0),
+                fundament = new BuildingFundament(0, 0, 0, 0),
+                canBeAbandoned = false,
                 canBeDamagedByTornado = false,
                 canBeLivingHouse = false,
                 canBeLivingPlant = false,
-                canBePlacedOnBlocks  =true,
+                canBePlacedOnBlocks = true,
                 canBePlacedOnLiquid = true,
                 canBeUpgraded = false,
                 affectedByAcid = false,
                 affectedByLava = false,
+                ignoreBuildings = true,
+                ignoredByCities = true,
                 buildingPlacement = CityBuildingPlacement.Borders,
                 burnable = false
             });
-            CityBuildOrder.list.Add(new CityBuildOrderElement
-            {
-                buildingID = "Circumvallation_1_EasternHuman",
-                priority = 100,
-                requiredPop = 50,
-                waitForResources = false,
-                usedByRacesCheck = false
-            });
-            loadSprites(Circumvallation_1_EasternHuman);
+            AssetManager.buildings.clone("Circumvallation_hori_1_EasternHuman", "Circumvallation_vert_1_EasternHuman");
+            AssetManager.buildings.clone("Circumvallation_node1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0,1,0,1);
+            AssetManager.buildings.clone("Circumvallation_node2_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0, 1, 0, 1);
+            AssetManager.buildings.clone("Circumvallation_vertGate1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0,1,0,3);
+            AssetManager.buildings.clone("Circumvallation_vertGate2_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman");
+            AssetManager.buildings.clone("Circumvallation_horiGate1_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman").fundament = new BuildingFundament(0, 3, 0, 1);
+            AssetManager.buildings.clone("Circumvallation_horiGate2_1_EasternHuman", "Circumvallation_horiGate1_1_EasternHuman");
+            loadCircumvallationSprites("EasternHuman", 1);
         }
         private void setSpecial()
         {
