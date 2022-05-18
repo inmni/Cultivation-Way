@@ -8,9 +8,10 @@ namespace Cultivation_Way
     class MoreBuildings
     {
         List<BuildingAsset> humanBuildings = new List<BuildingAsset>();
-        static float[] xOffsets = new float[] { 0.25f, 0, -0.24f, -0.24f, 0, 0, 0, 0 };
-        static float[] yOffsets = new float[] { 0, 0, 0.15f, 0.15f, 0.04f, 0.04f, 0, 0 };
+        static float[] xOffsets = new float[] { 0.24f, 0, -0.24f, -0.24f, 0, 0, 0.08f, 0.00f };
+        static float[] yOffsets = new float[] { 0, 0, 0.00f, 0.00f, -0.04f, -0.04f, 0.24f, 0.24f };
         static string[] CircumvallationParts = new string[] { "hori", "vert", "horiGate1", "horiGate2", "node1","node2", "vertGate1", "vertGate2" };
+        //                                                     横墙    竖墙      北门         南门      北节点   南节点     西门          东门
         internal void init()
         {
             foreach (BuildingAsset humanBuilding in AssetManager.buildings.list)
@@ -245,6 +246,10 @@ namespace Cultivation_Way
                     {
                         pTemplate.sprites.mapIcon = new BuildingMapIcon(sprite);
                     }
+                    else if (text.Equals("construction"))
+                    {
+                        pTemplate.sprites.construction = sprite;
+                    }
                 }
                 foreach (BuildingAnimationDataNew buildingAnimationDataNew2 in pTemplate.sprites.animationData)
                 {
@@ -312,11 +317,11 @@ namespace Cultivation_Way
                 shadow = false
             });
             AssetManager.buildings.clone("Circumvallation_hori_1_EasternHuman", "Circumvallation_vert_1_EasternHuman");
-            AssetManager.buildings.clone("Circumvallation_node1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0,1,0,1);
-            AssetManager.buildings.clone("Circumvallation_node2_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0, 1, 0, 1);
+            AssetManager.buildings.clone("Circumvallation_node1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0, 1, 1, 0);
+            AssetManager.buildings.clone("Circumvallation_node2_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0, 1, 1, 0);
             AssetManager.buildings.clone("Circumvallation_vertGate1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0,1,0,3);
             AssetManager.buildings.clone("Circumvallation_vertGate2_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman");
-            AssetManager.buildings.clone("Circumvallation_horiGate1_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman").fundament = new BuildingFundament(0, 3, 0, 1);
+            AssetManager.buildings.clone("Circumvallation_horiGate1_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman").fundament = new BuildingFundament(0, 3, 1, 0);
             AssetManager.buildings.clone("Circumvallation_horiGate2_1_EasternHuman", "Circumvallation_horiGate1_1_EasternHuman");
             loadCircumvallationSprites("EasternHuman", 1);
         }

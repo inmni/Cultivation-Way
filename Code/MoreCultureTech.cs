@@ -28,6 +28,7 @@ namespace Cultivation_Way
                 id = "Circumvallation_1",
                 icon = "Circumvallation_1",
                 type = TechType.Common,
+                requirements = new System.Collections.Generic.List<string>() { "governance_1"},
                 enabled = true,
             });
             //城墙2级
@@ -36,7 +37,7 @@ namespace Cultivation_Way
                 id = "Circumvallation_2",
                 icon = "Circumvallation_2",
                 type = TechType.Common,
-                requirements = new System.Collections.Generic.List<string>() { "Circumvallation_1" },
+                requirements = new System.Collections.Generic.List<string>() { "governance_2", "Circumvallation_1" },
                 enabled = false,
             });
             //城墙3级
@@ -45,7 +46,7 @@ namespace Cultivation_Way
                 id = "Circumvallation_3",
                 icon = "Circumvallation_3",
                 type = TechType.Common,
-                requirements = new System.Collections.Generic.List<string>() { "Circumvallation_2" },
+                requirements = new System.Collections.Generic.List<string>() { "governance_3","Circumvallation_2" },
                 enabled = false,
             });
         }
