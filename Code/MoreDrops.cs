@@ -11,7 +11,7 @@ namespace Cultivation_Way
             AssetManager.drops.add(new DropAsset
             {
                 id = "exp",
-                texture = "drops/drop_lava",
+                path_texture = "drops/drop_lava",
                 random_frame = true,
                 default_scale = 0.2f,
                 fallingHeight = new Vector2(30f, 45f),

@@ -1,4 +1,4 @@
-﻿using ai.behaviours;
+﻿
 using CultivationWay;
 using HarmonyLib;
 using ReflectionUtility;
@@ -14,10 +14,20 @@ namespace Cultivation_Way
     {
         internal void init()
         {
+            AssetManager.kingdoms.add(new KingdomAsset
+            {
+                id="empty",
+                civ=true
+            });
+            AssetManager.kingdoms.add(new KingdomAsset
+            {
+                id = "nomads_empty",
+                nomads = true,
+                mobs = true
+            });
             #region 天族
             //主要国家
-            KingdomAsset addKingdom1 = AssetManager.kingdoms.clone("Tian", "human");
-            addKingdom1.tags.Clear();
+            KingdomAsset addKingdom1 = AssetManager.kingdoms.clone("Tian", "empty");
             addKingdom1.addTag("civ");
             addKingdom1.addTag("Tian");
             addKingdom1.addFriendlyTag("Tian");
@@ -29,8 +39,7 @@ namespace Cultivation_Way
             AssetManager.kingdoms.get("good").addFriendlyTag("Tian");
             this.newHiddenKingdom(addKingdom1);
             //临时用的国家
-            KingdomAsset addKingdom2 = AssetManager.kingdoms.clone("nomads_Tian", "nomads_human");
-            addKingdom2.tags.Clear();
+            KingdomAsset addKingdom2 = AssetManager.kingdoms.clone("nomads_Tian", "nomads_empty");
             addKingdom2.addTag("civ");
             addKingdom2.addTag("Tian");
             addKingdom2.addFriendlyTag("Tian");
@@ -54,8 +63,7 @@ namespace Cultivation_Way
             undead.addEnemyTag("Yao");
             undead.addEnemyTag("Tian");
             //主要国家
-            KingdomAsset addKingdom3 = AssetManager.kingdoms.clone("Ming", "human");
-            addKingdom3.tags.Clear();
+            KingdomAsset addKingdom3 = AssetManager.kingdoms.clone("Ming", "empty");
             addKingdom3.addTag("civ");
             addKingdom3.addTag("Ming");
             addKingdom3.addFriendlyTag("undead");
@@ -67,8 +75,7 @@ namespace Cultivation_Way
             addKingdom3.nomads = true;
             this.newHiddenKingdom(addKingdom3);
             //临时用的国家
-            KingdomAsset addKingdom4 = AssetManager.kingdoms.clone("nomads_Ming", "nomads_human");
-            addKingdom4.tags.Clear();
+            KingdomAsset addKingdom4 = AssetManager.kingdoms.clone("nomads_Ming", "nomads_empty");
             addKingdom4.addTag("civ");
             addKingdom4.addTag("Ming");
             addKingdom4.addFriendlyTag("Ming");
@@ -82,8 +89,7 @@ namespace Cultivation_Way
             #endregion
             #region 妖族
             //主要国家
-            KingdomAsset addKingdom5 = AssetManager.kingdoms.clone("Yao", "human");
-            addKingdom5.tags.Clear();
+            KingdomAsset addKingdom5 = AssetManager.kingdoms.clone("Yao", "empty");
             addKingdom5.addTag("civ");
             addKingdom5.addTag("Yao");
             addKingdom5.addTag("nature_creature");
@@ -93,11 +99,10 @@ namespace Cultivation_Way
             addKingdom5.addFriendlyTag("good");
             addKingdom5.addEnemyTag("bandits");
             addKingdom5.civ = true;
-            AssetManager.kingdoms.get("snakes").enemy_tags.Remove("civ");
+            AssetManager.kingdoms.get("snakes").addFriendlyTag("civ");
             this.newHiddenKingdom(addKingdom5);
             //临时用的国家
-            KingdomAsset addKingdom6 = AssetManager.kingdoms.clone("nomads_Yao", "nomads_human");
-            addKingdom6.tags.Clear();
+            KingdomAsset addKingdom6 = AssetManager.kingdoms.clone("nomads_Yao", "nomads_empty");
             addKingdom6.addTag("civ");
             addKingdom6.addTag("Yao");
             addKingdom6.addTag("nature_creature");
@@ -112,8 +117,7 @@ namespace Cultivation_Way
             #endregion
             #region 东方人族
             //主要国家
-            KingdomAsset addKingdom7 = AssetManager.kingdoms.clone("EasternHuman", "human");
-            addKingdom7.tags.Clear();
+            KingdomAsset addKingdom7 = AssetManager.kingdoms.clone("EasternHuman", "empty");
             addKingdom7.addTag("civ");
             addKingdom7.addTag("EasternHuman");
             addKingdom7.addFriendlyTag("EasternHuman");
@@ -123,8 +127,7 @@ namespace Cultivation_Way
             addKingdom7.civ = true;
             this.newHiddenKingdom(addKingdom7);
             //临时用的国家
-            KingdomAsset addKingdom8 = AssetManager.kingdoms.clone("nomads_EasternHuman", "nomads_human");
-            addKingdom8.tags.Clear();
+            KingdomAsset addKingdom8 = AssetManager.kingdoms.clone("nomads_EasternHuman", "nomads_empty");
             addKingdom8.addTag("civ");
             addKingdom8.addTag("EasternHuman");
             addKingdom8.addFriendlyTag("EasternHuman");
@@ -137,7 +140,6 @@ namespace Cultivation_Way
             #endregion
             #region BOSS
             KingdomAsset addKingdom0 = AssetManager.kingdoms.clone("boss", "Ming");
-            addKingdom0.tags.Clear();
             addKingdom0.addTag("boss");
             addKingdom0.addEnemyTag("civ");
             addKingdom0.addEnemyTag("boss");
@@ -168,27 +170,28 @@ namespace Cultivation_Way
         //城市给予物品修复
         [HarmonyPrefix]
         [HarmonyPatch(typeof(City), "giveItem")]
-        public static bool giveItem_Prefix(ref bool __result, Actor pActor, ActorEquipmentSlot pSlot, City pCity)
+        public static bool giveItem_Prefix(ref bool __result, Actor pActor, List<ItemData> pItems, City pCity)
         {
-            if (pActor == null || pActor.equipment == null || pSlot == null || pCity == null)
+            if (pActor == null || pActor.equipment == null || pItems == null || pCity == null)
             {
                 __result = false;
                 return false;
             }
             return true;
         }
+
         //城市获取死亡人口的装备修复
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(City), "giveItemsToCity")]
-        public static bool giveItemsToCity_Prefix(City pCity, Actor pDeadActor)
+        [HarmonyPatch(typeof(City), "takeAllItemsFromActor")]
+        public static bool takeAllItemsFromActor_Prefix(Actor pActor)
         {
-            if (pDeadActor.stats.use_items)
+            if (pActor.stats.use_items)
             {
                 return true;
             }
             return false;
         }
-        //设置投降条件
+        //设置投降条件，编写错误
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(City), "updateCapture")]
         public static IEnumerable<CodeInstruction> updateCapture_Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -196,17 +199,17 @@ namespace Cultivation_Way
             List<CodeInstruction> codes = instructions.ToList();
             MethodInfo canBeCapturedSmoothly = AccessTools.Method(typeof(KingdomAndCityTools), "canBeCapturedSmoothly");
             Label label = new Label();
-            codes[162].labels.Add(label);
+            codes[118].labels.Add(label);
             int offset = 0;
-            codes.Insert(162 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            codes.Insert(118 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
-            codes.Insert(162 + offset, new CodeInstruction(OpCodes.Ldloc_0));
+            codes.Insert(118 + offset, new CodeInstruction(OpCodes.Ldloc_0));
             offset++;
-            codes.Insert(162 + offset, new CodeInstruction(OpCodes.Callvirt, canBeCapturedSmoothly));
+            codes.Insert(118 + offset, new CodeInstruction(OpCodes.Callvirt, canBeCapturedSmoothly));
             offset++;
-            codes.Insert(162 + offset, new CodeInstruction(OpCodes.Brtrue, label));
+            codes.Insert(118 + offset, new CodeInstruction(OpCodes.Brtrue, label));
             offset++;
-            codes.Insert(162 + offset, new CodeInstruction(OpCodes.Ret));
+            codes.Insert(118 + offset, new CodeInstruction(OpCodes.Ret));
             return codes.AsEnumerable();
         }
         //修改城市覆灭条件
@@ -239,8 +242,8 @@ namespace Cultivation_Way
         }
         //彻底修改生育
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(CityBehProduceUnit), "produceNewCitizen")]
-        public static bool produceNewCitizen_Prefix(CityBehProduceUnit __instance, bool __result, Building pBuilding, City pCity)
+        [HarmonyPatch(typeof(ai.behaviours.CityBehProduceUnit), "produceNewCitizen")]
+        public static bool produceNewCitizen_Prefix(ai.behaviours.CityBehProduceUnit __instance, bool __result, Building pBuilding, City pCity)
         {
             ExtendedActor randomParent = (ExtendedActor)pCity.getRandomParent(null);
             if (randomParent == null)
@@ -255,7 +258,7 @@ namespace Cultivation_Way
             }
             ExtendedActor randomParent2 = (ExtendedActor)pCity.getRandomParent(randomParent);
             randomParent.GetData().children++;
-            pCity.status.homesFree--;
+            pCity.status.housingFree--;
             CityData cityData = Reflection.GetField(typeof(City), pCity, "data") as CityData;
             if (randomParent.kingdom != null)
             {
@@ -279,7 +282,7 @@ namespace Cultivation_Way
             }
             actorData.status.skin = ai.ActorTool.getBabyColor(randomParent, randomParent2);
             actorData.status.skin_set = randomParent.GetData().skin_set;
-            Culture babyCulture = (Culture)Reflection.CallStaticMethod(typeof(CityBehProduceUnit),"getBabyCulture", randomParent, randomParent2);
+            Culture babyCulture = (Culture)Reflection.CallStaticMethod(typeof(ai.behaviours.CityBehProduceUnit), "getBabyCulture", randomParent, randomParent2);
             if (babyCulture != null)
             {
                 actorData.status.culture = babyCulture.id;
@@ -320,17 +323,17 @@ namespace Cultivation_Way
             moreData.status.familyID = randomParent.GetFamily().id;
             if (Toolbox.randomChance(0.05f))
             {
-                moreData.status.familyID = stats.unit?AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom(): AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
+                moreData.status.familyID = stats.unit ? AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() : AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
             }
             Family family = Main.instance.familys[moreData.status.familyID];
             family.num++;
             //设置名字
             moreData.status.familyName = randomParent.extendedData.status.familyName;
-                if (Toolbox.randomChance(0.02f))
-                {
-                    moreData.status.familyName = stats.unit?AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom(): AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
-                }
-                actorData.status.firstName = stats.unit ? ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, true) : ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, false);
+            if (Toolbox.randomChance(0.02f))
+            {
+                moreData.status.familyName = stats.unit ? AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() : AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
+            }
+            actorData.status.firstName = stats.unit ? ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, true) : ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, false);
             #endregion
             cityData.popPoints.Add(actorData);
             __result = true;
@@ -338,9 +341,9 @@ namespace Cultivation_Way
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(City), "spawnPopPoint")]
-        public static bool spawnPopPoint(ActorData pData,WorldTile pTile)
+        public static bool spawnPopPoint(ActorData pData, WorldTile pTile)
         {
-            
+
             if (pData.status.age <= 8)
             {
                 pData.status.statsID = pData.status.statsID.Replace("unit_", "baby_");
@@ -371,22 +374,22 @@ namespace Cultivation_Way
         }
         //国家创建时事件
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(KingdomManager),"makeNewCivKingdom")]
+        [HarmonyPatch(typeof(KingdomManager), "makeNewCivKingdom")]
         public static void makeNewCivKingdom_Postfix(Kingdom __result)
         {
             Main.instance.kingdomBindActors[__result.id] = new List<Actor>();
         }
         //国家灭亡事件
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(KingdomManager),"destroyKingdom")]
+        [HarmonyPatch(typeof(KingdomManager), "destroyKingdom")]
         public static void destroyKingdom_Postfix(Kingdom pKingdom)
         {
             List<Actor> actors = null;
-            if(!Main.instance.kingdomBindActors.TryGetValue(pKingdom.id,out actors))
+            if (!Main.instance.kingdomBindActors.TryGetValue(pKingdom.id, out actors))
             {
                 return;
             }
-            for(int i=0;i<actors.Count;i++)
+            for (int i = 0; i < actors.Count; i++)
             {
                 Actor actor = actors[i];
                 string id = actor.GetData().actorID;
@@ -397,7 +400,7 @@ namespace Cultivation_Way
                 {
                     MonoBehaviour.print("成功摧毁");
                 }
-                if (MapBox.instance.getActorByID(id)!=null)
+                if (MapBox.instance.getActorByID(id) != null)
                 {
                     MonoBehaviour.print("[MoreKingdoms.destroyKingdom_Postfix]未成功删除对象");
                 }
@@ -406,7 +409,7 @@ namespace Cultivation_Way
         }
         //妖族建立城市修改
         [HarmonyTranspiler]
-        [HarmonyPatch(typeof(BehCheckBuildCity),"execute")]
+        [HarmonyPatch(typeof(ai.behaviours.BehCheckBuildCity), "execute")]
         public static IEnumerable<CodeInstruction> execute_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
@@ -414,27 +417,27 @@ namespace Cultivation_Way
             codes[39].labels.Add(next);
             MethodInfo isAllowedBuildCity = AccessTools.Method(typeof(KingdomAndCityTools), "isAllowedBuildCity");
             int offset = 0;
-            codes.Insert(39+offset, new CodeInstruction(OpCodes.Ldarg_1));
+            codes.Insert(39 + offset, new CodeInstruction(OpCodes.Ldarg_1));
             offset++;
             codes.Insert(39 + offset, new CodeInstruction(OpCodes.Callvirt, isAllowedBuildCity));
             offset++;
-            codes.Insert(39+offset, new CodeInstruction(OpCodes.Brtrue_S, next));
+            codes.Insert(39 + offset, new CodeInstruction(OpCodes.Brtrue_S, next));
             offset++;
             codes.Insert(39 + offset, new CodeInstruction(OpCodes.Ldc_I4_1));
             offset++;
             codes.Insert(39 + offset, new CodeInstruction(OpCodes.Ret));
             return codes.AsEnumerable();
         }
-        #region 神明加成（未完工）
+        //#region 神明加成（未完工）
         //月老Hymen提高生育
         [HarmonyTranspiler]
-        [HarmonyPatch(typeof(CityBehProduceUnit),"execute")]
+        [HarmonyPatch(typeof(ai.behaviours.CityBehProduceUnit), "execute")]
         public static IEnumerable<CodeInstruction> produceMoreUnit(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
             MethodInfo moreProduceNum = AccessTools.Method(typeof(KingdomAndCityTools), "moreProduceMin");
-            codes[28] = new CodeInstruction(OpCodes.Ldarg_1);
-            codes.Insert(29, new CodeInstruction(OpCodes.Callvirt, moreProduceNum));
+            codes[41] = new CodeInstruction(OpCodes.Ldarg_1);
+            codes.Insert(42, new CodeInstruction(OpCodes.Callvirt, moreProduceNum));
             return codes.AsEnumerable();
         }
         //钟馗ZhongKui提高对冥族的伤害
@@ -444,30 +447,41 @@ namespace Cultivation_Way
         //土地EarthGod提高作物产出
         //山神MountainGod加快树木生长和矿物获取
         [HarmonyTranspiler]
-        [HarmonyPatch(typeof(Building),"extractResources")]
+        [HarmonyPatch(typeof(ai.behaviours.BehExtractResourcesFromBuilding), "execute")]
         public static IEnumerable<CodeInstruction> produceMoreResources(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
             MethodInfo moreGained = AccessTools.Method(typeof(KingdomAndCityTools), "produceMore");
+            FieldInfo beh_building_target = AccessTools.Field(typeof(ActorBase), "beh_building_target");
+            FieldInfo stats = AccessTools.Field(typeof(Building), "stats");
+            FieldInfo buildingType = AccessTools.Field(typeof(BuildingAsset), "buildingType");
             int offset = 0;
-            codes.Insert(70 + offset, new CodeInstruction(OpCodes.Ldarg_1));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldloc_S,4));
             offset++;
-            codes.Insert(70 + offset, new CodeInstruction(OpCodes.Ldloc_2));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldarg_1));
             offset++;
-            codes.Insert(70 + offset, new CodeInstruction(OpCodes.Callvirt, moreGained));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldarg_1));
             offset++;
-            codes.Insert(70 + offset, new CodeInstruction(OpCodes.Add));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld,beh_building_target));
+            offset++;
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld,stats));
+            offset++;
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld, buildingType));
+            offset++;
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Callvirt, moreGained));
+            offset++;
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Add));
             return codes.AsEnumerable();
         }
         //财神Momman增加黄金
         [HarmonyTranspiler]
-        [HarmonyPatch(typeof(BehBoatMakeTrade),"execute")]
+        [HarmonyPatch(typeof(ai.behaviours.BehBoatMakeTrade), "execute")]
         public static IEnumerable<CodeInstruction> gainMoreGold(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
             MethodInfo moreGold = AccessTools.Method(typeof(KingdomAndCityTools), "gainMoreFromTrade");
-            codes[3] = new CodeInstruction(OpCodes.Ldarg_1);
-            codes.Insert(4, new CodeInstruction(OpCodes.Callvirt, moreGold));
+            codes[2] = new CodeInstruction(OpCodes.Ldarg_1);
+            codes.Insert(3, new CodeInstruction(OpCodes.Callvirt, moreGold));
             return codes.AsEnumerable();
         }
         //河伯Achelous无视浅海，未完工
@@ -481,6 +495,6 @@ namespace Cultivation_Way
         //[HarmonyTranspiler]
         //[HarmonyPatch(typeof(Actor),"checkCurTileAction")]
         //public static bool 
-        #endregion
+        // #endregion
     }
 }

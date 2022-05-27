@@ -157,10 +157,6 @@ namespace Cultivation_Way
                 ExtendedActor actor = null;
                 if (actorData.status.alive)
                 {
-                    if (actorData.inventory.resource == "food")
-                    {
-                        actorData.inventory.resource = "wheat";
-                    }
                     if (actorData.status.gender == ActorGender.Unknown)
                     {
                         if (Toolbox.randomBool())

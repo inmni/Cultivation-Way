@@ -21,6 +21,10 @@ namespace Cultivation_Way
                     humanBuildings.Add(humanBuilding);
                 }
             }
+            AssetManager.race_build_orders.clone("Tian", "human").replace("human", "Tian");
+            AssetManager.race_build_orders.clone("Ming", "human").replace("human", "Ming");
+            AssetManager.race_build_orders.clone("EasternHuman", "human").replace("human", "EasternHuman");
+            AssetManager.race_build_orders.clone("Yao", "human").replace("human", "Yao");
             addRaceNormalBuildings("Tian");
             addRaceNormalBuildings("Ming");
             addRaceNormalBuildings("EasternHuman");
@@ -100,7 +104,7 @@ namespace Cultivation_Way
                 }
                 else if (text.Equals("shadow"))
                 {
-                    buildingAnimationDataNew.list_shadows.Add(sprite);
+                    //buildingAnimationDataNew.list_shadows.Add(sprite);
                 }
                 else if (text.Equals("construction"))
                 {
@@ -123,7 +127,7 @@ namespace Cultivation_Way
             {
                 buildingAnimationDataNew2.main = buildingAnimationDataNew2.list_main.ToArray();
                 buildingAnimationDataNew2.ruins = buildingAnimationDataNew2.list_ruins.ToArray();
-                buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
+                //buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
                 buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
             }
         }
@@ -171,7 +175,7 @@ namespace Cultivation_Way
                 }
                 else if (text.Equals("shadow"))
                 {
-                    buildingAnimationDataNew.list_shadows.Add(sprite);
+                    //buildingAnimationDataNew.list_shadows.Add(sprite);
                 }
                 else if (text.Equals("special"))
                 {
@@ -186,7 +190,7 @@ namespace Cultivation_Way
             {
                 buildingAnimationDataNew2.main = buildingAnimationDataNew2.list_main.ToArray();
                 buildingAnimationDataNew2.ruins = buildingAnimationDataNew2.list_ruins.ToArray();
-                buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
+                //buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
                 buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
             }
         }
@@ -236,7 +240,7 @@ namespace Cultivation_Way
                     }
                     else if (text.Equals("shadow"))
                     {
-                        buildingAnimationDataNew.list_shadows.Add(sprite);
+                        //buildingAnimationDataNew.sha.Add(sprite);
                     }
                     else if (text.Equals("special"))
                     {
@@ -255,7 +259,7 @@ namespace Cultivation_Way
                 {
                     buildingAnimationDataNew2.main = buildingAnimationDataNew2.list_main.ToArray();
                     buildingAnimationDataNew2.ruins = buildingAnimationDataNew2.list_ruins.ToArray();
-                    buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
+                    //buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
                     buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
                 }
             }
@@ -279,16 +283,7 @@ namespace Cultivation_Way
             Tian1.spawnUnits_asset = "summonTian2";
             Tian1.shadow = false;
             loadSprites(Tian1);
-            CityBuildOrder.list.Add(new CityBuildOrderElement
-            {
-                buildingID = "Barrack1",
-                priority = 80,
-                limitID =2 ,
-                requiredPop = 50,
-                addRace = true,
-                usedByRacesCheck = true,
-                usedByRaces = "Tian"
-            });
+            AssetManager.race_build_orders.get("Tian").addBuilding("Barrack1_Tian", 0, 2, 50, 10, false, false, 0);
 
             addCircumvallation();
         }
@@ -312,7 +307,6 @@ namespace Cultivation_Way
                 affectedByAcid = false,
                 affectedByLava = false,
                 ignoreBuildings = true,
-                buildingPlacement = CityBuildingPlacement.Everywhere,
                 burnable = false,
                 shadow = false
             });
@@ -346,15 +340,14 @@ namespace Cultivation_Way
             BuildingAsset house5_EH = AssetManager.buildings.get("5house_EasternHuman");
             house5_EH.fundament = new BuildingFundament(5, 5, 7, 0);
         }
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Building), "applyScale")]
-        public static bool applyScale_Postfix(Building __instance)
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(BuildingTweenExtension), "applyScale")]
+        public static void applyScale_Postfix(Building __instance)
         {
-            if (((BuildingAsset)Reflection.GetField(typeof(Building), __instance, "stats")).id == "windmill_Tian")
-            {
-                __instance.currentScale = new Vector3(0.23f, 0.23f, 0.23f);
-            }
-            return true;
+            //if (((BuildingAsset)Reflection.GetField(typeof(Building), __instance, "stats")).id == "windmill_Tian")
+            //{
+            //    __instance.currentScale = new Vector3(0.23f, 0.23f, 0.23f);
+            //}
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingTower), "checkEnemies")]
@@ -415,7 +408,7 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(UnitSpawner),"setUnitFromHere")]
         public static void setUnitFromHere(UnitSpawner __instance,Actor pActor)
         {
-            Building building = __instance.GetComponent<Building>();
+            Building building = Reflection.GetField(typeof(UnitSpawner), __instance, "building") as Building;
             if (building.city != null)
             {
                 building.city.addNewUnit(pActor, true);

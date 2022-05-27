@@ -415,7 +415,6 @@ namespace Cultivation_Way
                     break;
                 }
             }
-            Vector2 pos = new Vector2();
             Utils.ResourcesHelper.playSpell("firework", pUser.currentTile.pos, pTile.pos, 20f);
             return true;
         }

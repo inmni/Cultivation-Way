@@ -12,6 +12,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
     {
         internal bool isBuilding = false;
         internal bool done = false;
+        internal bool slow = false;
         internal int level = 0;
         internal string raceID = "";
         internal BuildingAsset horiWall;
@@ -32,40 +33,45 @@ namespace Cultivation_Way.ExtendedAiBehaviours
     }
     class CityBehBuildWall : BehaviourActionCity
     {
-        private static int instanceID;
+        private static int cityKey;
         private static Vector2Int[] dirs = new Vector2Int[] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
         private static Vector2Int[] dirAll = new Vector2Int[] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down, new Vector2Int(1, 1), new Vector2Int(1, -1), new Vector2Int(-1, 1), new Vector2Int(-1, -1) };
         private Dictionary<int, CityWallCondition> conditions = new Dictionary<int, CityWallCondition>();
 
         public override BehResult execute(City pCity)
         {
-            instanceID = pCity.GetInstanceID();
-            if (!conditions.ContainsKey(instanceID))
+            cityKey = pCity.GetHashCode();
+            if (!conditions.ContainsKey(cityKey))
             {
-                conditions[instanceID] = new CityWallCondition();
+                conditions[cityKey] = new CityWallCondition();
             }
             //若已完成则跳过
-            if (conditions[instanceID].done)
+            if (conditions[cityKey].done)
             {
                 return BehResult.Continue;
             }
-            if (conditions[instanceID].isBuilding)
+            if (conditions[cityKey].isBuilding)
             {
                 //若正在建造，则继续建造
-                conditions[instanceID].isBuilding = !buildWalls(pCity);
-                if (conditions[instanceID].isBuilding)
+                conditions[cityKey].isBuilding = !buildWalls(pCity);
+                if (conditions[cityKey].isBuilding)
                 {
-                    return BehResult.Continue;
+                    if (conditions[cityKey].slow)
+                    {
+                        return BehResult.Continue;
+                    }
+                    return BehResult.RepeatStep;
                 }
                 else
                 {
-                    conditions[instanceID].done = true;
+                    conditions[cityKey].done = true;
                     return BehResult.Continue;
                 }
             }
             else
             {
                 //若不在建造，则判断是否可以建造
+                conditions[cityKey].slow = false;
                 Culture culture = pCity.getCulture();
                 if (culture == null || !culture.list_tech_ids.Exists(x => x.StartsWith("Circumvallation")))
                 {
@@ -79,9 +85,9 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                     if (tech.StartsWith("Circumvallation"))
                     {
                         temp = tech[tech.Length - 1] - '0';
-                        if (temp > conditions[instanceID].level)
+                        if (temp > conditions[cityKey].level)
                         {
-                            conditions[instanceID].level = temp;
+                            conditions[cityKey].level = temp;
                             toBuild = true;
                             break;
                         }
@@ -94,24 +100,24 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                 }
                 //获取位置
                 getTiles(pCity);
-                if (conditions[instanceID].raceID == string.Empty)
+                if (conditions[cityKey].raceID == string.Empty)
                 {
-                    conditions[instanceID].raceID = (Reflection.GetField(typeof(City), pCity, "race") as Race).id;
+                    conditions[cityKey].raceID = (Reflection.GetField(typeof(City), pCity, "race") as Race).id;
                 }
                 //设定建造类型
-                conditions[instanceID].horiWall = AssetManager.buildings.get($"Circumvallation_hori_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].vertWall = AssetManager.buildings.get($"Circumvallation_vert_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].node1 = AssetManager.buildings.get($"Circumvallation_node1_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].node2 = AssetManager.buildings.get($"Circumvallation_node2_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].horiGate1 = AssetManager.buildings.get($"Circumvallation_horiGate1_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].horiGate2 = AssetManager.buildings.get($"Circumvallation_horiGate2_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].vertGate1 = AssetManager.buildings.get($"Circumvallation_vertGate1_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                conditions[instanceID].vertGate2 = AssetManager.buildings.get($"Circumvallation_vertGate2_{conditions[instanceID].level}_{conditions[instanceID].raceID}");
-                if (conditions[instanceID].horiWallTiles.Count == 0 || conditions[instanceID].vertWallTiles.Count == 0 || conditions[instanceID].nodeWallTiles.Count == 0 || conditions[instanceID].gateTiles.Count == 0)
+                conditions[cityKey].horiWall = AssetManager.buildings.get($"Circumvallation_hori_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].vertWall = AssetManager.buildings.get($"Circumvallation_vert_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].node1 = AssetManager.buildings.get($"Circumvallation_node1_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].node2 = AssetManager.buildings.get($"Circumvallation_node2_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].horiGate1 = AssetManager.buildings.get($"Circumvallation_horiGate1_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].horiGate2 = AssetManager.buildings.get($"Circumvallation_horiGate2_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].vertGate1 = AssetManager.buildings.get($"Circumvallation_vertGate1_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                conditions[cityKey].vertGate2 = AssetManager.buildings.get($"Circumvallation_vertGate2_{conditions[cityKey].level}_{conditions[cityKey].raceID}");
+                if (conditions[cityKey].horiWallTiles.Count == 0 || conditions[cityKey].vertWallTiles.Count == 0 || conditions[cityKey].nodeWallTiles.Count == 0 || conditions[cityKey].gateTiles.Count == 0)
                 {
                     return BehResult.Continue;
                 }
-                conditions[instanceID].isBuilding = true;
+                conditions[cityKey].isBuilding = true;
                 return BehResult.Continue;
             }
         }
@@ -123,31 +129,36 @@ namespace Cultivation_Way.ExtendedAiBehaviours
         private bool buildWalls(City pCity)
         {
             //若有建筑正在建造，则跳过
-            if (Reflection.GetField(typeof(City), pCity, "underconstructionbuilding") != null)
+            if (Reflection.GetField(typeof(City), pCity, "underConstructionBuilding") != null&&conditions[cityKey].slow)
             {
                 return false;
             }
             //按照节点、横向城墙、纵向城墙、城门顺序建造
-            if (conditions[instanceID].nodeWallTiles.Count > 0)
+            if (conditions[cityKey].nodeWallTiles.Count > 0)
             {
-                buildNode(pCity, conditions[instanceID].nodeWallTiles[0]);
-                conditions[instanceID].nodeWallTiles.RemoveAt(0);
+                buildNode(pCity, conditions[cityKey].nodeWallTiles[0]);
+                conditions[cityKey].nodeWallTiles.RemoveAt(0);
             }
-            else if (conditions[instanceID].vertWallTiles.Count > 0)
+            else if (conditions[cityKey].vertWallTiles.Count > 0)
             {
-                buildMain(pCity, conditions[instanceID].vertWallTiles[0], conditions[instanceID].vertWall);
-                conditions[instanceID].vertWallTiles.RemoveAt(0);
+                buildMain(pCity, conditions[cityKey].vertWallTiles[0], conditions[cityKey].vertWall);
+                conditions[cityKey].vertWallTiles.RemoveAt(0);
             }
-            else if (conditions[instanceID].horiWallTiles.Count > 0)
+            else if (conditions[cityKey].horiWallTiles.Count > 0)
             {
-                buildMain(pCity, conditions[instanceID].horiWallTiles[0], conditions[instanceID].horiWall);
-                conditions[instanceID].horiWallTiles.RemoveAt(0);
+                if (conditions[cityKey].horiWallTiles.Count <= 1)
+                {
+                    conditions[cityKey].slow = true;
+              
+                }
+                buildMain(pCity, conditions[cityKey].horiWallTiles[0], conditions[cityKey].horiWall);
+                conditions[cityKey].horiWallTiles.RemoveAt(0);
             }
-            else if (conditions[instanceID].gateTiles.Count > 0)
+            else if (conditions[cityKey].gateTiles.Count > 0)
             {
-                buildGate(pCity, conditions[instanceID].gateTiles[0], conditions[instanceID].gateDirections[0]);
-                conditions[instanceID].gateTiles.Clear();
-                conditions[instanceID].gateDirections.Clear();
+                buildGate(pCity, conditions[cityKey].gateTiles[0], conditions[cityKey].gateDirections[0]);
+                conditions[cityKey].gateTiles.Clear();
+                conditions[cityKey].gateDirections.Clear();
             }
             else
             {
@@ -162,13 +173,13 @@ namespace Cultivation_Way.ExtendedAiBehaviours
         private void buildNode(City pCity, WorldTile tile)
         {
             //需要确定此处是北面还是南面
-            if (tile.tile_down == null || !conditions[instanceID].vertWallTiles.Contains(tile.tile_down.tile_down))
+            if (tile.tile_down == null || !conditions[cityKey].vertWallTiles.Contains(tile.tile_down.tile_down))
             {
-                build(pCity, tile, conditions[instanceID].node2);
+                build(pCity, tile, conditions[cityKey].node2);
             }
             else
             {
-                build(pCity, tile, conditions[instanceID].node1);
+                build(pCity, tile, conditions[cityKey].node1);
             }
         }
         private void buildGate(City pCity, WorldTile tile, int direction)
@@ -176,19 +187,19 @@ namespace Cultivation_Way.ExtendedAiBehaviours
 
             if (direction == 2)
             {
-                build(pCity, tile, conditions[instanceID].horiGate2);
+                build(pCity, tile, conditions[cityKey].horiGate2);
             }
             else if (direction == 3)
             {
-                build(pCity, tile, conditions[instanceID].horiGate1);
+                build(pCity, tile, conditions[cityKey].horiGate1);
             }
             else if (direction == 0)
             {
-                build(pCity, tile, conditions[instanceID].vertGate1);
+                build(pCity, tile, conditions[cityKey].vertGate1);
             }
             else if (direction == 1)
             {
-                build(pCity, tile, conditions[instanceID].vertGate2);
+                build(pCity, tile, conditions[cityKey].vertGate2);
             }
         }
         private void build(City pCity, WorldTile tile, BuildingAsset buildingAsset)
@@ -204,9 +215,15 @@ namespace Cultivation_Way.ExtendedAiBehaviours
             }
             Building building = MapBox.instance.CallMethod("addBuilding", buildingAsset.id, tile, null, false, false, BuildPlacingType.New) as Building;
             pCity.addBuilding(building);
+            if (conditions[cityKey].slow) { 
             Reflection.SetField(pCity, "underConstructionBuilding", building);
             building.GetData().underConstruction = true;
             building.setSpriteUnderConstruction();
+            }
+            else
+            {
+                building.GetData().underConstruction = false;
+            }
             pCity.CallMethod("spendResourcesFor", buildingAsset.cost);
             Sfx.play("constructing", pRestart: true, building.transform.localPosition.x, building.transform.localPosition.y);
         }
@@ -218,18 +235,18 @@ namespace Cultivation_Way.ExtendedAiBehaviours
         /// <param name="pCity"></param>
         private void getTiles(City pCity)
         {
-            if (conditions[instanceID].cityZones == null)
+            if (conditions[cityKey].cityZones == null)
             {
-                conditions[instanceID].cityZones = Reflection.GetField(typeof(City), pCity, "zones") as List<TileZone>;
+                conditions[cityKey].cityZones = Reflection.GetField(typeof(City), pCity, "zones") as List<TileZone>;
             }
             int flag;
-            for (int i = 0; i < conditions[instanceID].cityZones.Count; i++)
+            for (int i = 0; i < conditions[cityKey].cityZones.Count; i++)
             {
                 flag = 0;
                 foreach (Vector2Int dir in dirs)
                 {
-                    if (Main.instance.zoneCalculator.getZone(conditions[instanceID].cityZones[i].x + dir.x, conditions[instanceID].cityZones[i].y + dir.y) == null
-                        || Main.instance.zoneCalculator.getZone(conditions[instanceID].cityZones[i].x + dir.x, conditions[instanceID].cityZones[i].y + dir.y).city != conditions[instanceID].cityZones[i].city)
+                    if (Main.instance.zoneCalculator.getZone(conditions[cityKey].cityZones[i].x + dir.x, conditions[cityKey].cityZones[i].y + dir.y) == null
+                        || Main.instance.zoneCalculator.getZone(conditions[cityKey].cityZones[i].x + dir.x, conditions[cityKey].cityZones[i].y + dir.y).city != conditions[cityKey].cityZones[i].city)
                     {
                         flag++;
                     }
@@ -238,12 +255,12 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                 {
                     continue;
                 }
-                conditions[instanceID].zones.Add(conditions[instanceID].cityZones[i]);
+                conditions[cityKey].zones.Add(conditions[cityKey].cityZones[i]);
             }
-            conditions[instanceID].horiWallTiles.Clear();
-            conditions[instanceID].vertWallTiles.Clear();
-            conditions[instanceID].nodeWallTiles.Clear();
-            conditions[instanceID].gateTiles.Clear();
+            conditions[cityKey].horiWallTiles.Clear();
+            conditions[cityKey].vertWallTiles.Clear();
+            conditions[cityKey].nodeWallTiles.Clear();
+            conditions[cityKey].gateTiles.Clear();
             getHoriTiles();
             getVertTiles();
             getNodeTiles();
@@ -253,10 +270,10 @@ namespace Cultivation_Way.ExtendedAiBehaviours
         private void printALL(City pCity)
         {
             MonoBehaviour.print("*************************************");
-            MonoBehaviour.print(pCity.name);
+            MonoBehaviour.print(pCity);
             MonoBehaviour.print("horiWall");
             StringBuilder line = new StringBuilder();
-            foreach (WorldTile tile in conditions[instanceID].horiWallTiles)
+            foreach (WorldTile tile in conditions[cityKey].horiWallTiles)
             {
                 line.Append($"({tile.x},{tile.y})");
             }
@@ -264,7 +281,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
 
             MonoBehaviour.print("vertWall");
             line.Clear();
-            foreach (WorldTile tile in conditions[instanceID].vertWallTiles)
+            foreach (WorldTile tile in conditions[cityKey].vertWallTiles)
             {
                 line.Append($"({tile.x},{tile.y})");
             }
@@ -272,7 +289,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
 
             MonoBehaviour.print("node");
             line.Clear();
-            foreach (WorldTile tile in conditions[instanceID].nodeWallTiles)
+            foreach (WorldTile tile in conditions[cityKey].nodeWallTiles)
             {
                 line.Append($"({tile.x},{tile.y})");
             }
@@ -280,7 +297,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
 
             MonoBehaviour.print("gate");
             line.Clear();
-            foreach (WorldTile tile in conditions[instanceID].gateTiles)
+            foreach (WorldTile tile in conditions[cityKey].gateTiles)
             {
                 line.Append($"({tile.x},{tile.y})");
             }
@@ -289,8 +306,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
         }
         private void getHoriTiles()
         {
-            int flag;
-            foreach (TileZone zone in conditions[instanceID].zones)
+            foreach (TileZone zone in conditions[cityKey].zones)
             {
                 int x = zone.x << 3;
                 int y = zone.y << 3;
@@ -303,7 +319,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                     }
                     for (int i = 0; i < maxX; i++)
                     {
-                        conditions[instanceID].horiWallTiles.Add(world.GetTile(i + x, y + 1));
+                        conditions[cityKey].horiWallTiles.Add(world.GetTile(i + x, y + 1));
                     }
                 }
                 if (Main.instance.zoneCalculator.getZone(zone.x, zone.y + 1) == null || Main.instance.zoneCalculator.getZone(zone.x, zone.y + 1).city != zone.city || !isInZones(zone, 0, 1))
@@ -315,15 +331,14 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                     }
                     for (int i = 0; i < maxX; i++)
                     {
-                        conditions[instanceID].horiWallTiles.Add(world.GetTile(i + x, y + 7));
+                        conditions[cityKey].horiWallTiles.Add(world.GetTile(i + x, y + 7));
                     }
                 }
             }
         }
         private void getVertTiles()
         {
-            int flag;
-            foreach (TileZone zone in conditions[instanceID].zones)
+            foreach (TileZone zone in conditions[cityKey].zones)
             {
                 if (!isInZones(zone, -1, 0))
                 {
@@ -336,7 +351,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                     }
                     for (int i = minY; i < 8; i++)
                     {
-                        conditions[instanceID].vertWallTiles.Add(world.GetTile(x, y + i));
+                        conditions[cityKey].vertWallTiles.Add(world.GetTile(x, y + i));
                     }
                 }
                 if (!isInZones(zone, 1, 0))
@@ -350,17 +365,16 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                     }
                     for (int i = minY; i < 8; i++)
                     {
-                        conditions[instanceID].vertWallTiles.Add(world.GetTile(x + 6, y + i));
+                        conditions[cityKey].vertWallTiles.Add(world.GetTile(x + 6, y + i));
                     }
                 }
             }
         }
         private void getNodeTiles()
         {
-            int removeIndex = 0;
-            int flag;
+            int removeIndex;
             bool[] fourDIR = new bool[8] { false, false, false, false, false, false, false, false };
-            foreach (TileZone zone in conditions[instanceID].zones)
+            foreach (TileZone zone in conditions[cityKey].zones)
             {
                 int x = zone.x << 3;
                 int y = zone.y << 3;
@@ -376,49 +390,49 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                 {
                     if (!fourDIR[0])
                     {
-                        removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
                     }
-                    conditions[instanceID].nodeWallTiles.Add(world.GetTile(x, y + 1 - 1));
+                    conditions[cityKey].nodeWallTiles.Add(world.GetTile(x, y + 1 - 1));
                 }
                 if (!fourDIR[5] && fourDIR[0] == fourDIR[3])
                 {
                     if (!fourDIR[0])
                     {
-                        removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 6));
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x, y + 7));
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 6));
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x, y + 7));
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
                     }
-                    conditions[instanceID].nodeWallTiles.Add(world.GetTile(x, y + 7 - 1));
+                    conditions[cityKey].nodeWallTiles.Add(world.GetTile(x, y + 7 - 1));
                 }
                 if (!fourDIR[6] && fourDIR[1] == fourDIR[2])
                 {
                     if (!fourDIR[1])
                     {
-                        removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
                     }
-                    conditions[instanceID].nodeWallTiles.Add(world.GetTile(x + 6, y + 1 - 1));
+                    conditions[cityKey].nodeWallTiles.Add(world.GetTile(x + 6, y + 1 - 1));
                 }
                 if (!fourDIR[7] && fourDIR[1] == fourDIR[3])
                 {
                     if (!fourDIR[1])
                     {
-                        removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 6));
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 7));
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 6));
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 7));
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
                     }
-                    conditions[instanceID].nodeWallTiles.Add(world.GetTile(x + 6, y + 7 - 1));
+                    conditions[cityKey].nodeWallTiles.Add(world.GetTile(x + 6, y + 7 - 1));
                 }
                 if (false)
                 {
@@ -426,83 +440,83 @@ namespace Cultivation_Way.ExtendedAiBehaviours
                     {
                         if (Main.instance.zoneCalculator.getZone(zone.x, zone.y - 1) == null || !fourDIR[2])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x, y + 1));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x, y + 1));
                         }
                         if (Main.instance.zoneCalculator.getZone(zone.x, zone.y + 1) == null || !fourDIR[3])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x, y + 7));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x, y + 7));
                         }
                     }
                     if (Main.instance.zoneCalculator.getZone(zone.x + 1, zone.y) == null)
                     {
                         if (Main.instance.zoneCalculator.getZone(zone.x, zone.y - 1) == null || !fourDIR[2])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x + 6, y + 1));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x + 6, y + 1));
                         }
                         if (Main.instance.zoneCalculator.getZone(zone.x, zone.y + 1) == null || !fourDIR[3])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 6));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 7));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x + 6, y + 7));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 6));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 7));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x + 6, y + 7));
                         }
                     }
                     if (Main.instance.zoneCalculator.getZone(zone.x, zone.y - 1) == null)
                     {
                         if (Main.instance.zoneCalculator.getZone(zone.x - 1, zone.y) != null && !fourDIR[0])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x, y + 1));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 1));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x, y + 1));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x, y + 1));
                         }
                         if (Main.instance.zoneCalculator.getZone(zone.x + 1, zone.y) != null && !fourDIR[1])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x + 6, y + 1));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 1));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x + 6, y + 1));
                         }
                     }
                     if (Main.instance.zoneCalculator.getZone(zone.x, zone.y + 1) == null)
                     {
                         if (Main.instance.zoneCalculator.getZone(zone.x - 1, zone.y) != null && !fourDIR[0])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 6));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x, y + 7));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x, y + 7));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 6));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x, y + 7));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x, y + 7));
                         }
                         if (Main.instance.zoneCalculator.getZone(zone.x + 1, zone.y) != null && !fourDIR[1])
                         {
-                            removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 6));
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                            removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 7));
-                            conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                            conditions[instanceID].nodeWallTiles.Add(world.GetTile(x + 6, y + 7));
+                            removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 6, y + 6));
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                            removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 6, y + 7));
+                            conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                            conditions[cityKey].nodeWallTiles.Add(world.GetTile(x + 6, y + 7));
                         }
                     }
                 }
@@ -515,7 +529,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
             int store;
             int maxLength=1;
             int tempLength;
-            foreach (WorldTile node in conditions[instanceID].nodeWallTiles)
+            foreach (WorldTile node in conditions[cityKey].nodeWallTiles)
             {
                 TileZone node_zone = node.zone;
                 store = 0;
@@ -654,46 +668,46 @@ namespace Cultivation_Way.ExtendedAiBehaviours
             {
                 if (!isInZones(centerZone, 0, -1))
                 {
-                    removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 2, y + yOffset1));
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex); 
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex); 
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex); 
-                        conditions[instanceID].horiWallTiles.RemoveAt(removeIndex); 
-                    conditions[instanceID].gateTiles.Add(world.GetTile(x + 2, y + 1 - 1));
-                    conditions[instanceID].gateDirections.Add(2);
+                    removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 2, y + yOffset1));
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex); 
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex); 
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex); 
+                        conditions[cityKey].horiWallTiles.RemoveAt(removeIndex); 
+                    conditions[cityKey].gateTiles.Add(world.GetTile(x + 2, y + 1 - 1));
+                    conditions[cityKey].gateDirections.Add(2);
                 }
                 else if(!isInZones(centerZone,0,1))
                 {
-                    removeIndex = conditions[instanceID].horiWallTiles.IndexOf(world.GetTile(x + 2, y + 7));
-                    conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                    conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                    conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                    conditions[instanceID].horiWallTiles.RemoveAt(removeIndex);
-                    conditions[instanceID].gateTiles.Add(world.GetTile(x + 2, y + 7 - 1));
-                    conditions[instanceID].gateDirections.Add(3);
+                    removeIndex = conditions[cityKey].horiWallTiles.IndexOf(world.GetTile(x + 2, y + 7));
+                    conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                    conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                    conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                    conditions[cityKey].horiWallTiles.RemoveAt(removeIndex);
+                    conditions[cityKey].gateTiles.Add(world.GetTile(x + 2, y + 7 - 1));
+                    conditions[cityKey].gateDirections.Add(3);
                 }
             }
             else if (vector == 2 || vector == 1)
             {
                 if (!isInZones(centerZone, -1, 0))
                 {
-                        removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x, y + 2));
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex);
-                        conditions[instanceID].gateTiles.Add(world.GetTile(x, y + 5));
-                        conditions[instanceID].gateDirections.Add(0);
+                        removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x, y + 2));
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex);
+                        conditions[cityKey].gateTiles.Add(world.GetTile(x, y + 5));
+                        conditions[cityKey].gateDirections.Add(0);
                 }
                 else if(!isInZones(centerZone,1,0))
                 {
-                    removeIndex = conditions[instanceID].vertWallTiles.IndexOf(world.GetTile(x + 7 + xOffset1, y + 2));
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex); 
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex); 
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex); 
-                        conditions[instanceID].vertWallTiles.RemoveAt(removeIndex); 
-                    conditions[instanceID].gateTiles.Add(world.GetTile(x + 6, y + 5));
-                    conditions[instanceID].gateDirections.Add(1);
+                    removeIndex = conditions[cityKey].vertWallTiles.IndexOf(world.GetTile(x + 7 + xOffset1, y + 2));
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex); 
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex); 
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex); 
+                        conditions[cityKey].vertWallTiles.RemoveAt(removeIndex); 
+                    conditions[cityKey].gateTiles.Add(world.GetTile(x + 6, y + 5));
+                    conditions[cityKey].gateDirections.Add(1);
                 }
             }
         }
@@ -701,7 +715,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
         {
             if (xOffset == 0 && yOffset == 0)
             {
-                return zone!=null&& conditions[instanceID].zones.Contains(zone);
+                return zone!=null&& conditions[cityKey].zones.Contains(zone);
             }
             if (zone == null)
             {
@@ -709,7 +723,7 @@ namespace Cultivation_Way.ExtendedAiBehaviours
             }
             TileZone zone1 = Main.instance.zoneCalculator.getZone(zone.x + xOffset, zone.y + yOffset);
             return zone1!=null&&zone1.city == zone.city&&
-                conditions[instanceID].zones.Contains(zone1);
+                conditions[cityKey].zones.Contains(zone1);
         }
         private bool isOverEdge(TileZone zone, int xOffset = 0, int yOffset = 0)
         {

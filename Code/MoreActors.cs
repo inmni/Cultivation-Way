@@ -1117,24 +1117,24 @@ namespace Cultivation_Way
             List<CodeInstruction> codes = instructions.ToList();
             #region 绑定函数
             MethodInfo getCity = AccessTools.Method(typeof(ActorTools), "GetCity");
-            MethodInfo getCurStats = AccessTools.Method(typeof(ActorTools), "GetCurStats");
             MethodInfo getBsFromMoreStats = AccessTools.Method(typeof(MoreStats), "GetBaseStats");
             MethodInfo part1 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper1");
             MethodInfo part2 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper2");
             MethodInfo addStats = AccessTools.Method(typeof(BaseStats), "addStats", new System.Type[] { typeof(BaseStats) });
 
+            FieldInfo CurStats = AccessTools.Field(typeof(ExtendedActor), "curStats");
             FieldInfo extendedCurStats = AccessTools.Field(typeof(ExtendedActor), "extendedCurStats");
             //MethodInfo addStats = typeof(BaseStats).GetMethod("addStats", BindingFlags.Instance | BindingFlags.NonPublic);
             #endregion
             #region 属性添加处理
             int offset = 0;
-            codes.Insert(56 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
-            codes.Insert(56 + offset, new CodeInstruction(OpCodes.Callvirt, part1));
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, part1));
             offset++;//执行part1函数(done)
             codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
-            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Callvirt, getCurStats));
+            codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldfld, CurStats));
             offset++;//获取并将CurStats压入栈
             codes.Insert(64 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
@@ -1146,8 +1146,8 @@ namespace Cultivation_Way
             offset++;//两者相加
             #endregion
             #region 性格设置（为妖族
-            codes[224 + offset] = new CodeInstruction(OpCodes.Callvirt, getCity);
-            codes[225 + offset] = new CodeInstruction(OpCodes.Nop);
+            codes[211 + offset] = new CodeInstruction(OpCodes.Callvirt, getCity);
+            codes[212 + offset] = new CodeInstruction(OpCodes.Nop);
             #endregion
             #region 属性规格化处理
             codes.Insert(728 + offset, new CodeInstruction(OpCodes.Ldarg_0));
@@ -1199,12 +1199,12 @@ namespace Cultivation_Way
             WindowCreatureInfoHelper helper = new WindowCreatureInfoHelper();
             helper.instance = __instance;
             __instance.nameInput.setText(data.firstName);
-            __instance.health.setBar((float)data.health, (float)curStats.health, data.health.ToString() + "/" + curStats.health.ToString());
+            __instance.health.setBar((float)data.health, (float)curStats.health,"/" + curStats.health.ToString(),true,false);
             if (selectedUnit.stats.needFood || selectedUnit.stats.unit)
             {
                 __instance.hunger.gameObject.SetActive(true);
                 int num = (int)((float)data.hunger / (float)selectedUnit.stats.maxHunger * 100f);
-                __instance.hunger.setBar((float)num, 100f, num.ToString() + "%");
+                __instance.hunger.setBar((float)num, 100f, "%");
             }
             else
             {
@@ -1515,17 +1515,17 @@ namespace Cultivation_Way
             Label ret = new Label();
 
             int offset = 0;
-            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            codes.Insert(80 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
-            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Callvirt, getActor));
+            codes.Insert(80 + offset, new CodeInstruction(OpCodes.Callvirt, getActor));
             offset++;
-            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldloc_0));
+            codes.Insert(80 + offset, new CodeInstruction(OpCodes.Ldloc_0));
             offset++;
-            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Ldc_I4_0));
+            codes.Insert(80 + offset, new CodeInstruction(OpCodes.Ldc_I4_0));
             offset++;
-            codes.Insert(81 + offset, new CodeInstruction(OpCodes.Call, copyMore));
+            codes.Insert(80 + offset, new CodeInstruction(OpCodes.Call, copyMore));
             offset++;
-            codes[88 + offset].labels.Add(ret);
+            codes[87 + offset].labels.Add(ret);
             codes[17].operand = ret;
             return codes.AsEnumerable();
         }
@@ -1567,7 +1567,16 @@ namespace Cultivation_Way
                 actor.extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
             }
             //设置名字
-            actor.extendedData.status.familyName = __instance.stats.unit? AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_startList.GetRandom():AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_endList.GetRandom();
+            try
+            {
+                actor.extendedData.status.familyName = __instance.stats.unit ?
+                    AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_startList.GetRandom() :
+                    AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_endList.GetRandom();
+            }
+            catch (Exception e)
+            {
+                MonoBehaviour.print(__instance.stats.nameTemplate);
+            }
             actor.extendedData.status.familyID = actor.extendedData.status.familyName;
             status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, actor.extendedData.status.familyName, __instance.stats.unit);
             Family family = Main.instance.familys[actor.extendedData.status.familyID];
@@ -1697,19 +1706,19 @@ namespace Cultivation_Way
 
             Label label = new Label();
             int offset = 0;
-            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Ldarg_0));
+            codes.Insert(19 + offset, new CodeInstruction(OpCodes.Ldarg_0));
             offset++;
-            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Ldfld, spriteRenderer));
+            codes.Insert(19 + offset, new CodeInstruction(OpCodes.Ldfld, spriteRenderer));
             offset++;
-            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Callvirt, get_sprite));
+            codes.Insert(19 + offset, new CodeInstruction(OpCodes.Callvirt, get_sprite));
             offset++;
-            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Ldnull));
+            codes.Insert(19 + offset, new CodeInstruction(OpCodes.Ldnull));
             offset++;
-            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Call, op_Inequality));
+            codes.Insert(19 + offset, new CodeInstruction(OpCodes.Call, op_Inequality));
             offset++;
-            codes.Insert(13 + offset, new CodeInstruction(OpCodes.Brfalse_S, label));
+            codes.Insert(19 + offset, new CodeInstruction(OpCodes.Brfalse_S, label));
             offset++;
-            codes[34 + offset].labels.Add(label);
+            codes[40 + offset].labels.Add(label);
             return codes.AsEnumerable();
         }
         #endregion

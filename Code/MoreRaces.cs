@@ -1,4 +1,5 @@
-﻿using Cultivation_Way.Utils;
+﻿
+using Cultivation_Way.Utils;
 using CultivationWay;
 using HarmonyLib;
 using NCMS.Utils;
@@ -24,7 +25,8 @@ namespace Cultivation_Way
             Main.instance.moreRaces.Add("EasternHuman");
             Race EasternHuman = AssetManager.raceLibrary.clone("EasternHuman", "human");
             tRace = EasternHuman;
-            EasternHuman.icon = "iconEasternHuman";
+            EasternHuman.build_order_id = "EasternHuman";
+            EasternHuman.path_icon = "iconEasternHuman";
             EasternHuman.nameLocale = "EasternHumans";
             EasternHuman.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
             EasternHuman.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
@@ -41,16 +43,14 @@ namespace Cultivation_Way
             tRace = Tian;
             Tian.culture_rate_tech_limit = 8;
             Tian.culture_knowledge_gain_per_intelligence = 1.2f;
-            Tian.civ_baseCities = 1;
-            Tian.civ_baseArmy = 5;
-            Tian.civ_baseZones = 16;
             Tian.color = Toolbox.makeColor("#000000");
-            Tian.icon = "iconTian";
+            Tian.path_icon = "iconTian";
             Tian.nameLocale = "Tians";
-            Tian.bannerId = "human";
+            Tian.build_order_id = "Tian";
+            Tian.banner_id = "human";
             Tian.hateRaces = "orc,dwarf";
             Tian.preferred_weapons.Clear();
-            Tian.production = new string[] { "metals", "bread", "jam", "sushi", "cider" };
+            Tian.production = new string[] { "bread", "jam", "sushi", "cider" };
             Tian.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
             Tian.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
             Tian.skin_warrior = List.Of<string>(new string[] { "unit_warrior_1" });
@@ -71,16 +71,14 @@ namespace Cultivation_Way
             tRace = Ming;
             Ming.culture_rate_tech_limit = 8;
             Ming.culture_knowledge_gain_per_intelligence = 1.2f;
-            Ming.civ_baseCities = 1;
-            Ming.civ_baseArmy = 5;
-            Ming.civ_baseZones = 16;
             Ming.color = Toolbox.makeColor("#FFFFFF");
-            Ming.icon = "iconMing";
+            Ming.path_icon = "iconMing";
             Ming.nameLocale = "Mings";
-            Ming.bannerId = "dwarf";
+            Ming.build_order_id = "Ming";
+            Ming.banner_id = "dwarf";
             Ming.hateRaces = "orc,dwarf,elf,human,Tian";
             Ming.preferred_weapons.Clear();
-            Ming.production = new string[] { "metals", "bread", "jam", "sushi", "cider" };
+            Ming.production = new string[] {"bread", "jam", "sushi", "cider" };
             Ming.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
             Ming.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
             Ming.skin_warrior = List.Of<string>(new string[] { "unit_warrior_1" });
@@ -101,16 +99,14 @@ namespace Cultivation_Way
             tRace = Yao;
             Yao.culture_rate_tech_limit = 8;
             Yao.culture_knowledge_gain_per_intelligence = 1.2f;
-            Yao.civ_baseCities = 1;
-            Yao.civ_baseArmy = 5;
-            Yao.civ_baseZones = 16;
             Yao.color = Toolbox.makeColor("#000000");
-            Yao.icon = "iconYao";
+            Yao.path_icon = "iconYao";
             Yao.nameLocale = "Yaos";
-            Yao.bannerId = "orc";
+            Yao.banner_id = "orc";
+            Yao.build_order_id = "Yao";
             Yao.hateRaces = "elf,human";
             Yao.preferred_weapons.Clear();
-            Yao.production = new string[] { "metals", "bread" };
+            Yao.production = new string[] {"bread" };
             Yao.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
             Yao.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
             Yao.skin_warrior = List.Of<string>(new string[] { "unit_warrior_1" });
@@ -177,14 +173,14 @@ namespace Cultivation_Way
         public static void kingdomColorsDataInit()
         {
             KingdomColorsData kingdomColorsData = JsonUtility.FromJson<KingdomColorsData>(ResourcesHelper.LoadTextAsset("colors/kingdom_colors.json"));
-            KingdomColors.dict = new Dictionary<string, KingdomColorContainer>();
+            Dictionary<string, KingdomColorContainer> dict = (Dictionary<string, KingdomColorContainer>)typeof(KingdomColors).GetField("dict", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
             foreach (KingdomColorContainer kingdomColorContainer in kingdomColorsData.colors)
             {
                 foreach (KingdomColor kingdomColor in kingdomColorContainer.list)
                 {
                     kingdomColor.initColor();
                 }
-                KingdomColors.dict.Add(kingdomColorContainer.race, kingdomColorContainer);
+                dict.Add(kingdomColorContainer.race, kingdomColorContainer);
             }
         }
 
@@ -269,20 +265,21 @@ namespace Cultivation_Way
                     || Main.instance.MoreActors.protoAndShengs[1].GetSeconds().Contains(actor.stats.id)
                     ||actor.stats.id =="EasternDragon");
         }
-        //城市界面
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(CityWindow), "showInfo")]
-        public static void showInfo_Postfix(ref CityWindow __instance)
-        {
-            if (__instance == null || selectedCity == null || (Race)Reflection.GetField(typeof(City), selectedCity, "race") == null)
-            {
-                return;
-            }
-            if (Main.instance.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
-            {
-                __instance.icon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
-            }
-        }
+        ////城市界面，等待更换新资源加载后直接删除
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(CityWindow), "showInfo")]
+        //public static void showInfo_Postfix(ref CityWindow __instance)
+        //{
+        //    if (__instance == null || selectedCity == null || (Race)Reflection.GetField(typeof(City), selectedCity, "race") == null)
+        //    {
+        //        return;
+        //    }
+
+        //    //if (Main.instance.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
+        //    //{
+        //    //    __instance.icon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
+        //    //}
+        //}
         //国家列表
         [HarmonyPostfix]
         [HarmonyPatch(typeof(KingdomListWindow),"showElement")]
@@ -302,7 +299,7 @@ namespace Cultivation_Way
             CitiesListElement element = (Reflection.GetField(typeof(CitiesListWindow), __instance, "elements") as List<CitiesListElement>).Last();
             if (element.raceIcon.sprite == null)
             {
-                element.raceIcon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/{(Reflection.GetField(typeof(City), pObject, "race") as Race).icon}.png");
+                element.raceIcon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/{(Reflection.GetField(typeof(City), pObject, "race") as Race).path_icon}.png");
             }
         }
         //文化列表
@@ -409,8 +406,9 @@ namespace Cultivation_Way
             }
             return true;
         }
-        
+
         #endregion
+
     }
 
 }

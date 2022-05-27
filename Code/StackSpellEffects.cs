@@ -19,8 +19,6 @@ namespace Cultivation_Way
 
         public WorldTile currentTile;
 
-        public Vector3 zPosition;
-
         public Vector2 currentPosition;
 
         public Vector3 currentScale;

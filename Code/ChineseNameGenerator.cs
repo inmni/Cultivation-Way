@@ -94,6 +94,10 @@ namespace Cultivation_Way
             {
                 return NameGenerator.getName(pAsset);
             }
+            if (!AddAssetManager.chineseNameGenerator.dict.ContainsKey(pAsset))
+            {
+                pAsset ="default_name";
+            }
             ChineseNameAsset asset = AddAssetManager.chineseNameGenerator.get(pAsset);
             //prefix表示姓氏是否为前缀
             string origin = instance.getNameFromTemplate(asset, false);

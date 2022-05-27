@@ -24,7 +24,7 @@ namespace Cultivation_Way.Utils
         private static float yOffset = -37f;
         private static Vector2 buttonScale = new Vector2(1.5f, 1.5f);
 
-        private static GameObject originLawButton = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/world_laws/Background/Scroll View/Viewport/Content/Units/world_law_old_age").GetComponent<WorldLawElement>().gameObject;
+        private static GameObject originLawButton = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/world_laws/Background/Scroll View/Viewport/Content/Units/Grid/world_law_old_age").GetComponent<WorldLawElement>().gameObject;
         public static void createWorldLaw(string id,string name,string description,Transform parent,UnityAction<WorldLawElement> action,int num,bool defaultActive = true)
         {
             GameObject newLawButton = null;

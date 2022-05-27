@@ -13,6 +13,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Purchasing.MiniJSON;
 using static Config;
+using System.IO;
 /*
 MonoBehaviour.print("[修真之路Cultivation Way]:测试点n");//测试用测试点格式
 
@@ -348,7 +349,7 @@ namespace CultivationWay
 
         //重建地图导致问题
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(MapBox), "generateNewMap", typeof(string))]
+        [HarmonyPatch(typeof(MapBox), "generateNewMap", typeof(bool))]
         public static void GenerateMap()
         {
             instance.initChunkElement();

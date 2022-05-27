@@ -16,7 +16,7 @@ namespace Cultivation_Way
                 AssetManager.culture_tech.add(new CultureTechAsset
                 {
                     id = "culti_" + cultisystem.id,
-                    icon = cultisystem.id,
+                    path_icon = cultisystem.id,
                     type = TechType.Rare,
                     enabled = true,
                 });
@@ -26,27 +26,27 @@ namespace Cultivation_Way
             AssetManager.culture_tech.add(new CultureTechAsset
             {
                 id = "Circumvallation_1",
-                icon = "Circumvallation_1",
+                path_icon = "Circumvallation_1",
                 type = TechType.Common,
-                requirements = new System.Collections.Generic.List<string>() { "governance_1"},
+                requirements = new System.Collections.Generic.List<string>() { "housing_3" },
                 enabled = true,
             });
             //城墙2级
             AssetManager.culture_tech.add(new CultureTechAsset
             {
                 id = "Circumvallation_2",
-                icon = "Circumvallation_2",
+                path_icon = "Circumvallation_2",
                 type = TechType.Common,
-                requirements = new System.Collections.Generic.List<string>() { "governance_2", "Circumvallation_1" },
+                requirements = new System.Collections.Generic.List<string>() { "housing_2", "Circumvallation_1" },
                 enabled = false,
             });
             //城墙3级
             AssetManager.culture_tech.add(new CultureTechAsset
             {
                 id = "Circumvallation_3",
-                icon = "Circumvallation_3",
+                path_icon = "Circumvallation_3",
                 type = TechType.Common,
-                requirements = new System.Collections.Generic.List<string>() { "governance_3","Circumvallation_2" },
+                requirements = new System.Collections.Generic.List<string>() { "housing_3", "Circumvallation_2" },
                 enabled = false,
             });
         }
@@ -56,12 +56,12 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(TechElement), "load", typeof(CultureTechAsset))]
         public static bool load_Prefix(CultureTechAsset pAsset, TechElement __instance)
         {
-            if (pAsset.icon.StartsWith("tech")|| pAsset == null)
+            if (pAsset.path_icon.StartsWith("tech")|| pAsset == null)
             {
                 return true;
             }
             Reflection.SetField(__instance, "asset", pAsset);
-            Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + pAsset.icon + ".png");
+            Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + pAsset.path_icon + ".png");
             __instance.GetComponent<Image>().sprite = sprite;
             return false;
         }
@@ -108,13 +108,13 @@ namespace Cultivation_Way
                 pMax = Config.selectedCulture.getKnowledgeCostForResearch();
                 CultureTechAsset cultureTechAsset = AssetManager.culture_tech.get(Config.selectedCulture.researching_tech);
                 Sprite sprite;
-                if (cultureTechAsset.icon.StartsWith("tech"))
+                if (cultureTechAsset.path_icon.StartsWith("tech"))
                 {
-                    sprite = (Sprite)Resources.Load("ui/Icons/" + cultureTechAsset.icon, typeof(Sprite));
+                    sprite = (Sprite)Resources.Load("ui/Icons/" + cultureTechAsset.path_icon, typeof(Sprite));
                 }
                 else
                 {
-                    sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + cultureTechAsset.icon + ".png");
+                    sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/tech/" + cultureTechAsset.path_icon + ".png");
                 }
                 __instance.iconCurrentTech.GetComponent<Image>().sprite = sprite;
                 __instance.iconCurrentTech.gameObject.SetActive(true);

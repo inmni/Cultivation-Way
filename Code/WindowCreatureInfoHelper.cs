@@ -120,8 +120,8 @@ namespace Cultivation_Way
         {
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
 
-            Reflection.SetField(traitButton, "trait", AssetManager.traits.get(pID));
-            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + $"/EmbededResources/icons/traits/{ AssetManager.traits.get(pID).icon}.png");
+            Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get(pID));
+            Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + $"/EmbededResources/icons/traits/{ AssetManager.traits.get(pID).path_icon}.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
@@ -141,8 +141,8 @@ namespace Cultivation_Way
         {
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
 
-
-            Reflection.SetField(traitButton, "trait", AssetManager.traits.get("race"));
+    
+            Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("race"));
             if (!AssetManager.raceLibrary.dict[raceID].civilization)
             {
                 Localization.setLocalization("trait_race", "其他");
@@ -188,7 +188,7 @@ namespace Cultivation_Way
             }
             Localization.setLocalization("trait_realm_info", description.ToString());
 
-            Reflection.SetField(traitButton, "trait", AssetManager.traits.get("realm"));
+            Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("realm"));
 
             Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/" + ((ExtendedActor)actor).extendedData.status.cultisystem + "_" + 1 + ".png");
             traitButton.GetComponent<Image>().sprite = sprite;
@@ -215,7 +215,6 @@ namespace Cultivation_Way
                 ExtensionSpell[] spells = Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
                 for(int i=0;i<spells.Length;i++)
                 {
-                    MonoBehaviour.print(i);
                     if (spells[i] == null)
                     {
                         continue;
@@ -224,7 +223,7 @@ namespace Cultivation_Way
                 }
             Localization.setLocalization("trait_cultivationBook_info", "法术\n"+description.ToString());
 
-            Reflection.SetField(traitButton, "trait", AssetManager.traits.get("cultivationBook"));
+            Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("cultivationBook"));
             Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/cultivationBook.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
@@ -248,7 +247,7 @@ namespace Cultivation_Way
 
             Localization.setLocalization("trait_element_info", "");
 
-            Reflection.SetField(traitButton, "trait", AssetManager.traits.get("element"));
+            Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("element"));
             Sprite sprite = Utils.ResourcesHelper.loadSprite(Main.mainPath + "/EmbededResources/icons/traits/element.png");
             traitButton.GetComponent<Image>().sprite = sprite;
 
@@ -268,7 +267,7 @@ namespace Cultivation_Way
         internal void loadEquipment()
         {
             Actor selectedUnit = Config.selectedUnit;
-            List<ActorEquipmentSlot> temp_equipment = ReflectionUtility.Reflection.GetField(typeof(WindowCreatureInfo), instance, "temp_equipment") as List<ActorEquipmentSlot>;
+            List<ItemData> temp_equipment = ReflectionUtility.Reflection.GetField(typeof(WindowCreatureInfo), instance, "temp_equipment") as List<ItemData>;
 
             temp_equipment.Clear();
             instance.equipmentParent.gameObject.SetActive(false);
@@ -279,27 +278,27 @@ namespace Cultivation_Way
             instance.equipmentParent.gameObject.SetActive(true);
             if (selectedUnit.equipment.weapon.data != null)
             {
-                temp_equipment.Add(selectedUnit.equipment.weapon);
+                temp_equipment.Add(selectedUnit.equipment.weapon.data);
             }
             if (selectedUnit.equipment.helmet.data != null)
             {
-                temp_equipment.Add(selectedUnit.equipment.helmet);
+                temp_equipment.Add(selectedUnit.equipment.helmet.data);
             }
             if (selectedUnit.equipment.armor.data != null)
             {
-                temp_equipment.Add(selectedUnit.equipment.armor);
+                temp_equipment.Add(selectedUnit.equipment.armor.data);
             }
             if (selectedUnit.equipment.boots.data != null)
             {
-                temp_equipment.Add(selectedUnit.equipment.boots);
+                temp_equipment.Add(selectedUnit.equipment.boots.data);
             }
             if (selectedUnit.equipment.ring.data != null)
             {
-                temp_equipment.Add(selectedUnit.equipment.ring);
+                temp_equipment.Add(selectedUnit.equipment.ring.data);
             }
             if (selectedUnit.equipment.amulet.data != null)
             {
-                temp_equipment.Add(selectedUnit.equipment.amulet);
+                temp_equipment.Add(selectedUnit.equipment.amulet.data);
             }
             int num = 0;
             int count = temp_equipment.Count;
@@ -312,10 +311,10 @@ namespace Cultivation_Way
                 }
             }
         }
-        internal void loadEquipmentButton(ActorEquipmentSlot pSlot, int pIndex, int pTotal)
+        internal void loadEquipmentButton(ItemData pData, int pIndex, int pTotal)
         {
             EquipmentButton equipmentButton = UnityEngine.Object.Instantiate<EquipmentButton>(instance.prefabEquipment, instance.equipmentParent);
-            equipmentButton.CallMethod("load", pSlot);
+            equipmentButton.CallMethod("load", pData);
             RectTransform component = equipmentButton.GetComponent<RectTransform>();
             float num = 10f;
             float num2 = 22.4f;

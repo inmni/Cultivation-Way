@@ -86,12 +86,10 @@ namespace Cultivation_Way
         {
             SmoothLoader.add(delegate
             {
-                MonoBehaviour.print(1);
                 foreach (string id in Main.instance.tempMoreData.Keys)
                 {
                     tempMoreData[id] = Main.instance.tempMoreData[id];
                 }
-                MonoBehaviour.print(2);
                 foreach (Actor actor in MapBox.instance.units.getSimpleList())
                 {
                     if(actor.GetData().alive==false || actor.stats.skipSave)
@@ -114,7 +112,6 @@ namespace Cultivation_Way
                     }
                     moreActorData.Add(extendedActor.extendedData);
                 }
-                MonoBehaviour.print(3);
                 foreach (Building building in MapBox.instance.buildings.getSimpleList())
                 {
                     ExtendedBuilding extendedBuilding = (ExtendedBuilding)building;

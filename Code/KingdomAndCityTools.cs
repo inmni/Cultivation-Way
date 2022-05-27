@@ -122,7 +122,7 @@ namespace Cultivation_Way
                 return 0;
             }
             if (gods.Exists(a => 
-                  (a.stats.id == "MountainGod"&&(buildingType<=BuildingType.Gold||buildingType>=BuildingType.Tree))
+                  (a.stats.id == "MountainGod"&&(buildingType<=BuildingType.Mineral||buildingType>=BuildingType.Tree))
                 ||(a.stats.id=="EarthGod"&&buildingType==BuildingType.Wheat)))
             {
                 return 1;
