@@ -172,6 +172,7 @@ namespace Cultivation_Way
                     if ((!(actorData.status.statsID == "livingPlants") && !(actorData.status.statsID == "livingHouse")) || !string.IsNullOrEmpty(actorData.status.special_graphics))
                     {
                         actor = (ExtendedActor)MapBox.instance.spawnAndLoadUnit(actorData.status.statsID, actorData, tile);
+                        
                         if (!(actor == null) && savedMap.saveVersion < 6)
                         {
                             foreach (string pTrait in actor.stats.traits)
@@ -204,9 +205,11 @@ namespace Cultivation_Way
                 {
                     buildingData.templateID = buildingData.templateID.Replace("ork", "orc");
                 }
-                if (AssetManager.buildings.get(buildingData.templateID) != null)
+                BuildingAsset b = AssetManager.buildings.get(buildingData.templateID);
+                if (b != null)
                 {
                     ExtendedBuilding building = (ExtendedBuilding)MapBox.instance.CallMethod("loadBuilding",buildingData);
+                    
                     if (building == null)
                     {
                         continue;
@@ -215,10 +218,17 @@ namespace Cultivation_Way
                     {
                         if (savedModData != null)
                         {
+                            building.easyData = buildingData;
+                            building.easyStats = b;
                             building.extendedData = savedModData.moreBuildingData[i];
                             building.extendedCurStats.element = new ChineseElement(building.extendedData.status.element);
                         }
                     }
+                    //if (building.kingdom == null)
+                    //{
+                    //    MonoBehaviour.print(buildingData.templateID);
+                    //    MapBox.instance.removeBuildingFully(building);
+                    //}
                 }
             }
             MapBox.instance.buildings.checkAddRemove();

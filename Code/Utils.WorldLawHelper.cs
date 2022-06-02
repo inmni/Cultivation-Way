@@ -38,7 +38,7 @@ namespace Cultivation_Way.Utils
             newLawButton.transform.localScale = buttonScale;
 
             Image image = newLawButton.transform.Find("Button").Find("LawIcon").GetComponent<Image>();
-            image.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/laws/{id}.png");
+            image.sprite = Resources.Load<Sprite>($"ui/Icons/{id}");
 
             WorldLawElement wle = newLawButton.GetComponent<WorldLawElement>();
             wle.icon.color = defaultActive ? Toolbox.makeColor("#FFFFFF") : Toolbox.makeColor("#666666");

@@ -22,11 +22,11 @@ namespace Cultivation_Way
         {
             
             #region 东方人族
-            Main.instance.moreRaces.Add("EasternHuman");
+            Main.instance.addRaces.Add("EasternHuman");
             Race EasternHuman = AssetManager.raceLibrary.clone("EasternHuman", "human");
             tRace = EasternHuman;
             EasternHuman.build_order_id = "EasternHuman";
-            EasternHuman.path_icon = "iconEasternHuman";
+            EasternHuman.path_icon = "ui/Icons/iconEasternHuman";
             EasternHuman.nameLocale = "EasternHumans";
             EasternHuman.skin_citizen_male = List.Of<string>(new string[] { "unit_male_1" });
             EasternHuman.skin_citizen_female = List.Of<string>(new string[] { "unit_female_1" });
@@ -38,13 +38,13 @@ namespace Cultivation_Way
             #endregion
 
             #region 天族
-            Main.instance.moreRaces.Add("Tian");
+            Main.instance.addRaces.Add("Tian");
             Race Tian = AssetManager.raceLibrary.clone("Tian", "human");
             tRace = Tian;
             Tian.culture_rate_tech_limit = 8;
             Tian.culture_knowledge_gain_per_intelligence = 1.2f;
             Tian.color = Toolbox.makeColor("#000000");
-            Tian.path_icon = "iconTian";
+            Tian.path_icon = "ui/Icons/iconTian";
             Tian.nameLocale = "Tians";
             Tian.build_order_id = "Tian";
             Tian.banner_id = "human";
@@ -66,13 +66,13 @@ namespace Cultivation_Way
             #endregion
 
             #region 冥族
-            Main.instance.moreRaces.Add("Ming");
+            Main.instance.addRaces.Add("Ming");
             Race Ming = AssetManager.raceLibrary.clone("Ming", "human");
             tRace = Ming;
             Ming.culture_rate_tech_limit = 8;
             Ming.culture_knowledge_gain_per_intelligence = 1.2f;
             Ming.color = Toolbox.makeColor("#FFFFFF");
-            Ming.path_icon = "iconMing";
+            Ming.path_icon = "ui/Icons/iconMing";
             Ming.nameLocale = "Mings";
             Ming.build_order_id = "Ming";
             Ming.banner_id = "dwarf";
@@ -94,13 +94,13 @@ namespace Cultivation_Way
             #endregion
 
             #region 妖族
-            Main.instance.moreRaces.Add("Yao");
+            Main.instance.addRaces.Add("Yao");
             Race Yao = AssetManager.raceLibrary.clone("Yao", "human");
             tRace = Yao;
             Yao.culture_rate_tech_limit = 8;
             Yao.culture_knowledge_gain_per_intelligence = 1.2f;
             Yao.color = Toolbox.makeColor("#000000");
-            Yao.path_icon = "iconYao";
+            Yao.path_icon = "ui/Icons/iconYao";
             Yao.nameLocale = "Yaos";
             Yao.banner_id = "orc";
             Yao.build_order_id = "Yao";
@@ -134,40 +134,7 @@ namespace Cultivation_Way
             Race dwarf = AssetManager.raceLibrary.get("dwarf");
             dwarf.culture_forbidden_tech.Add("Circumvallation_1");
         }
-        internal void setIntelligentRaceFeature()
-        {
-            RaceFeature humanFeature = Main.instance.raceFeatures["unit_human"];
-
-            RaceFeature elfFeature = Main.instance.raceFeatures["unit_elf"];
-
-            RaceFeature dwarfFeature = Main.instance.raceFeatures["unit_dwarf"];
-
-            RaceFeature orcFeature = Main.instance.raceFeatures["unit_orc"];
-
-            RaceFeature TianFeature = Main.instance.raceFeatures["unit_Tian"];
-            TianFeature.raceSpells.Add("summonTian");
-            TianFeature.raceSpells.Add("summonTian1");
-            RaceFeature MingFeature = Main.instance.raceFeatures["unit_Ming"];
-            MingFeature.raceSpells.Add("summon");
-            RaceFeature YaoFeature = Main.instance.raceFeatures["unit_Yao"];
-        }
-        internal void setOtherRaceFeature()
-        {
-            RaceFeature JiaoDragonFeature = Main.instance.raceFeatures["JiaoDragon"];
-            JiaoDragonFeature.raceSpells.Add("JiaoDragon_laser");
-
-            RaceFeature EasternDragonFeature = Main.instance.raceFeatures["EasternDragon"];
-            EasternDragonFeature.raceSpells.Add("JiaoDragon_laser");
-
-            RaceFeature MengZhuFeature = Main.instance.raceFeatures["MengZhu"];
-            MengZhuFeature.raceSpells.Add("lightning");
-            MengZhuFeature.raceSpells.Add("summonTian");
-
-            RaceFeature MonkeySheng1 = Main.instance.raceFeatures["MonkeySheng1"];
-            MonkeySheng1.raceSpells.Add("goldBar");
-            MonkeySheng1.raceSpells.Add("goldBarDown");
-
-        }
+        
 
         //国家颜色
         public static void kingdomColorsDataInit()
@@ -257,68 +224,21 @@ namespace Cultivation_Way
         }
         public static bool isCitizen(Actor actor)
         {
-            return (actor.stats.unit ||Main.instance.MoreActors.protoAndYao==null
-                    || Main.instance.MoreActors.protoAndShengs==null
-                    ||Main.instance.MoreActors.protoAndShengs.Count<2
-                    || Main.instance.MoreActors.protoAndYao.GetSeconds().Contains(actor.stats.id)
-                    || Main.instance.MoreActors.protoAndShengs[0].GetSeconds().Contains(actor.stats.id)
-                    || Main.instance.MoreActors.protoAndShengs[1].GetSeconds().Contains(actor.stats.id)
+            return (actor.stats.unit ||Main.instance.moreActors.protoAndYao==null
+                    || Main.instance.moreActors.protoAndShengs==null
+                    ||Main.instance.moreActors.protoAndShengs.Count<2
+                    || Main.instance.moreActors.protoAndYao.GetSeconds().Contains(actor.stats.id)
+                    || Main.instance.moreActors.protoAndShengs[0].GetSeconds().Contains(actor.stats.id)
+                    || Main.instance.moreActors.protoAndShengs[1].GetSeconds().Contains(actor.stats.id)
                     ||actor.stats.id =="EasternDragon");
         }
-        ////城市界面，等待更换新资源加载后直接删除
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(CityWindow), "showInfo")]
-        //public static void showInfo_Postfix(ref CityWindow __instance)
-        //{
-        //    if (__instance == null || selectedCity == null || (Race)Reflection.GetField(typeof(City), selectedCity, "race") == null)
-        //    {
-        //        return;
-        //    }
 
-        //    //if (Main.instance.moreRaces.Contains(((Race)Reflection.GetField(typeof(City), selectedCity, "race")).id))
-        //    //{
-        //    //    __instance.icon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/" + ((Race)Reflection.GetField(typeof(City), selectedCity, "race")).icon + ".png");
-        //    //}
-        //}
-        //国家列表
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(KingdomListWindow),"showElement")]
-        public static void showElement_KingdomList(KingdomListWindow __instance,Kingdom pKingdom)
-        {
-            KingdomElement element = (Reflection.GetField(typeof(KingdomListWindow), __instance, "elements") as List<KingdomElement>).Last();
-            if (element.iconRace.sprite == null)
-            {
-                element.iconRace.sprite =Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/icon{pKingdom.raceID}.png");
-            }
-        }
-        //城市列表
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(CitiesListWindow), "showElement")]
-        public static void showElement_CitiesList(CitiesListWindow __instance, City pObject)
-        {
-            CitiesListElement element = (Reflection.GetField(typeof(CitiesListWindow), __instance, "elements") as List<CitiesListElement>).Last();
-            if (element.raceIcon.sprite == null)
-            {
-                element.raceIcon.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/{(Reflection.GetField(typeof(City), pObject, "race") as Race).path_icon}.png");
-            }
-        }
-        //文化列表
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(CulturesListWindow), "showElement")]
-        public static void showElement_CulturesList(CulturesListWindow __instance, Culture pObject)
-        {
-            CultureListElement element = (Reflection.GetField(typeof(CulturesListWindow), __instance, "elements") as List<CultureListElement>).Last();
-            if (element.iconRace.sprite == null)
-            {
-                element.iconRace.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/actors/icon{pObject.race}.png");
-            }
-        }
-        //主贴图加载
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ActorAnimationLoader), "generateAnimation")]
+        ////主贴图加载
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(ActorAnimationLoader), "generateAnimation")]
         public static bool generateAnimation_Prefix(string pSheetPath, ActorStats pStats, ref AnimationDataUnit __result, ActorAnimationLoader __instance)
         {
-            if (Main.instance.moreActors.Contains(pStats.id))
+            if (Main.instance.addActors.Contains(pStats.id))
             {
                 //根据原版的路径构建新路径
                 AnimationDataUnit animationDataUnit = new AnimationDataUnit();
@@ -332,7 +252,7 @@ namespace Cultivation_Way
                     sprite.name = name;
                     sprites.Add(name, sprite);
                 }
-                if (Main.instance.moreRaces.Contains(pStats.race))
+                if (Main.instance.addRaces.Contains(pStats.race))
                 {
                     for (int i = 4; i < 8; i++)
                     {
@@ -380,7 +300,7 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(ActorBase), "findHeadSprite")]
         public static bool findHeadSprite_Prefix(ActorBase __instance)
         {
-            if (Main.instance.moreRaces.Contains(__instance.stats.race))
+            if (Main.instance.addRaces.Contains(__instance.stats.race))
             {
                 return false;
             }
@@ -396,7 +316,7 @@ namespace Cultivation_Way
                 pTexturePath = pTexturePath + "human";
                 return true;
             }
-            foreach (string race in Main.instance.moreRaces)
+            foreach (string race in Main.instance.addRaces)
             {
                 if (pTexturePath.Contains(race))
                 {

@@ -153,7 +153,7 @@ namespace Cultivation_Way
         /// <returns></returns>
         public static bool tryTransform(this Actor actor)
         {
-            if (!Main.instance.MoreActors.protoAndYao.GetFirsts().Contains(actor.stats.id))
+            if (!Main.instance.moreActors.protoAndYao.GetFirsts().Contains(actor.stats.id))
             {
                 return false;
             }
@@ -167,7 +167,7 @@ namespace Cultivation_Way
             }
             int level = actor.GetData().level;
             string originRace = actor.stats.race;
-            string targetRace = Main.instance.MoreActors.protoAndYao.GetByFirst(originRace);
+            string targetRace = Main.instance.moreActors.protoAndYao.GetByFirst(originRace);
             //两个特判
             if (originRace == "chicken" && Toolbox.randomBool())
             {
@@ -180,7 +180,7 @@ namespace Cultivation_Way
             if (Toolbox.randomChance(0.1f))
             {
                 targetRace = "unit_Yao";
-                if (Toolbox.randomChance(0.1f) && Main.instance.MoreActors.protoAndShengs[0].GetFirsts().Contains(originRace))
+                if (Toolbox.randomChance(0.1f) && Main.instance.moreActors.protoAndShengs[0].GetFirsts().Contains(originRace))
                 {
                     int index = 0;
                     //又一个特判
@@ -188,7 +188,7 @@ namespace Cultivation_Way
                     {
                         index = 1;
                     }
-                    string tmp = Main.instance.MoreActors.protoAndShengs[index].GetByFirst(originRace);
+                    string tmp = Main.instance.moreActors.protoAndShengs[index].GetByFirst(originRace);
                     if (Main.instance.creatureLimit[tmp] > 0)
                     {
                         targetRace = tmp;
@@ -317,10 +317,18 @@ namespace Cultivation_Way
                 realm = (realm + 9) / 10 + 9;
                 if (realm > 20)
                 {
-                    realm = 20;
+                    return 20;
                 }
+                return realm;
             }
-            return realm;
+            else
+            {
+                if (realm < 1)
+                {
+                    return 1;
+                }
+                return realm;
+            }
         }
         public static string getRealmName(this Actor actor)
         {
@@ -340,7 +348,8 @@ namespace Cultivation_Way
             morestats.clear();
             int realm = actor.getRealm();
             morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[realm-1]);
-            morestats.addAnotherStats(Main.instance.familys[moredata.familyID].cultivationBook.stats[realm-1]);
+            morestats.addAnotherStats(Main.instance.familys[moredata.familyID].cultivationBook.stats[realm - 1]);
+            
             morestats.addAnotherStats(moredata.bonusStats);
         }
         /// <summary>

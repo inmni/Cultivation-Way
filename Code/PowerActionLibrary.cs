@@ -31,7 +31,7 @@ namespace Cultivation_Way
                 MapBox.instance.stackEffects.CallMethod("startSpawnEffect", pTile, godPower.showSpawnEffect);
             }
             string pStatsID = "unit_Yao";
-            ICollection<string> t = Main.instance.MoreActors.protoAndYao.GetSeconds();
+            ICollection<string> t = Main.instance.moreActors.protoAndYao.GetSeconds();
             int index = Toolbox.randomInt(0, t.Count);
             pStatsID = t.ElementAt(index);
 

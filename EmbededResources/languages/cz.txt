@@ -28,6 +28,7 @@
   "elementFire": "火",
   "elementGround": "土",
   "age/maxAge": "年龄/寿元",
+  "Lost": "天道有缺",
   "trait_cursed_immune": "诅咒免疫",
   "trait_asylum": "天道眷顾",
   "trait_asylum_info": "真正的永恒",

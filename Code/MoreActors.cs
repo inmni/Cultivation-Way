@@ -57,7 +57,7 @@ namespace Cultivation_Way
             summonTian.baseStats.speed = 1.5f;
             summonTian.traits.Add("giant");
             summonTian.disablePunchAttackAnimation = true;
-            summonTian.texture_path = "summonTian";
+            summonTian.texture_path = "t_summonTian";
             summonTian.flying = true;
             summonTian.very_high_flyer = true;
             summonTian.dieOnBlocks = false;
@@ -77,7 +77,7 @@ namespace Cultivation_Way
             summonTian1.baseStats.speed = 1.5f;
             summonTian1.traits.Add("giant");
             summonTian1.disablePunchAttackAnimation = true;
-            summonTian1.texture_path = "summonTian1";
+            summonTian1.texture_path = "t_summonTian1";
             summonTian1.body_separate_part_head = false;
             summonTian1.swimToIsland = false;
             summonTian1.procreate = false;
@@ -128,7 +128,7 @@ namespace Cultivation_Way
             addActor(AssetManager.unitStats.clone("unit_Tian", "Tian"));
             #region 天族附属
             ActorStats Tian1 = AssetManager.unitStats.clone("summonTian2", "summonTian");
-            Tian1.texture_path = "summonTian2";
+            Tian1.texture_path = "t_summonTian2";
             Tian1.nameTemplate = "default_name";
             Tian1.race = "Tian";
             Tian1.kingdom = "nomads_Tian";
@@ -280,7 +280,7 @@ namespace Cultivation_Way
             FairyFoxAsset.nameLocale = "FairyFox";
             FairyFoxAsset.shadowTexture = "unitShadow_5";
             FairyFoxAsset.useSkinColors = false;
-            FairyFoxAsset.texture_path = "FairyFox";
+            FairyFoxAsset.texture_path = "t_FairyFox";
             FairyFoxAsset.texture_heads = "";
             FairyFoxAsset.icon = "iconFairyFox";
             FairyFoxAsset.defaultAttack = "snowball";
@@ -292,7 +292,7 @@ namespace Cultivation_Way
             FuRenAsset.race = "EasternHuman";
             FuRenAsset.nameLocale = "FuRen";
             FuRenAsset.useSkinColors = false;
-            FuRenAsset.texture_path = "FuRen";
+            FuRenAsset.texture_path = "t_FuRen";
             FuRenAsset.texture_heads = "";
             FuRenAsset.icon = "iconFuRen";
             FuRenAsset.defaultAttack = "firework";
@@ -304,7 +304,7 @@ namespace Cultivation_Way
             TigerAsset.race = "Tiger";
             TigerAsset.nameLocale = "Tiger";
             TigerAsset.nameTemplate = "tiger_name";
-            TigerAsset.texture_path = "Tiger";
+            TigerAsset.texture_path = "t_Tiger";
             TigerAsset.icon = "iconTiger";
             addActor(TigerAsset);
             AssetManager.topTiles.get("grass_low").addUnitsToSpawn("Tiger");
@@ -313,7 +313,7 @@ namespace Cultivation_Way
             EasternDragonAsset.race = "EasternDragon";
             EasternDragonAsset.actorSize = ActorSize.S17_Dragon;
             EasternDragonAsset.shadowTexture = "unitShadow_23";
-            EasternDragonAsset.texture_path = "EasternDragon";
+            EasternDragonAsset.texture_path = "t_EasternDragon";
             EasternDragonAsset.texture_heads = "";
             EasternDragonAsset.icon = "iconEasternDragon";
             EasternDragonAsset.skipFightLogic = true;
@@ -351,31 +351,31 @@ namespace Cultivation_Way
             Main.instance.creatureLimit.Add(Achelous.id, 1);
             Main.instance.godList.Add(Achelous.id, "河伯");
             ActorStats EarthGod = AssetManager.unitStats.clone("EarthGod", "Achelous");
-            EarthGod.texture_path = "EarthGod";
+            EarthGod.texture_path = "t_EarthGod";
             EarthGod.icon = "EarthGod";
             addActor(EarthGod);
             Main.instance.creatureLimit.Add(EarthGod.id, 1);
             Main.instance.godList.Add(EarthGod.id, "土地");
             ActorStats Mammon = AssetManager.unitStats.clone("Mammon", "Achelous");
-            Mammon.texture_path = "Mammon";
+            Mammon.texture_path = "t_Mammon";
             Mammon.icon = "Mammon";
             addActor(Mammon);
             Main.instance.creatureLimit.Add(Mammon.id, 1);
             Main.instance.godList.Add(Mammon.id, "财神");
             ActorStats Hymen = AssetManager.unitStats.clone("Hymen", "Achelous");
-            Hymen.texture_path = "Hymen";
+            Hymen.texture_path = "t_Hymen";
             Hymen.icon = "Hymen";
             addActor(Hymen);
             Main.instance.creatureLimit.Add(Hymen.id, 1);
             Main.instance.godList.Add(Hymen.id, "月老");
             ActorStats MountainGod = AssetManager.unitStats.clone("MountainGod", "Achelous");
-            MountainGod.texture_path = "MountainGod";
+            MountainGod.texture_path = "t_MountainGod";
             MountainGod.icon = "MountainGod";
             addActor(MountainGod);
             Main.instance.creatureLimit.Add(MountainGod.id, 1);
             Main.instance.godList.Add(MountainGod.id, "山神");
             ActorStats ZhongKui = AssetManager.unitStats.clone("ZhongKui", "Achelous");
-            ZhongKui.texture_path = "ZhongKui";
+            ZhongKui.texture_path = "t_ZhongKui";
             ZhongKui.icon = "ZhongKui";
             addActor(ZhongKui);
             Main.instance.creatureLimit.Add(ZhongKui.id, 1);
@@ -392,7 +392,7 @@ namespace Cultivation_Way
             JiaoDragonAsset.nameTemplate = "default_name";
             JiaoDragonAsset.shadowTexture = "unitShadow_5";
             JiaoDragonAsset.useSkinColors = false;
-            JiaoDragonAsset.texture_path = "JiaoDragon";
+            JiaoDragonAsset.texture_path = "t_JiaoDragon";
             JiaoDragonAsset.texture_heads = "";
             JiaoDragonAsset.canTurnIntoZombie = false;
             JiaoDragonAsset.canTurnIntoMush = false;
@@ -418,7 +418,7 @@ namespace Cultivation_Way
             XieDragonAsset.nameLocale = "XieDragon";
             XieDragonAsset.nameTemplate = "default_name";
             XieDragonAsset.shadowTexture = "unitShadow_5";
-            XieDragonAsset.texture_path = "XieDragon";
+            XieDragonAsset.texture_path = "t_XieDragon";
             XieDragonAsset.icon = "iconXieDrangon";
             XieDragonAsset.setBaseStats(1000000, 10000, 0, 99, 100, 100);
             XieDragonAsset.baseStats.scale = 0.20f;
@@ -428,7 +428,7 @@ namespace Cultivation_Way
             ActorStats NianAsset = AssetManager.unitStats.clone("Nian", "EasternDragon");
             NianAsset.race = "Nian";
             NianAsset.kingdom = "boss";
-            NianAsset.texture_path = "Nian";
+            NianAsset.texture_path = "t_Nian";
             NianAsset.icon = "iconNian";
             NianAsset.baseStats.range = 23f;
             NianAsset.oceanCreature = false;
@@ -455,7 +455,7 @@ namespace Cultivation_Way
             MengZhuAsset.canTurnIntoMush = false;
             MengZhuAsset.canTurnIntoTumorMonster = false;
             MengZhuAsset.needFood = false;
-            MengZhuAsset.texture_path = "MengZhu";
+            MengZhuAsset.texture_path = "t_MengZhu";
             MengZhuAsset.texture_heads = "";
             MengZhuAsset.icon = "iconMengZhu";
             MengZhuAsset.traits = new List<string> { "immortal", "cursed_immune", "fire_proof", "freeze_proof", "poison_immune", "immune", "healing_aura" };
@@ -508,7 +508,7 @@ namespace Cultivation_Way
         {
             string tranformID = ActorTools.getTranformID(id);
             ActorStats pStats = AssetManager.unitStats.clone(tranformID, "_Yao");
-            pStats.texture_path = tranformID;
+            pStats.texture_path = "t_"+tranformID;
             pStats.nameTemplate = id + "_name";
             addColor(pStats);
             addActor(pStats);
@@ -519,7 +519,7 @@ namespace Cultivation_Way
         {
             string tranformID = ActorTools.getTranformID(id).Replace("Yao", "Sheng");
             ActorStats pStats = AssetManager.unitStats.clone(tranformID, "YaoSheng");
-            pStats.texture_path = tranformID;
+            pStats.texture_path = "t_" + tranformID;
             pStats.nameTemplate = id + "_name";
             pStats.useSkinColors = false;
             addActor(pStats);
@@ -553,7 +553,7 @@ namespace Cultivation_Way
         }
         private void addActor(ActorStats pStats)
         {
-            Main.instance.moreActors.Add(pStats.id);
+            Main.instance.addActors.Add(pStats.id);
             if (pStats.shadow)
             {
                 Reflection.CallMethod(AssetManager.unitStats, "loadShadow", pStats);
@@ -1621,6 +1621,7 @@ namespace Cultivation_Way
             if (pData != null)
             {
                 component.easyData = pData.status;
+                
                 Reflection.SetField(component,"data",pData.status);
                 Reflection.SetField(component,"professionAsset",AssetManager.professions.get(pData.status.profession));
             }
@@ -1674,11 +1675,15 @@ namespace Cultivation_Way
             }
             
             MoreStatus moreData = ((ExtendedActor)pActor).extendedData.status;
-            Family family = Main.instance.familys[moreData.familyID];
-            family.num--;
-            if (family.num <= 0)
+            if (moreData.familyID != string.Empty)
             {
-                Main.instance.familys[moreData.familyID] = new Family(moreData.familyID);
+                Family family = Main.instance.familys[moreData.familyID];
+                family.num--;
+                if (family.num <= 0)
+                {
+                    Main.instance.familys[moreData.familyID] = new Family(moreData.familyID);
+                }
+                moreData.familyID = string.Empty;
             }
             if (pActor.kingdom == null)
             {

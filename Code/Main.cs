@@ -1,6 +1,6 @@
 using Cultivation_Way;
 using Cultivation_Way.Utils;
-using Cultivation_Way.ExtendedAiBehaviours;
+using Cultivation_Way.MoreAiBehaviours;
 using HarmonyLib;
 using NCMS;
 using ReflectionUtility;
@@ -65,27 +65,28 @@ namespace CultivationWay
 
         public Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族映射表
 
-        public Dictionary<string, RaceFeature> raceFeatures = new Dictionary<string, RaceFeature>();//种族id与种族特色对照
+        public Dictionary<string, ExtendedActorStats> raceFeatures = new Dictionary<string, ExtendedActorStats>();//种族id与种族特色对照
         #endregion
 
         #region 更多玩意
-        public MoreItems MoreItems = new MoreItems();
-        public MoreTraits MoreTraits = new MoreTraits();
-        public MoreActors MoreActors = new MoreActors();
-        public MoreProjectiles MoreProjectiles = new MoreProjectiles();
-        public MoreRaces MoreRaces = new MoreRaces();
-        public MoreKingdoms MoreKingdoms = new MoreKingdoms();
-        public MoreBuildings MoreBuildings = new MoreBuildings();
-        public MoreGodPowers MoreGodPowers = new MoreGodPowers();
-        public MoreDrops MoreDrops = new MoreDrops();
-        public MoreCultureTech MoreCultureTech = new MoreCultureTech();
-        public MoreMapModes MoreMapModes = new MoreMapModes();
-        public MoreWorldLaws MoreWorldLaws = new MoreWorldLaws();
-        public BehaviourTaskCityLibrary MoreCityTasks = new BehaviourTaskCityLibrary();
-        public List<string> moreActors = new List<string>();
-        public List<string> moreItems = new List<string>();
-        public List<string> moreRaces = new List<string>();
-        public Dictionary<string, Vector2> moreProjectiles = new Dictionary<string, Vector2>();
+        public MoreItems moreItems = new MoreItems();
+        public MoreTraits moreTraits = new MoreTraits();
+        public MoreActors moreActors = new MoreActors();
+        public MoreProjectiles moreProjectiles = new MoreProjectiles();
+        public MoreRaces moreRaces = new MoreRaces();
+        public MoreKingdoms moreKingdoms = new MoreKingdoms();
+        public MoreBuildings moreBuildings = new MoreBuildings();
+        public MoreGodPowers moreGodPowers = new MoreGodPowers();
+        public MoreDrops moreDrops = new MoreDrops();
+        public MoreCultureTech moreCultureTechs = new MoreCultureTech();
+        public MoreMapModes moreMapModes = new MoreMapModes();
+        public MoreWorldLaws moreWorldLaws = new MoreWorldLaws();
+        public MoreTopTileType moreTopTileTypes = new MoreTopTileType();
+        public BehaviourTaskCityLibrary moreCityTasks = new BehaviourTaskCityLibrary();
+        public List<string> addActors = new List<string>();
+        public List<string> addItems = new List<string>();
+        public List<string> addRaces = new List<string>();
+        public Dictionary<string, Vector2> addProjectiles = new Dictionary<string, Vector2>();
         #endregion
 
         #region 初始化n件套
@@ -111,7 +112,7 @@ namespace CultivationWay
             patchHarmony();
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
             spellEffects = this.transform.gameObject.AddComponent<StackSpellEffects>();
-            spellEffects.Awake();
+// spellEffects.Awake();
         }
         void Update()
         {
@@ -127,9 +128,10 @@ namespace CultivationWay
                 //sfx_MusicMan_racesAdd();
                 MoreRaces.kingdomColorsDataInit();//国家颜色数据
                 initChunkElement();//区块元素
-                MoreMapModes.add();//地图显示模式
+                moreMapModes.add();//地图显示模式
                 createOrResetFamily();//家族初始化
-                addRaceFeature();//添加种族特色
+                ExtendedActorStats.init();//添加种族特色
+                ExtendedBuildingStats.init();
                 prefabs.init();//预制体初始化
                 instance.gameStatsData = Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data") as GameStatsData;
                 instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
@@ -221,25 +223,12 @@ namespace CultivationWay
         }
         void initWindows()
         {
-            MoreWorldLaws.init();
+            moreWorldLaws.init();
             WindowAboutThis.init();
             WindowChunkInfo.init();
             WindowFamily.init();
             WindowMoreStats.init();
             WindowTops.init();
-        }
-        void addRaceFeature()
-        {
-            foreach (ActorStats stats in AssetManager.unitStats.list)
-            {
-
-                RaceFeature feature = new RaceFeature();
-                feature.raceID = stats.race;
-                feature.raceSpells = new List<string>();
-                this.raceFeatures.Add(stats.id, feature);
-            }
-            MoreRaces.setIntelligentRaceFeature();
-            MoreRaces.setOtherRaceFeature();
         }
         public void initChunkElement()
         {
@@ -493,7 +482,7 @@ namespace CultivationWay
         }
         public static void sfx_MusicMan_racesAdd()
         {
-            foreach (string race in instance.moreRaces)
+            foreach (string race in instance.addRaces)
             {
                 sfx.MusicMan.races[race] = new sfx.MusicRaceContainer();
             }

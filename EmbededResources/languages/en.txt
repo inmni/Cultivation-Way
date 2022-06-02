@@ -28,6 +28,7 @@
   "elementFire": "Fire element",
   "elementGround": "Earth element",
   "age/maxAge": "age/max age",
+  "Lost": "Lost Ancient Culture",
   "trait_cursed_immune": "Cursed Immune",
   "trait_asylum": "Asylum",
   "trait_asylum_info": "Real Eternal!",

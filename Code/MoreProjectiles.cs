@@ -46,7 +46,7 @@ namespace Cultivation_Way
                 impactSoundID = "explosion medium",//碰撞声音
             });
             
-            Main.instance.moreProjectiles.Add("lightning_orb", new Vector2(0,7f));//添加，用于加载，后面的Vector2确定发射位置
+            Main.instance.addProjectiles.Add("lightning_orb", new Vector2(0,7f));//添加，用于加载，后面的Vector2确定发射位置
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "lightningFire_orb",
@@ -59,7 +59,7 @@ namespace Cultivation_Way
                 playImpactSound = true,
                 impactSoundID = "explosion medium",
             });
-            Main.instance.moreProjectiles.Add("lightningFire_orb", new Vector2(0,7f));
+            Main.instance.addProjectiles.Add("lightningFire_orb", new Vector2(0,7f));
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "magicArrow",
@@ -73,7 +73,7 @@ namespace Cultivation_Way
                 look_at_target = true,
                 impactSoundID = "explosion medium",
             });
-            Main.instance.moreProjectiles.Add("magicArrow", new Vector2(0,20f));
+            Main.instance.addProjectiles.Add("magicArrow", new Vector2(0,20f));
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "red_magicArrow",
@@ -88,7 +88,7 @@ namespace Cultivation_Way
                 endEffect = "fireballExplosion",
                 impactSoundID = "explosion medium",
             });
-            Main.instance.moreProjectiles.Add("red_magicArrow", Vector2.zero);
+            Main.instance.addProjectiles.Add("red_magicArrow", Vector2.zero);
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "water_orb",
@@ -99,7 +99,7 @@ namespace Cultivation_Way
                 targetScale = 0.4f,            //到达目的地大小
                 world_actions = new WorldAction(ExtensionSpellActionLibrary.aWaterPoleDamage)
             }) ;
-            Main.instance.moreProjectiles.Add("water_orb", new Vector2(0, 7f));
+            Main.instance.addProjectiles.Add("water_orb", new Vector2(0, 7f));
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "firework",
@@ -111,14 +111,14 @@ namespace Cultivation_Way
                 targetScale = 0.04f,            //到达目的地大小
                 world_actions = new WorldAction(ExtensionSpellActionLibrary.aFireworkDamage)
             });
-            Main.instance.moreProjectiles.Add("firework", Vector2.zero);
+            Main.instance.addProjectiles.Add("firework", Vector2.zero);
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Projectile), "start")]
         public static bool start_Prefix(Projectile __instance, ref Vector3 pStart, string pAssetID)
         {
-            if (!Main.instance.moreProjectiles.ContainsKey(pAssetID))
+            if (!Main.instance.addProjectiles.ContainsKey(pAssetID))
             {
                 return true;
             }
@@ -133,8 +133,8 @@ namespace Cultivation_Way
             {
                 Reflection.SetField(asset, "_frames", ResourcesHelper.loadAllSprite("projectiles/" + asset.id, 0.8f));
             }
-            pStart.x += Main.instance.moreProjectiles[pAssetID].x;
-            pStart.y += Main.instance.moreProjectiles[pAssetID].y;
+            pStart.x += Main.instance.addProjectiles[pAssetID].x;
+            pStart.y += Main.instance.addProjectiles[pAssetID].y;
             return true;
         }
         [HarmonyPrefix]

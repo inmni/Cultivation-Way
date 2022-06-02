@@ -60,14 +60,14 @@ namespace Cultivation_Way
 
             rectTransform1.pivot = new Vector2(0f, 1f);
 
-            PowerButton button = PowerButtons.CreateButton("combatRank", Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/stats/iconDamage.png"),
+            PowerButton button = PowerButtons.CreateButton("combatRank", Resources.Load<Sprite>("ui/Icons/iconDamage"),
                                                             "战力榜",
                                                             "",
                                                             new Vector3(120f, 35f), ButtonType.Click, windowTop.transform,
                                                             setCombat);
             button.GetComponent<Image>().sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/backButtonRight.png");
 
-            PowerButton button1 = PowerButtons.CreateButton("talentRank", Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/stats/iconTalent.png"),
+            PowerButton button1 = PowerButtons.CreateButton("talentRank", Resources.Load<Sprite>("ui/Icons/iconTalent"),
                                                             "天资榜",
                                                             "",
                                                             new Vector3(-120f, 35f), ButtonType.Click, windowTop.transform,
@@ -417,7 +417,7 @@ namespace Cultivation_Way
             gameObject.transform.SetParent(parent.transform);
 
             Image image = gameObject.AddComponent<Image>();
-            image.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/stats/iconLevels.png");
+            image.sprite = Resources.Load<Sprite>("ui/Icons/iconLevels");
             image.transform.localScale = new Vector3(0.07f, 0.58f);
 
             GameObject gameObject2 = new GameObject("actorLevelText");
@@ -450,7 +450,7 @@ namespace Cultivation_Way
             gameObject.transform.SetParent(parent.transform);
 
             Image image = gameObject.AddComponent<Image>();
-            image.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/stats/iconHealth.png");
+            image.sprite = Resources.Load<Sprite>("ui/Icons/iconHealth");
             image.transform.localScale = new Vector3(0.07f, 0.58f);
 
             GameObject gameObject2 = new GameObject("actorHealthText");
@@ -476,7 +476,7 @@ namespace Cultivation_Way
             gameObject.transform.SetParent(parent.transform);
 
             Image image = gameObject.AddComponent<Image>();
-            image.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/stats/iconDamage.png");
+            image.sprite = Resources.Load<Sprite>("ui/Icons/iconDamage");
             image.transform.localScale = new Vector3(0.07f, 0.58f);
 
             GameObject gameObject2 = new GameObject("actorHealthText");

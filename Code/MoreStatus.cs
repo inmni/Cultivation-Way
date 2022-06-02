@@ -46,7 +46,7 @@ namespace Cultivation_Way
         /// 元素
         /// </summary>
         public int[] element = { 0, 0, 0, 0, 0 };
-
+        
 
     }
 }

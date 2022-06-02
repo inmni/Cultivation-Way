@@ -140,11 +140,6 @@ namespace Cultivation_Way
             item.Add("cultisystem");
             value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).name);
             item.Add("realm");
-            int realm = data.level;
-            if (realm > 10)
-            {
-                realm = (realm + 9) / 10 + 9;
-            }
             value.Add(Config.selectedUnit.getRealmName());
 
             item.Add("magic");

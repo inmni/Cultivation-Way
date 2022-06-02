@@ -43,7 +43,7 @@ namespace Cultivation_Way
                 {
                     newBuilding.upgradeTo = humanBuilding.upgradeTo.Replace("human", race);
                 }
-                loadSprites(newBuilding);
+                loadSprites(newBuilding,string.Empty,humanBuilding.sprite_path);
             }
         }
         private void clone(string race, string from = "human")
@@ -64,13 +64,26 @@ namespace Cultivation_Way
                 {
                     newBuilding.upgradeTo = building.upgradeTo.Replace(from, race);
                 }
-                loadNormalSprites(newBuilding, building.id);
+                loadSprites(newBuilding, building.id, building.sprite_path);
+                MonoBehaviour.print(building.id);
             }
 
         }
-        private void loadNormalSprites(BuildingAsset pTemplate, string normalID)
+        private void loadSprites(BuildingAsset pTemplate, string normalID,string sprite_path = "")
         {
-            Sprite[] array = Resources.LoadAll<Sprite>("buildings/" + normalID);
+            string path = sprite_path;
+            if (sprite_path == string.Empty)
+            {
+                if (normalID == string.Empty)
+                {
+                    path = "buildings/" + pTemplate.id;
+                }
+                else
+                {
+                    path = "buildings/" + normalID;
+                }
+            }
+            Sprite[] array = SpriteTextureLoader.getSpriteList(path);
             pTemplate.sprites = new BuildingSprites();
             foreach (Sprite sprite in array)
             {
@@ -131,70 +144,6 @@ namespace Cultivation_Way
                 buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
             }
         }
-        private void loadSprites(BuildingAsset pTemplate)
-        {
-            string folder = pTemplate.race;
-            if (folder == string.Empty)
-            {
-                folder = "Others";
-            }
-            folder = folder + "/" + pTemplate.id.Replace("_" + pTemplate.race, "");
-            Sprite[] array = ResourcesHelper.loadAllSprite("buildings/" + folder, 0.5f);
-
-            pTemplate.sprites = new BuildingSprites();
-            foreach (Sprite sprite in array)
-            {
-                string[] array2 = sprite.name.Split(new char[] { '_' });
-                string text = array2[0];
-                int num = int.Parse(array2[1]);
-
-                if (array2.Length == 3)
-                {
-                    int.Parse(array2[2]);
-                }
-                while (pTemplate.sprites.animationData.Count < num + 1)
-                {
-                    pTemplate.sprites.animationData.Add(null);
-                }
-                if (pTemplate.sprites.animationData[num] == null)
-                {
-                    pTemplate.sprites.animationData[num] = new BuildingAnimationDataNew();
-                }
-                BuildingAnimationDataNew buildingAnimationDataNew = pTemplate.sprites.animationData[num];
-                if (text.Equals("main"))
-                {
-                    buildingAnimationDataNew.list_main.Add(sprite);
-                    if (buildingAnimationDataNew.list_main.Count > 1)
-                    {
-                        buildingAnimationDataNew.animated = true;
-                    }
-                }
-                else if (text.Equals("ruin"))
-                {
-                    buildingAnimationDataNew.list_ruins.Add(sprite);
-                }
-                else if (text.Equals("shadow"))
-                {
-                    //buildingAnimationDataNew.list_shadows.Add(sprite);
-                }
-                else if (text.Equals("special"))
-                {
-                    buildingAnimationDataNew.list_special.Add(sprite);
-                }
-                else if (text.Equals("mini"))
-                {
-                    pTemplate.sprites.mapIcon = new BuildingMapIcon(sprite);
-                }
-            }
-            foreach (BuildingAnimationDataNew buildingAnimationDataNew2 in pTemplate.sprites.animationData)
-            {
-                buildingAnimationDataNew2.main = buildingAnimationDataNew2.list_main.ToArray();
-                buildingAnimationDataNew2.ruins = buildingAnimationDataNew2.list_ruins.ToArray();
-                //buildingAnimationDataNew2.shadows = buildingAnimationDataNew2.list_shadows.ToArray();
-                buildingAnimationDataNew2.special = buildingAnimationDataNew2.list_special.ToArray();
-            }
-        }
-
         private void loadCircumvallationSprites(string race,int level)
         {
             string folder;
@@ -202,9 +151,9 @@ namespace Cultivation_Way
             for (int i =0;i<CircumvallationParts.Length;i++)
             {
                 part = CircumvallationParts[i];
-                BuildingAsset pTemplate = AssetManager.buildings.get($"Circumvallation_{part}_{level}_{race}");
-                folder =$"{race}/{level}Circumvallation/{part}";
-                Sprite[] array = ResourcesHelper.loadAllSprite("buildings/" + folder, 0.5f+xOffsets[i],yOffsets[i]);
+                BuildingAsset pTemplate = AssetManager.buildings.get($"{level}Circumvallation_{part}_{race}");
+                folder =$"{level}Circumvallation_{race}/{part}";
+                Sprite[] array = SpriteTextureLoader.getSpriteList("buildings/" + folder);
 
                 pTemplate.sprites = new BuildingSprites();
                 foreach (Sprite sprite in array)
@@ -272,7 +221,7 @@ namespace Cultivation_Way
             Tian1.tech = "building_barracks";
             Tian1.fundament = new BuildingFundament(3, 3, 4, 0);
             Tian1.cost = new ConstructionCost(20, 30, 50, 100);
-            Tian1.type = "barracks";
+            Tian1.type = "newBarracks";
             Tian1.race = "Tian";
             Tian1.canBePlacedOnLiquid = false;
             Tian1.ignoreBuildings = false;
@@ -282,21 +231,23 @@ namespace Cultivation_Way
             Tian1.spawnUnits = true;
             Tian1.spawnUnits_asset = "summonTian2";
             Tian1.shadow = false;
-            loadSprites(Tian1);
+            loadSprites(Tian1,string.Empty);
             AssetManager.race_build_orders.get("Tian").addBuilding("Barrack1_Tian", 0, 2, 50, 10, false, false, 0);
 
             addCircumvallation();
         }
         private void addCircumvallation()
         {
-            AssetManager.buildings.add(new BuildingAsset
+            BuildingAsset b = AssetManager.buildings.add(new BuildingAsset
             {
-                id = "Circumvallation_vert_1_EasternHuman",
+                id = "1Circumvallation_vert_EasternHuman",
                 tech = "Circumvallation_1",
                 race = "EasternHuman",
                 priority = 10000,
+                buildingType=BuildingType.None,
                 cost = new ConstructionCost(0, 0, 0, 0),
-                fundament = new BuildingFundament(0, 0, 0, 0),
+                fundament = new BuildingFundament(0, 0, 0,0),
+                cityBuilding = true,
                 canBeAbandoned = false,
                 canBeDamagedByTornado = false,
                 canBeLivingHouse = false,
@@ -310,13 +261,15 @@ namespace Cultivation_Way
                 burnable = false,
                 shadow = false
             });
-            AssetManager.buildings.clone("Circumvallation_hori_1_EasternHuman", "Circumvallation_vert_1_EasternHuman");
-            AssetManager.buildings.clone("Circumvallation_node1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0, 1, 1, 0);
-            AssetManager.buildings.clone("Circumvallation_node2_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0, 1, 1, 0);
-            AssetManager.buildings.clone("Circumvallation_vertGate1_1_EasternHuman", "Circumvallation_vert_1_EasternHuman").fundament = new BuildingFundament(0,1,0,3);
-            AssetManager.buildings.clone("Circumvallation_vertGate2_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman");
-            AssetManager.buildings.clone("Circumvallation_horiGate1_1_EasternHuman", "Circumvallation_vertGate1_1_EasternHuman").fundament = new BuildingFundament(0, 3, 1, 0);
-            AssetManager.buildings.clone("Circumvallation_horiGate2_1_EasternHuman", "Circumvallation_horiGate1_1_EasternHuman");
+            b.baseStats.health = 1000;
+            b.baseStats.armor = 90;
+            AssetManager.buildings.clone("1Circumvallation_hori_EasternHuman", "1Circumvallation_vert_EasternHuman");
+            AssetManager.buildings.clone("1Circumvallation_node1_EasternHuman", "1Circumvallation_vert_EasternHuman").fundament = new BuildingFundament(0, 1, 1, 0);
+            AssetManager.buildings.clone("1Circumvallation_node2_EasternHuman", "1Circumvallation_vert_EasternHuman").fundament = new BuildingFundament(0, 1, 1, 0);
+            AssetManager.buildings.clone("1Circumvallation_vertGate1_EasternHuman", "1Circumvallation_vert_EasternHuman").fundament = new BuildingFundament(0,1,0,3);
+            AssetManager.buildings.clone("1Circumvallation_vertGate2_EasternHuman", "1Circumvallation_vertGate1_EasternHuman");
+            AssetManager.buildings.clone("1Circumvallation_horiGate1_EasternHuman", "1Circumvallation_vertGate1_EasternHuman").fundament = new BuildingFundament(0, 3, 1, 0);
+            AssetManager.buildings.clone("1Circumvallation_horiGate2_EasternHuman", "1Circumvallation_horiGate1_EasternHuman");
             loadCircumvallationSprites("EasternHuman", 1);
         }
         private void setSpecial()
@@ -326,6 +279,7 @@ namespace Cultivation_Way
             p.baseStats.targets = 10;
             p.baseStats.range = 38f;
             p.tower = true;
+            p.canBeUpgraded = false;
             p.tower_projectile = "lightning_orb";
             p.tower_projectile_amount = 1;
             p.tower_projectile_offset = 7f;
@@ -340,15 +294,23 @@ namespace Cultivation_Way
             BuildingAsset house5_EH = AssetManager.buildings.get("5house_EasternHuman");
             house5_EH.fundament = new BuildingFundament(5, 5, 7, 0);
         }
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(BuildingTweenExtension), "applyScale")]
-        public static void applyScale_Postfix(Building __instance)
+
+        #region harmony
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Building), "startDestroyBuilding")]
+        public static bool actionBeforeDestroyBuilding(Building __instance,bool pRemove)
         {
-            //if (((BuildingAsset)Reflection.GetField(typeof(Building), __instance, "stats")).id == "windmill_Tian")
-            //{
-            //    __instance.currentScale = new Vector3(0.23f, 0.23f, 0.23f);
-            //}
-        }
+            if (pRemove|| __instance.GetData().underConstruction)
+            {
+                return true;
+            }
+            WorldAction destroy_action = ExtendedBuildingStats.GetWorldAction(((ExtendedBuilding)__instance).easyStats.id);
+            if (destroy_action != null)
+            {
+                destroy_action(__instance);
+            }
+            return true;
+        } 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingTower), "checkEnemies")]
         public static bool checkEnemies_Prefix(BuildingTower __instance)
@@ -419,6 +381,10 @@ namespace Cultivation_Way
                 {
                     level = data.storage.get("gold") / 30;
                 }
+                if (level < 1)
+                {
+                    level = 1;
+                }
                 data.storage.change("gold", level * 30);
                 pActor.GetData().level = level;
                 pActor.GetData().health = int.MaxValue >> 2;
@@ -429,7 +395,8 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(MapBox),"addBuilding")]
         public static bool addBuilding_Prefix(ref Building __result,string pID, WorldTile pTile, BuildingData pData = null, bool pCheckForBuild = false, bool pSfx = false, BuildPlacingType pType = BuildPlacingType.New)
         {
-            if (pCheckForBuild && !((bool)MapBox.instance.CallMethod("canBuildFrom",pTile, AssetManager.buildings.get(pID), null, pType)))
+            BuildingAsset buildingAsset = AssetManager.buildings.get(pID);
+            if (pCheckForBuild && !((bool)MapBox.instance.CallMethod("canBuildFrom",pTile, buildingAsset, null, pType)))
             {
                 __result = null;
                 return false;
@@ -437,33 +404,38 @@ namespace Cultivation_Way
             ExtendedBuilding building = Object.Instantiate(CultivationWay.Main.instance.prefabs.ExtendedBuildingPrefab).GetComponent<ExtendedBuilding>();
             building.gameObject.SetActive(true);
             building.CallMethod("create");
-            building.CallMethod("setBuilding",pTile, AssetManager.buildings.get(pID), pData);
+            building.CallMethod("setBuilding",pTile, buildingAsset, pData);
+            
             if (pData != null)
             {
-                building.CallMethod("finishScaleTween");
-                building.setAnimData(pData.frameID);
-                building.applyAnimDataToAnimation();
-                building.gameObject.GetComponent<SpriteAnimation>().forceUpdateFrame();
+                building.loadBuilding(pData);
+                building.easyData = pData;
             }
+            else
+            {
+                building.easyData = Reflection.GetField(typeof(Building), building, "data") as BuildingData;
+            }
+            building.easyStats = buildingAsset;
+            
             building.transform.parent = Reflection.GetField(typeof(MapBox),MapBox.instance,"transformBuildings") as Transform;
-            BuildingAsset stats = Reflection.GetField(typeof(Building), building, "stats") as BuildingAsset;
-            if (stats.buildingType == BuildingType.Tree)
+            if (buildingAsset.buildingType == BuildingType.Tree)
             {
                 building.transform.parent = building.transform.parent.Find("Trees");
             }
             building.resetShadow();
             MapBox.instance.buildings.Add(building);
-            if (pSfx && stats.sfx != "none")
+            if (pSfx && buildingAsset.sfx != "none")
             {
-                Sfx.play(stats.sfx, true, -1f, -1f);
+                Sfx.play(buildingAsset.sfx, true, -1f, -1f);
             }
             if (Config.timeScale > 10f)
             {
                 building.CallMethod("finishScaleTween");
             }
             __result = building;
-
+            
             return false;
         }
+        #endregion
     }
 }

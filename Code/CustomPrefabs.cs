@@ -10,6 +10,7 @@ namespace Cultivation_Way
 {
     class CustomPrefabs
     {
+        internal Dictionary<string, GameObject> extendPrefabDict = new Dictionary<string, GameObject>();
         internal GameObject ExtendedActorPrefab = new GameObject("ExtendedActor");
         internal GameObject ExtendedBuildingPrefab = new GameObject("ExtendedBuilding");
         internal void init()

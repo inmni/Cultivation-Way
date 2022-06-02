@@ -15,14 +15,14 @@ namespace Cultivation_Way
             AssetManager.traits.add(new ActorTrait
             {
                 id = "cursed_immune",
-                path_icon = "iconPoisonImmune",
+                path_icon = "ui/Icons/iconPoisonImmune",
                 opposite = "cursed"
             });
             AssetManager.traits.get("cursed").opposite = "cursed_immune";
             addTraits.Add(AssetManager.traits.add(new ActorTrait
             {
                 id = "asylum",
-                path_icon = "iconAsylum",
+                path_icon = "ui/Icons/iconAsylum",
                 birth = 0f
             }).id);
 
@@ -30,7 +30,7 @@ namespace Cultivation_Way
             {
                 id = "realm",
                 birth = 0f,
-                path_icon = "default_1",
+                path_icon = "ui/Icons/default_1",
                 unlockedWithAchievement = true,
                 achievement_id = "Lost"
             }).id);
@@ -38,7 +38,7 @@ namespace Cultivation_Way
             {
                 id = "cultivationBook",
                 birth = 0f,
-                path_icon = "cultivationBook",
+                path_icon = "ui/Icons/iconCultivationBook",
                 unlockedWithAchievement=true,
                 achievement_id="Lost"
             }).id);
@@ -46,7 +46,7 @@ namespace Cultivation_Way
             {
                 id = "element",
                 birth = 0f,
-                path_icon = "element",
+                path_icon = "ui/Icons/iconTalent",
                 unlockedWithAchievement = true,
                 achievement_id = "Lost"
             }).id);
@@ -54,7 +54,7 @@ namespace Cultivation_Way
             {
                 id = "race",
                 birth = 0f,
-                path_icon = "human",
+                path_icon = "ui/Icons/iconEasternHuman",
                 unlockedWithAchievement = true,
                 achievement_id = "Lost"
             }).id);
@@ -65,20 +65,6 @@ namespace Cultivation_Way
         {
             if (pActor.haveTrait("cursed_immune"))
             {
-                return false;
-            }
-            return true;
-        }
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(TraitButton), "load")]
-        public static bool load_Prefix(TraitButton __instance, string pTrait)
-        {
-            if (Main.instance.MoreTraits.addTraits.Contains(pTrait))
-            {
-                ActorTrait trait = AssetManager.traits.get(pTrait);
-                Reflection.SetField(__instance, "trait_asset", trait);
-                Sprite sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/traits/" + trait.path_icon + ".png");
-                __instance.GetComponent<Image>().sprite = sprite;
                 return false;
             }
             return true;

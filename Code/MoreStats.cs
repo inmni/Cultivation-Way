@@ -120,7 +120,7 @@ namespace Cultivation_Way
         /// 减法
         /// </summary>
         /// <param name="another"></param>
-        public void deleteAnotherStats(MoreStats another)
+        public void minusAnotherStats(MoreStats another)
         {
             this.spellRange -= another.spellRange;
             this.magic -= another.magic;

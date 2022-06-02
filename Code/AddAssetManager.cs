@@ -19,16 +19,17 @@ namespace Cultivation_Way
         {
             //顺序尽量不要调整
             ChineseNameGenerator.init();
-            Main.instance.MoreItems.init();
-            Main.instance.MoreTraits.init();
-            Main.instance.MoreActors.init();
-            Main.instance.MoreGodPowers.init();
-            Main.instance.MoreRaces.init();
-            Main.instance.MoreKingdoms.init();
-            Main.instance.MoreBuildings.init();
-            Main.instance.MoreDrops.init();
-            Main.instance.MoreProjectiles.init();
-            Main.instance.MoreCityTasks.init();
+            Main.instance.moreItems.init();
+            Main.instance.moreTraits.init();
+            Main.instance.moreActors.init();
+            Main.instance.moreGodPowers.init();
+            Main.instance.moreRaces.init();
+            Main.instance.moreKingdoms.init();
+            Main.instance.moreBuildings.init();
+            Main.instance.moreDrops.init();
+            Main.instance.moreProjectiles.init();
+            Main.instance.moreCityTasks.init();
+            Main.instance.moreTopTileTypes.init();
             chineseNameGenerator = new ChineseNameLibrary();
             chineseElementLibrary = new ChineseElementLibrary();
             cultisystemLibrary = new CultisystemLibrary();
@@ -39,7 +40,7 @@ namespace Cultivation_Way
             add(cultisystemLibrary, "cultisystem");
             add(extensionSpellLibrary, "extensionSpell");
             add(specialBodyLibrary, "specialBody");
-            Main.instance.MoreCultureTech.init();//顺序不可调换
+            Main.instance.moreCultureTechs.init();//顺序不可调换
 
         }
 

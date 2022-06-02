@@ -35,7 +35,6 @@ namespace Cultivation_Way
             addKingdom1.addFriendlyTag("good");
             addKingdom1.addEnemyTag("undead");
             addKingdom1.addEnemyTag("bandits");
-            addKingdom1.civ = true;
             AssetManager.kingdoms.get("good").addFriendlyTag("Tian");
             this.newHiddenKingdom(addKingdom1);
             //临时用的国家
@@ -47,8 +46,6 @@ namespace Cultivation_Way
             addKingdom2.addFriendlyTag("good");
             addKingdom2.addEnemyTag("undead");
             addKingdom2.addEnemyTag("bandits");
-            addKingdom2.mobs = true;
-            addKingdom2.nomads = true;
             this.newHiddenKingdom(addKingdom2);
             #endregion
             #region 冥族
@@ -62,6 +59,7 @@ namespace Cultivation_Way
             undead.addEnemyTag("dwarf");
             undead.addEnemyTag("Yao");
             undead.addEnemyTag("Tian");
+            undead.addEnemyTag("EasternHuman");
             //主要国家
             KingdomAsset addKingdom3 = AssetManager.kingdoms.clone("Ming", "empty");
             addKingdom3.addTag("civ");
@@ -71,8 +69,6 @@ namespace Cultivation_Way
             addKingdom3.addFriendlyTag("neutral");
             addKingdom3.addFriendlyTag("good");
             addKingdom3.addEnemyTag("bandits");
-            addKingdom3.civ = true;
-            addKingdom3.nomads = true;
             this.newHiddenKingdom(addKingdom3);
             //临时用的国家
             KingdomAsset addKingdom4 = AssetManager.kingdoms.clone("nomads_Ming", "nomads_empty");
@@ -83,8 +79,6 @@ namespace Cultivation_Way
             addKingdom4.addFriendlyTag("neutral");
             addKingdom4.addFriendlyTag("good");
             addKingdom4.addEnemyTag("bandits");
-            addKingdom4.mobs = true;
-            addKingdom4.nomads = true;
             this.newHiddenKingdom(addKingdom4);
             #endregion
             #region 妖族
@@ -98,7 +92,6 @@ namespace Cultivation_Way
             addKingdom5.addFriendlyTag("neutral");
             addKingdom5.addFriendlyTag("good");
             addKingdom5.addEnemyTag("bandits");
-            addKingdom5.civ = true;
             AssetManager.kingdoms.get("snakes").addFriendlyTag("civ");
             this.newHiddenKingdom(addKingdom5);
             //临时用的国家
@@ -111,8 +104,6 @@ namespace Cultivation_Way
             addKingdom6.addFriendlyTag("neutral");
             addKingdom6.addFriendlyTag("good");
             addKingdom6.addEnemyTag("bandits");
-            addKingdom6.mobs = true;
-            addKingdom6.nomads = true;
             this.newHiddenKingdom(addKingdom6);
             #endregion
             #region 东方人族
@@ -124,7 +115,6 @@ namespace Cultivation_Way
             addKingdom7.addFriendlyTag("neutral");
             addKingdom7.addFriendlyTag("good");
             addKingdom7.addEnemyTag("bandits");
-            addKingdom7.civ = true;
             this.newHiddenKingdom(addKingdom7);
             //临时用的国家
             KingdomAsset addKingdom8 = AssetManager.kingdoms.clone("nomads_EasternHuman", "nomads_empty");
@@ -134,8 +124,6 @@ namespace Cultivation_Way
             addKingdom8.addFriendlyTag("neutral");
             addKingdom8.addFriendlyTag("good");
             addKingdom8.addEnemyTag("bandits");
-            addKingdom8.mobs = true;
-            addKingdom8.nomads = true;
             this.newHiddenKingdom(addKingdom8);
             #endregion
             #region BOSS
@@ -191,7 +179,7 @@ namespace Cultivation_Way
             }
             return false;
         }
-        //设置投降条件，编写错误
+        //设置投降条件
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(City), "updateCapture")]
         public static IEnumerable<CodeInstruction> updateCapture_Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -396,14 +384,6 @@ namespace Cultivation_Way
                 actors.RemoveAt(i);
                 i--;
                 actor.killHimself(true, AttackType.Other, true, true);
-                if (actor == null)
-                {
-                    MonoBehaviour.print("成功摧毁");
-                }
-                if (MapBox.instance.getActorByID(id) != null)
-                {
-                    MonoBehaviour.print("[MoreKingdoms.destroyKingdom_Postfix]未成功删除对象");
-                }
             }
             Main.instance.kingdomBindActors.Remove(pKingdom.id);
         }

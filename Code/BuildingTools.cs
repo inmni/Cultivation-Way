@@ -10,7 +10,7 @@ namespace Cultivation_Way
     {
         public static BuildingData GetData(this Building building)
         {
-            return Reflection.GetField(typeof(Building), building, "data") as BuildingData;
+            return ((ExtendedBuilding)building).easyData;
         }
     }
 }
