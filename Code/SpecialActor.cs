@@ -10,11 +10,9 @@ namespace Cultivation_Way
 {
     class SpecialActor : BaseActorComponent
     {
-        internal Actor actor;
+        internal ExtendedActor actor;
 
         internal bool created;
-
-        protected new MapBox world;
 
         internal Transform m_transform;
 
@@ -30,8 +28,6 @@ namespace Cultivation_Way
 
         private Actor actorToAttack;
 
-        private bool _justGotHit;
-
         private bool _died;
 
         private static List<SpecialActorState> possibleActions = new List<SpecialActorState>();
@@ -39,6 +35,8 @@ namespace Cultivation_Way
         private SpriteAnimation spriteAnimation;
 
         private ExtensionSpell spellPrepared;
+        private bool _justGotHit;
+
         private void Start()
         {
             this.onStart();
@@ -49,7 +47,7 @@ namespace Cultivation_Way
         }
         internal void create()
         {
-            this.actor = base.gameObject.GetComponent<Actor>();
+            this.actor = base.gameObject.GetComponent<ExtendedActor>();
             this.created = true;
             this.m_gameObject = base.gameObject;
             this.m_transform = this.m_gameObject.transform;
@@ -148,7 +146,7 @@ namespace Cultivation_Way
             {
                 this.animationDoneOnce = true;
             }
-            if (!this.actor.GetData().alive)
+            if (!this.actor.easyData.alive)
             {
                 this.actionTime = -1f;
             }
@@ -182,7 +180,7 @@ namespace Cultivation_Way
             {
                 return;
             }
-            if (!this.actor.GetData().alive)
+            if (!this.actor.easyData.alive)
             {
                 if (this.state != SpecialActorState.Death)
                 {

@@ -2,3 +2,6 @@
 
 # IDE0055: 修正格式
 dotnet_diagnostic.IDE0055.severity = silent
+
+# CS0649: 从未对字段“BaseSpellEffect.autoYZ”赋值，字段将一直保持其默认值 false
+dotnet_diagnostic.CS0649.severity = warning

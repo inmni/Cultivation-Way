@@ -38,10 +38,11 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            string realSpell = OthersHelper.getRealBaseSpell(((ExtendedActor)pUser).extendedCurStats.element);
+            ExtendedActor user = (ExtendedActor)pUser;
+            string realSpell = OthersHelper.getRealBaseSpell(user.extendedCurStats.element);
             Projectile p = Utils.OthersHelper.startProjectile(realSpell, pUser, pTarget);
-            Reflection.SetField(p, "byWho", (Actor)pUser);
-            p.setStats(((Actor)pUser).GetCurStats());
+            Reflection.SetField(p, "byWho", user);
+            p.setStats(user.easyCurStats);
             p.targetObject = pTarget;
             return true;
         }
@@ -68,16 +69,16 @@ namespace Cultivation_Way
                 return false;
             }
             Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y + 2.2f);
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, ((Actor)pUser).GetData().level / 20f);
+            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, ((ExtendedActor)pUser).easyData.level / 20f);
             float oriDamage = OthersHelper.getSpellDamage(spell, pUser, pTarget);
             //再进行伤害处理
             if (pTarget.objectType == MapObjectType.Actor)
             {
-                ((Actor)pTarget).CallMethod("getHit", oriDamage, true, AttackType.Other, pUser, true);
+                ((ExtendedActor)pTarget).CallMethod("getHit", oriDamage, true, AttackType.Other, pUser, true);
             }
             else
             {
-                ((Building)pTarget).CallMethod("getHit", oriDamage, true, AttackType.Other, pUser, true);
+                ((ExtendedBuilding)pTarget).CallMethod("getHit", oriDamage, true, AttackType.Other, pUser, true);
             }
             pTarget.currentTile.setBurned();
             return true;
@@ -138,16 +139,15 @@ namespace Cultivation_Way
             OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 10f, 0f, spell);
             Vector3 start = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y - 0.5f);
             Vector3 end = new Vector3(pTarget.currentTile.posV3.x, pTarget.currentTile.posV3.y - 0.5f);
-            float angle = OthersHelper.getAngle(start, end);
             BaseSpellEffectController baseEffectController1 = Main.instance.spellEffects.get(spell.spellAssetID);
             BaseSpellEffectController baseEffectController2 = Main.instance.spellEffects.get(spell.spellAssetID);
             BaseSpellEffectController baseEffectController3 = Main.instance.spellEffects.get(spell.spellAssetID);
             BaseSpellEffectController baseEffectController4 = Main.instance.spellEffects.get(spell.spellAssetID);
 
-            BaseSpellEffect baseEffect1 = ((baseEffectController1 != null) ? baseEffectController1.spawnAt(end, new Vector3(-0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, 135)) : null);
-            BaseSpellEffect baseEffect2 = ((baseEffectController2 != null) ? baseEffectController2.spawnAt(end, new Vector3(0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, -135)) : null);
-            BaseSpellEffect baseEffect3 = ((baseEffectController3 != null) ? baseEffectController3.spawnAt(end, new Vector3(0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, 45)) : null);
-            BaseSpellEffect baseEffect4 = ((baseEffectController4 != null) ? baseEffectController4.spawnAt(end, new Vector3(-0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, -45)) : null);
+            BaseSpellEffect baseEffect1 = baseEffectController1 != null? baseEffectController1.spawnAt(end, new Vector3(-0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, 135)) : null;
+            BaseSpellEffect baseEffect2 = baseEffectController2 != null ? baseEffectController2.spawnAt(end, new Vector3(0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, -135)) : null;
+            BaseSpellEffect baseEffect3 = baseEffectController3 != null ? baseEffectController3.spawnAt(end, new Vector3(0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, 45)) : null;
+            BaseSpellEffect baseEffect4 = baseEffectController4 != null ? baseEffectController4.spawnAt(end, new Vector3(-0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, -45)) : null;
 
             return true;
         }
@@ -173,38 +173,39 @@ namespace Cultivation_Way
         //骷髅召唤
         public static bool summonSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-            if (pUser == null || ((Actor)pUser).stats.race.Contains("summon"))
+            ExtendedActor user = (ExtendedActor)pUser;
+            if (pUser == null || user.stats.race.Contains("summon"))
             {
                 return false;
             }
-            int level = ((Actor)pUser).GetData().level;
+            int level = user.easyData.level;
             int num = (int)spell.might + level / 30;//威力取整作为召唤生物的个数
 
             for (int i = 0; i < num; i++)
             {
                 WorldTile tile = pUser.currentTile.neighboursAll.GetRandom();
                 Utils.ResourcesHelper.playSpell(spell.spellAssetID, tile.posV3, tile.posV3, 1f);
-                Actor summoned = MapBox.instance.createNewUnit(spell.spellAssetID, tile);
+                ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile);
 
                 ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
                 ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setTask("warrior_army_follow_leader");
-                summoned.GetData().profession = UnitProfession.Warrior;
+                summoned.easyData.profession = UnitProfession.Warrior;
 
                 summoned.kingdom = pUser.kingdom;
                 if (pUser.city != null)
                 {
                     pUser.city.addNewUnit(summoned);
                 }
-                if (((Actor)pUser).GetData().level > 10 - level / 11)
+                if (user.easyData.level > 10 - level / 11)
                 {
-                    summoned.GetData().level = ((Actor)pUser).GetData().level - 10 + level / 11;
+                    summoned.easyData.level = user.easyData.level - 10 + level / 11;
                 }
                 else
                 {
-                    summoned.GetData().level = 1;
+                    summoned.easyData.level = 1;
                 }
-                summoned.GetData().firstName = ((Actor)pUser).GetData().firstName + "召唤物";
-                summoned.GetData().health = ((Actor)pUser).GetCurStats().health / 3;
+                summoned.easyData.firstName = user.easyData.firstName + "召唤物";
+                summoned.easyData.health = user.GetCurStats().health / 3;
                 summoned.setStatsDirty();
             }
             return true;
@@ -212,67 +213,70 @@ namespace Cultivation_Way
         //单独召唤
         public static bool summonTianSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-            if (pUser == null || ((Actor)pUser).stats.race.Contains("summon"))
+            ExtendedActor user = (ExtendedActor)pUser;
+            if (pUser == null || user.stats.race.Contains("summon"))
             {
                 return false;
             }
             int num = (int)spell.might;//威力取整作为召唤生物的等级因素
             //设置生成位置和动画位置
-            WorldTile tile1 = pUser.currentTile;
+            WorldTile tile1 = user.currentTile;
             Vector2 pos = new Vector2(tile1.posV3.x + 3f, tile1.posV3.y + 12f);
-            Actor summoned = MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
+            
+            ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
             Reflection.SetField(summoned, "hitboxZ", 10f);
             Utils.ResourcesHelper.playSpell(spell.spellAssetID, pos, pos, 15f);
 
             ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
-            summoned.GetData().profession = UnitProfession.Warrior;
+            summoned.easyData.profession = UnitProfession.Warrior;
             summoned.kingdom = pUser.kingdom;
-            if (pUser.city != null)
+            if (user.city != null)
             {
-                pUser.city.addNewUnit(summoned);
+                user.city.addNewUnit(summoned);
             }
-            if (((Actor)pUser).GetData().level > 10 - num)
+            if (user.easyData.level > 10 - num)
             {
-                summoned.GetData().level = ((Actor)pUser).GetData().level - 10 + num;
+                summoned.easyData.level = user.easyData.level - 10 + num;
             }
             else
             {
-                summoned.GetData().level = 1;
+                summoned.easyData.level = 1;
             }
-            summoned.GetData().firstName = ((Actor)pUser).GetData().firstName + "召唤物";
-            summoned.GetData().health = ((Actor)pUser).GetCurStats().health;
+            summoned.easyData.firstName = user.easyData.firstName + "召唤物";
+            summoned.easyData.health = user.GetCurStats().health;
             summoned.setStatsDirty();
             return true;
         }
         public static bool summonTianSpell1(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-            if (pUser == null || ((Actor)pUser).stats.race.Contains("summon") || Main.instance.creatureLimit[spell.spellAssetID] <= 0)
+            ExtendedActor user = (ExtendedActor)pUser;
+            if (pUser == null || user.stats.race.Contains("summon") || ExtendedWorldData.instance.creatureLimit[spell.spellAssetID] <= 0)
             {
                 return false;
             }
-            Main.instance.creatureLimit[spell.spellAssetID]--;
+            ExtendedWorldData.instance.creatureLimit[spell.spellAssetID]--;
             //设置生成位置和动画位置
             WorldTile tile1 = pUser.currentTile;
             Vector2 pos = new Vector2(tile1.posV3.x, tile1.posV3.y);
-            Actor summoned = MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
+            ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
             ResourcesHelper.playSpell("explosion", pos, pos, 15f);
             summoned.kingdom = pUser.kingdom;
-            if (pUser.city != null)
+            if (user.city != null)
             {
-                pUser.city.addNewUnit(summoned);
+                user.city.addNewUnit(summoned);
             }
-            ((Actor)pUser).kingdom.setKing(summoned);
+            user.kingdom.setKing(summoned);
             int level = MapBox.instance.mapStats.year / 50 + 1;
             if (level > 110)
             {
                 level = 110;
             }
-            summoned.GetData().level = level;
-            summoned.GetData().health = int.MaxValue >> 2;
+            summoned.easyData.level = level;
+            summoned.easyData.health = int.MaxValue >> 2;
             #region 复制
-            Reflection.SetField(summoned, "s_personality", (PersonalityAsset)Reflection.GetField(typeof(Actor), (Actor)pUser, "s_personality"));
-            ActorTools.copyActor((Actor)pUser, summoned);
-            ((Actor)pUser).killHimself(false, AttackType.GrowUp, false, false);
+            Reflection.SetField(summoned, "s_personality", (PersonalityAsset)Reflection.GetField(typeof(Actor), user, "s_personality"));
+            ActorTools.copyActor(user, summoned);
+            user.killHimself(false, AttackType.GrowUp, false, false);
             #endregion
             summoned.setStatsDirty();
             return true;
@@ -280,18 +284,18 @@ namespace Cultivation_Way
         //法相天地
         public static bool Shengtixianhua(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
-
-            if (pUser == null || ((Actor)pUser).GetData().health < ((Actor)pUser).GetCurStats().health * 3 / 4)
+            ExtendedActor user = (ExtendedActor)pUser;
+            if (pUser == null || user.easyData.health < user.easyCurStats.health * 3 / 4)
             {
                 return false;
             }
             Vector3 start = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y + 2f);
             int time = 2;
-            SpecialBody body = ((Actor)pUser).GetSpecialBody();
+            SpecialBody body = user.GetSpecialBody();
             if (body.rank > 1)
             {
                 BaseSpellEffectController baseEffectController = Main.instance.spellEffects.get(Utils.OthersHelper.getOriginBodyID(body));
-                BaseSpellEffect baseEffect = ((baseEffectController != null) ? baseEffectController.spawnAt(start, 0.1f, true, (Actor)pUser, time, 0, 2f) : null);
+                BaseSpellEffect baseEffect = baseEffectController != null ? baseEffectController.spawnAt(start, 0.1f, true, (Actor)pUser, time, 0, 2f) : null;
             }
 
             MoreStatus moredata = ((ExtendedActor)pUser).extendedData.status;
@@ -327,9 +331,9 @@ namespace Cultivation_Way
             Vector2 pos = new Vector2(pTile.posV3.x, pTile.posV3.y - 5f);
             Utils.ResourcesHelper.playSpell("lightningPunishment", pos, pos, 8f);
             List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 6f);
-            foreach (Actor target in targets)
+            foreach (ExtendedActor target in targets)
             {
-                if (target.GetData().alive)
+                if (target.easyData.alive)
                 {
                     target.CallMethod("getHit", 300f, true, AttackType.None, null, true);
                 }
@@ -338,14 +342,15 @@ namespace Cultivation_Way
         }
         public static bool aTransformToGod(BaseSimObject pUser, WorldTile pTile = null)
         {
-            if (((Actor)pUser).GetData().level <= 10 || Toolbox.randomChance(0.15f))
+            ExtendedActor user = (ExtendedActor)pUser;
+            if (user.easyData.level <= 10 || Toolbox.randomChance(0.15f))
             {
                 return false;
             }
             string godID = "";
             foreach(string key in Main.instance.godList.Keys)
             {
-                if (Main.instance.creatureLimit[key] > 0)
+                if (ExtendedWorldData.instance.creatureLimit[key] > 0)
                 {
                     godID = key;
                     break;
@@ -355,18 +360,19 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            Main.instance.creatureLimit[godID]--;
-            Actor god = MapBox.instance.createNewUnit(godID, pTile);
-            ActorTools.copyActor((Actor)pUser, god);
+            ExtendedWorldData.instance.creatureLimit[godID]--;
+            ExtendedActor god = (ExtendedActor)MapBox.instance.createNewUnit(godID, pTile);
+            ActorTools.copyActor(user, god);
             god.kingdom = pUser.kingdom;
             god.city = pUser.city;
+            
             if (Main.instance.kingdomBindActors.ContainsKey(god.kingdom.id))
             {
                 Main.instance.kingdomBindActors[god.kingdom.id].Add(god);
             }
-            god.GetData().health = int.MaxValue >> 2;
-            god.GetData().level = ((Actor)pUser).GetData().level;
-            god.GetData().firstName = Main.instance.godList[godID];
+            god.easyData.health = int.MaxValue >> 2;
+            god.easyData.level = user.easyData.level;
+            god.easyData.firstName = Main.instance.godList[godID];
             return true;
         }
         public static bool aWaterPoleDamage(BaseSimObject pUser, WorldTile pTile = null)
@@ -380,10 +386,11 @@ namespace Cultivation_Way
                 pTile = pUser.currentTile;
             }
             List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 3f);
-            float damage = ((Actor)pUser).GetCurStats().damage * 5f;
-            foreach (Actor target in targets)
+            ExtendedActor user = (ExtendedActor)pUser;
+            float damage = user.GetCurStats().damage * 5f;
+            foreach (ExtendedActor target in targets)
             {
-                if (target.GetData().alive)
+                if (target.easyData.alive)
                 {
                     target.CallMethod("getHit", damage, true, AttackType.Other, null, true);
                 }

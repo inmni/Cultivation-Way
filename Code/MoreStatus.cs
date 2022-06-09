@@ -29,6 +29,10 @@ namespace Cultivation_Way
         /// </summary>
         public bool canCultivate = true;
         /// <summary>
+        /// 灵根
+        /// </summary>
+        public ChineseElement chineseElement = new ChineseElement();
+        /// <summary>
         /// buff效果
         /// </summary>
         public MoreStats bonusStats = new MoreStats();

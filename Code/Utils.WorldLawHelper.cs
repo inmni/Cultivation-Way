@@ -58,13 +58,19 @@ namespace Cultivation_Way.Utils
             float y = yStart + (num / 5) * yOffset;
             return new Vector2(x, y);
         }
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(WorldLaws),"init")]
         public static void initWorldLaws()
         {
+            if (MapBox.instance.worldLaws.dict == null)
+            {
+                MapBox.instance.worldLaws.dict = new Dictionary<string, PlayerOptionData>();
+            }
+            if (MapBox.instance.worldLaws.list == null)
+            {
+                MapBox.instance.worldLaws.list = new List<PlayerOptionData>();
+            }
             foreach(string id in originLaws.Keys)
             {
-                MapBox.instance.worldLaws.dict[id]= originLaws[id];
+                MapBox.instance.worldLaws.add(originLaws[id]);
                 
             }
         }

@@ -53,7 +53,7 @@ namespace Cultivation_Way
         /// <returns></returns>
         public static Family GetFamily(this Actor actor)
         {
-            return Main.instance.familys[((ExtendedActor)actor).extendedData.status.familyID];
+            return ExtendedWorldData.instance.familys[((ExtendedActor)actor).extendedData.status.familyID];
         }
         public static bool canCastSpell(this ExtendedActor actor,ExtensionSpell spell)
         {
@@ -104,12 +104,13 @@ namespace Cultivation_Way
         public static void generateNewBody(this Actor actor)
         {
             SpecialBody newBody = new SpecialBody();
+            ExtendedActor extendedActor = (ExtendedActor)actor;
             if (((ExtendedActor)actor).extendedData.status.specialBody == null || ((ExtendedActor)actor).extendedData.status.specialBody == string.Empty)
             {
                 ((ExtendedActor)actor).extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
             }
-            newBody.id = actor.GetData().actorID;
-            newBody.madeBy = actor.GetData().firstName;
+            newBody.id = extendedActor.easyData.actorID;
+            newBody.madeBy = extendedActor.easyData.firstName;
             newBody.origin = actor.GetSpecialBody().origin;
             newBody.rank = Toolbox.randomInt(1, 7);
             if (newBody.rank > actor.GetSpecialBody().rank)
@@ -127,7 +128,7 @@ namespace Cultivation_Way
         public static void learnNewSpell(this Actor actor)
         {
             ExtendedActor extendedActor = (ExtendedActor)actor;
-            ExtensionSpell[] spells= Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
+            ExtensionSpell[] spells= ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
             for(int i = 0; i < spells.Length; i++)
             {
                 if (spells[i] == null)
@@ -151,7 +152,7 @@ namespace Cultivation_Way
         /// </summary>
         /// <param name="actor"></param>
         /// <returns></returns>
-        public static bool tryTransform(this Actor actor)
+        public static bool tryTransform(this ExtendedActor actor)
         {
             if (!Main.instance.moreActors.protoAndYao.GetFirsts().Contains(actor.stats.id))
             {
@@ -165,7 +166,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            int level = actor.GetData().level;
+            int level = actor.easyData.level;
             string originRace = actor.stats.race;
             string targetRace = Main.instance.moreActors.protoAndYao.GetByFirst(originRace);
             //两个特判
@@ -189,17 +190,17 @@ namespace Cultivation_Way
                         index = 1;
                     }
                     string tmp = Main.instance.moreActors.protoAndShengs[index].GetByFirst(originRace);
-                    if (Main.instance.creatureLimit[tmp] > 0)
+                    if (ExtendedWorldData.instance.creatureLimit[tmp] > 0)
                     {
                         targetRace = tmp;
-                        Main.instance.creatureLimit[tmp]--;
+                        ExtendedWorldData.instance.creatureLimit[tmp]--;
                         level = 50;
                     }
                 }
             }
-            Actor transformTo = MapBox.instance.spawnNewUnit(targetRace, actor.currentTile, pSpawnHeight: 0f);
+            ExtendedActor transformTo = (ExtendedActor)MapBox.instance.spawnNewUnit(targetRace, actor.currentTile, pSpawnHeight: 0f);
             copyActor(actor, transformTo);
-            transformTo.GetData().level = level;
+            transformTo.easyData.level = level;
             if (level == 50)
             {
                 transformTo.tryToUnite();
@@ -211,7 +212,7 @@ namespace Cultivation_Way
         /// 尝试统一，目前仅限妖族
         /// </summary>
         /// <param name="actor"></param>
-        public static void tryToUnite(this Actor actor)
+        public static void tryToUnite(this ExtendedActor actor)
         {
             if (actor.stats.race == "Yao")
             {
@@ -229,16 +230,16 @@ namespace Cultivation_Way
                         continue;
                     }
 
-                    if (kingdom.king != null && kingdom.king != actor && kingdom.king.GetData().level >= actor.GetData().level)
+                    if (kingdom.king != null && kingdom.king != actor && ((ExtendedActor)kingdom.king).easyData.level >= actor.easyData.level)
                     {
                         unite = false;
                         break;
                     }
                     if (kingdom.getPopulationTotal() > 0)
                     {
-                        Actor tmp = kingdom.getMaxLevelActor();
+                        ExtendedActor tmp = kingdom.getMaxLevelActor();
 
-                        if (tmp != actor && tmp.GetData().level >= actor.GetData().level)
+                        if (tmp != actor && tmp.easyData.level >= actor.easyData.level)
                         {
                             unite = false;
                             break;
@@ -307,11 +308,11 @@ namespace Cultivation_Way
                     ComposeTools.composeTwo(toActor, baseSimObject);
                 }
             }
-            //MonoBehaviour.print("successfully copy " + to.GetData().actorID + "'s more...");
+            //MonoBehaviour.print("successfully copy " + to.easyData.actorID + "'s more...");
         }
-        public static int getRealm(this Actor actor)
+        public static int getRealm(this ExtendedActor actor)
         {
-            int realm = actor.GetData().level;
+            int realm = actor.easyData.level;
             if (realm > 10)
             {
                 realm = (realm + 9) / 10 + 9;
@@ -330,10 +331,10 @@ namespace Cultivation_Way
                 return realm;
             }
         }
-        public static string getRealmName(this Actor actor)
+        public static string getRealmName(this ExtendedActor actor)
         {
             int realm = actor.getRealm();
-            return LocalizedTextManager.getText(((ExtendedActor)actor).extendedData.status.cultisystem + realm);
+            return LocalizedTextManager.getText(actor.extendedData.status.cultisystem + realm);
         }
         #region updateStats所用
         /// <summary>
@@ -346,9 +347,9 @@ namespace Cultivation_Way
             MoreStats morestats = actor1.extendedCurStats;
             MoreStatus moredata = actor1.extendedData.status;
             morestats.clear();
-            int realm = actor.getRealm();
+            int realm = actor1.getRealm();
             morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[realm-1]);
-            morestats.addAnotherStats(Main.instance.familys[moredata.familyID].cultivationBook.stats[realm - 1]);
+            morestats.addAnotherStats(ExtendedWorldData.instance.familys[moredata.familyID].cultivationBook.stats[realm - 1]);
             
             morestats.addAnotherStats(moredata.bonusStats);
         }
@@ -359,9 +360,10 @@ namespace Cultivation_Way
         /// <returns></returns>
         public static void dealStatsHelper2(Actor actor)
         {
-            int maxArmor = 80 + actor.GetData().level / 6;
             ExtendedActor actor1 = (ExtendedActor)actor;
             MoreStatus moredata = actor1.extendedData.status;
+            int maxArmor = 80 + actor1.easyData.level / 6;
+            
             if (moredata.cultisystem == "bodying")
             {
                 maxArmor += 5;

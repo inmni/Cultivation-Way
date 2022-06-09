@@ -107,14 +107,14 @@ namespace Cultivation_Way
             fuRen.click_action = new PowerActionWithID((WorldTile pTile, string pPower)
                             =>
             {
-                if (Main.instance.creatureLimit[fuRen.actorStatsId] <= 0)
+                if (ExtendedWorldData.instance.creatureLimit[fuRen.actorStatsId] <= 0)
                 {
                     return false;
                 }
-                Main.instance.creatureLimit[fuRen.actorStatsId]--;
-                Actor FuRen = MapBox.instance.spawnNewUnit("FuRen", pTile, "", 3f);
-                FuRen.GetData().level = 11;
-                FuRen.GetData().health = int.MaxValue >> 2;
+                ExtendedWorldData.instance.creatureLimit[fuRen.actorStatsId]--;
+                ExtendedActor FuRen = (ExtendedActor)MapBox.instance.spawnNewUnit("FuRen", pTile, "", 3f);
+                FuRen.easyData.level = 11;
+                FuRen.easyData.health = int.MaxValue >> 2;
                 FuRen.setStatsDirty();
                 return true;
             });
@@ -133,15 +133,15 @@ namespace Cultivation_Way
             easterDragon.click_action = new PowerActionWithID((WorldTile pTile, string pPower)
                                 =>
             {
-                if (Main.instance.creatureLimit[easterDragon.actorStatsId] <= 0)
+                if (ExtendedWorldData.instance.creatureLimit[easterDragon.actorStatsId] <= 0)
                 {
                     return false;
                 }
-                Main.instance.creatureLimit[easterDragon.actorStatsId]--;
+                ExtendedWorldData.instance.creatureLimit[easterDragon.actorStatsId]--;
                 ExtendedActor actor = (ExtendedActor)MapBox.instance.spawnNewUnit("EasternDragon", pTile, "", 3f);
-                actor.GetData().firstName = "龙王";
-                actor.GetData().level = 11;
-                actor.GetData().health = int.MaxValue >> 2;
+                actor.easyData.firstName = "龙王";
+                actor.easyData.level = 11;
+                actor.easyData.health = int.MaxValue >> 2;
                 actor.extendedCurStats.element.baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
                 actor.extendedCurStats.element.setType();
                 return true;
@@ -251,13 +251,13 @@ namespace Cultivation_Way
             Nian.click_action = new PowerActionWithID((WorldTile pTile, string pPower)
                                 =>
             {
-                if (Main.instance.creatureLimit[Nian.actorStatsId] <= 0)
+                if (ExtendedWorldData.instance.creatureLimit[Nian.actorStatsId] <= 0)
                 {
                     return false;
                 }
-                Main.instance.creatureLimit[Nian.actorStatsId]--;
+                ExtendedWorldData.instance.creatureLimit[Nian.actorStatsId]--;
                 ExtendedActor actor = (ExtendedActor)MapBox.instance.spawnNewUnit("Nian", pTile, "", 3f);
-                actor.GetData().firstName = "夕";
+                actor.easyData.firstName = "夕";
                 actor.extendedCurStats.element.baseElementContainer = new int[5] { 20, 20, 20, 20, 20 };
                 actor.extendedCurStats.element.setType();
                 int level = MapBox.instance.mapStats.year / 2022 * 10 + 1;
@@ -265,8 +265,8 @@ namespace Cultivation_Way
                 {
                     level = 110;
                 }
-                actor.GetData().level = level;
-                actor.GetData().health = int.MaxValue >> 2;
+                actor.easyData.level = level;
+                actor.easyData.health = int.MaxValue >> 2;
                 WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning, true)}>年兽入侵！</color>", "iconKingslayer", pTile);
                 return true;
             });

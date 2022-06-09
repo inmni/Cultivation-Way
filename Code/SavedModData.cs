@@ -11,6 +11,8 @@ namespace Cultivation_Way
 {
     class SavedModData
     {
+        public int saveVersion;
+
         public int specialBodyLimit = 100;
 
         public Dictionary<string, int> creatureLimit = new Dictionary<string, int>();//生物数量限制
@@ -86,49 +88,47 @@ namespace Cultivation_Way
         {
             SmoothLoader.add(delegate
             {
-                foreach (string id in Main.instance.tempMoreData.Keys)
+                foreach (string id in ExtendedWorldData.instance.tempMoreData.Keys)
                 {
-                    tempMoreData[id] = Main.instance.tempMoreData[id];
+                    tempMoreData[id] = ExtendedWorldData.instance.tempMoreData[id];
                 }
-                foreach (Actor actor in MapBox.instance.units.getSimpleList())
+                foreach (ExtendedActor actor in MapBox.instance.units.getSimpleList())
                 {
-                    if(actor.GetData().alive==false || actor.stats.skipSave)
+                    if(actor.easyData.alive==false || actor.stats.skipSave)
                     {
                         continue;
                     }
-                    ExtendedActor extendedActor = (ExtendedActor)actor;
-                    extendedActor.extendedData.status.element = extendedActor.extendedCurStats.element.baseElementContainer;
-                    extendedActor.extendedData.status.compositionsID = new string[extendedActor.compositions.Count];
-                    for(int i=0;i<extendedActor.compositions.Count;i++)
+                    actor.extendedData.status.element = actor.extendedCurStats.element.baseElementContainer;
+                    actor.extendedData.status.compositionsID = new string[actor.compositions.Count];
+                    for(int i=0;i<actor.compositions.Count;i++)
                     {
-                        if (extendedActor.compositions[i].objectType == MapObjectType.Building)
+                        if (actor.compositions[i].objectType == MapObjectType.Building)
                         {
-                            extendedActor.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building),(Building)(extendedActor.compositions[i]),"data") as BuildingData).objectID;
+                            actor.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building),(Building)(actor.compositions[i]),"data") as BuildingData).objectID;
                         }
-                        else if (extendedActor.compositions[i].objectType == MapObjectType.Actor)
+                        else if (actor.compositions[i].objectType == MapObjectType.Actor)
                         {
-                            extendedActor.extendedData.status.compositionsID[i] = ((Actor)(extendedActor.compositions[i])).GetData().actorID;
+                            actor.extendedData.status.compositionsID[i] = ((ExtendedActor)(actor.compositions[i])).easyData.actorID;
                         }
                     }
-                    moreActorData.Add(extendedActor.extendedData);
+                    moreActorData.Add(actor.extendedData);
                 }
-                foreach (Building building in MapBox.instance.buildings.getSimpleList())
+                foreach (ExtendedBuilding building in MapBox.instance.buildings.getSimpleList())
                 {
-                    ExtendedBuilding extendedBuilding = (ExtendedBuilding)building;
-                    extendedBuilding.extendedData.status.element = extendedBuilding.extendedCurStats.element.baseElementContainer;
-                    extendedBuilding.extendedData.status.compositionsID = new string[extendedBuilding.compositions.Count];
-                    for (int i = 0; i < extendedBuilding.compositions.Count; i++)
+                    building.extendedData.status.element = building.extendedCurStats.element.baseElementContainer;
+                    building.extendedData.status.compositionsID = new string[building.compositions.Count];
+                    for (int i = 0; i < building.compositions.Count; i++)
                     {
-                        if (extendedBuilding.compositions[i].objectType == MapObjectType.Building)
+                        if (building.compositions[i].objectType == MapObjectType.Building)
                         {
-                            extendedBuilding.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building), (Building)(extendedBuilding.compositions[i]), "data") as BuildingData).objectID;
+                            building.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building), (Building)(building.compositions[i]), "data") as BuildingData).objectID;
                         }
-                        else if (extendedBuilding.compositions[i].objectType == MapObjectType.Actor)
+                        else if (building.compositions[i].objectType == MapObjectType.Actor)
                         {
-                            extendedBuilding.extendedData.status.compositionsID[i] = ((Actor)(extendedBuilding.compositions[i])).GetData().actorID;
+                            building.extendedData.status.compositionsID[i] = ((ExtendedActor)(building.compositions[i])).easyData.actorID;
                         }
                     }
-                    moreBuildingData.Add(extendedBuilding.extendedData);
+                    moreBuildingData.Add(building.extendedData);
                 }
             }, "Prepare Mod Data(2/3): Prepare units and buildings data", false);
             SmoothLoader.add(delegate
@@ -136,9 +136,9 @@ namespace Cultivation_Way
                 foreach (string kingdomID in Main.instance.kingdomBindActors.Keys)
                 {
                     kingdomBindActors[kingdomID] = new List<string>();
-                    foreach (Actor actor in Main.instance.kingdomBindActors[kingdomID])
+                    foreach (ExtendedActor actor in Main.instance.kingdomBindActors[kingdomID])
                     {
-                        kingdomBindActors[kingdomID].Add(actor.GetData().actorID);
+                        kingdomBindActors[kingdomID].Add(actor.easyData.actorID);
                     }
                 }
             }, "Prepare Mod Data(2/3): Prepare kingdoms data", false);

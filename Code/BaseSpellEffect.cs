@@ -36,15 +36,7 @@ namespace Cultivation_Way
         internal BaseSpellEffectController controller;
         internal SpriteAnimation spriteAnimation;
 
-        internal MapObjectShadow shadow;
-
-        internal Vector3 lastShadowPos;
-
-        internal Vector3 lastShadowScale;
-
         internal bool active;
-
-        internal bool autoYZ;//是否自动设置高度
 
         internal int state;
 
@@ -63,6 +55,8 @@ namespace Cultivation_Way
         internal BaseCallback callback;
 
         internal int callbackOnFrame = -1;
+        private bool autoYZ;
+
         private void Awake()
         {
             this.spriteRenderer = base.GetComponent<SpriteRenderer>();

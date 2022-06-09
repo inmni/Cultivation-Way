@@ -9,14 +9,6 @@ namespace Cultivation_Way
     class BaseSpellEffectController : MonoBehaviour
     {
 
-        public WorldTile currentTile;
-
-        public Vector3 zPosition;
-
-        public Vector2 currentPosition;
-
-        public Vector3 currentScale;
-
         public Transform prefab;//动画模板
 
         public float timer_interval = 1f;//播放间隔

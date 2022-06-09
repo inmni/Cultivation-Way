@@ -42,10 +42,10 @@ namespace Cultivation_Way
                 switch (Main.instance.addMapMode)
                 {
                     case "map_reki_zones":
-                        for (int i = 0; i < Main.instance.chunks.Count; i++)
+                        for (int i = 0; i < ExtendedWorldData.instance.chunks.Count; i++)
                         {
-                            MapChunk chunk = Main.instance.chunks[i];
-                            Color32 color = Utils.OthersHelper.GetColor32ByElement(Main.instance.chunkToElement[chunk.id]);
+                            MapChunk chunk = ExtendedWorldData.instance.chunks[i];
+                            Color32 color = Utils.OthersHelper.GetColor32ByElement(ExtendedWorldData.instance.chunkToElement[chunk.id]);
                             __instance.colorModeElement(chunk.zone, color);
                         }
                         Reflection.SetField(__instance, "_dirty", true);

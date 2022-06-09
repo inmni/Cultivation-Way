@@ -17,7 +17,7 @@ namespace Cultivation_Way
             this.punishStats = punishStats;
             this.leftTime = leftTime;
             this.punishTime = punishTime;
-            Main.instance.bonusStatsManagers.Add(this);
+            ExtendedWorldData.instance.bonusStatsManagers.Add(this);
         }
         public void update()
         {

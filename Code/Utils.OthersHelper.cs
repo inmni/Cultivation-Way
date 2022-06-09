@@ -198,44 +198,33 @@ namespace Cultivation_Way.Utils
         }//通过元素获取一定透明度的颜色，可能存在一定偏差
         public static float getSpellDamage(ExtensionSpell spell, BaseSimObject pUser, BaseSimObject pTarget)
         {
-
+            ExtendedActor user = (ExtendedActor)pUser;
             if (pTarget.objectType == MapObjectType.Actor)
             {
-                if (!((Actor)pTarget).GetData().alive)
+                ExtendedActor target = (ExtendedActor)pTarget;
+                if (!target.easyData.alive)
                 {
                     return 0;
                 }
-                float oriDamage = ((Actor)pUser).GetCurStats().damage * spell.might;
+                float oriDamage = user.easyCurStats.damage * spell.might;
                 float num = 0f;
                 float num1 = 0f;
-                try
+                int[] elementU = user.extendedData.status.chineseElement.baseElementContainer;
+                int[] elementT = target.extendedData.status.chineseElement.baseElementContainer;
+                int[] elementS = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).chineseElement.baseElementContainer;
+                //考虑属性克制
+                for (int i = 0; i < 5; i++)
                 {
-                    int[] elementU = ((ExtendedActor)pUser).extendedCurStats.element.baseElementContainer;
-                    int[] elementT = ((ExtendedActor)pTarget).extendedCurStats.element.baseElementContainer;
-                    int[] elementS = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).chineseElement.baseElementContainer;
-                    //考虑属性克制
-                    for (int i = 0; i < 5; i++)
-                    {
-                        num += elementU[i] * elementT[getBeOppsitedBy(i)] / 2000f;
-                        num1 += elementU[i] * (elementS[i] + elementS[getBePromotedBy(i)]) / 2000f;
-                    }
-                    return oriDamage * num * num1;
+                    num += elementU[i] * elementT[getBeOppsitedBy(i)] / 2000f;
+                    num1 += elementU[i] * (elementS[i] + elementS[getBePromotedBy(i)]) / 2000f;
                 }
-                catch (NullReferenceException e)
-                {
-                    MonoBehaviour.print("攻击方：" + ((Actor)pUser).GetData().firstName + ":" + ((ExtendedActor)pUser).extendedCurStats);
-                    MonoBehaviour.print("存活状态：" + ((Actor)pUser).GetData().alive);
-                    MonoBehaviour.print("被攻击方：" + ((Actor)pTarget).GetData().firstName + ":" + ((ExtendedActor)pTarget).extendedCurStats);
-                    MonoBehaviour.print("存活状态：" + ((Actor)pTarget).GetData().alive);
-                    MonoBehaviour.print("*******************");
-                    return 1000000f;
-                }
+                return oriDamage * num * num1;
             }
             else
             {
-                float oriDamage = ((Actor)pUser).GetCurStats().damage * spell.might;
+                float oriDamage = user.easyCurStats.damage * spell.might;
                 float num1 = 0f;
-                int[] elementU = ((ExtendedActor)pUser).extendedCurStats.element.baseElementContainer;
+                int[] elementU = user.extendedData.status.chineseElement.baseElementContainer;
                 int[] elementS = AddAssetManager.extensionSpellLibrary.get(spell.spellAssetID).chineseElement.baseElementContainer;
                 //考虑属性克制
                 for (int i = 0; i < 5; i++)
@@ -252,9 +241,9 @@ namespace Cultivation_Way.Utils
             List<WorldTile>  tiles = getTilesInRange(pTargetTile, range);
             if (spell == null)
             {
-                foreach (Actor actor in enemies)
+                foreach (ExtendedActor actor in enemies)
                 {
-                    if (actor == pUser || !actor.GetData().alive)
+                    if (actor == pUser || !actor.easyData.alive)
                     {
                         continue;
                     }
@@ -263,9 +252,9 @@ namespace Cultivation_Way.Utils
             }
             else
             {
-                foreach (Actor actor in enemies)
+                foreach (ExtendedActor actor in enemies)
                 {
-                    if (actor == pUser || !actor.GetData().alive)
+                    if (actor == pUser || !actor.easyData.alive)
                     {
                         continue;
                     }

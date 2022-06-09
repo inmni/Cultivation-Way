@@ -111,22 +111,23 @@ namespace Cultivation_Way
             //    value.Add(property.GetValue(moreStats,null).ToString());
             //}
             //Debug.Log(properties.Length);
-            ActorStatus data = Config.selectedUnit.GetData();
-            
-            MoreStatus moredata = ((ExtendedActor)Config.selectedUnit).extendedData.status;
-            MoreStats stats = ((ExtendedActor)Config.selectedUnit).extendedCurStats;
+            ExtendedActor actor = (ExtendedActor)Config.selectedUnit;
+            ActorStatus data = actor.easyData;
+            SpecialBody specialBody = actor.GetSpecialBody();
+            MoreStatus moredata = actor.extendedData.status;
+            MoreStats stats = actor.extendedCurStats;
             item.Add("family");
             value.Add(moredata.familyID + "氏");
             item.Add("cultivationBook");
-            value.Add(Main.instance.familys[moredata.familyID].cultivationBook.bookName);
+            value.Add(ExtendedWorldData.instance.familys[moredata.familyID].cultivationBook.bookName);
             item.Add("specialBody");
-            value.Add(Config.selectedUnit.GetSpecialBody().name);
+            value.Add(specialBody.name);
             item.Add("origin");
-            value.Add(Config.selectedUnit.GetSpecialBody().origin);
+            value.Add(specialBody.origin);
             item.Add("madeBy");
-            value.Add(Config.selectedUnit.GetSpecialBody().madeBy);
+            value.Add(specialBody.madeBy);
             item.Add("elementType");
-            value.Add(stats.element.name + "灵根");
+            value.Add(AddAssetManager.chineseElementLibrary.get(stats.element.id).name + "灵根");
             item.Add("elementGold");
             value.Add(stats.element.baseElementContainer[0] + "%");
             item.Add("elementWood");
@@ -140,7 +141,7 @@ namespace Cultivation_Way
             item.Add("cultisystem");
             value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).name);
             item.Add("realm");
-            value.Add(Config.selectedUnit.getRealmName());
+            value.Add(actor.getRealmName());
 
             item.Add("magic");
             value.Add(moredata.magic + "/" + stats.magic);

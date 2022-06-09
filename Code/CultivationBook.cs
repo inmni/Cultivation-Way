@@ -1,5 +1,13 @@
 ﻿namespace Cultivation_Way
 {
+    enum CultivationBookType
+    {
+        NONE,
+        GONG,
+        JUE,
+        SHU,
+        FA
+    }
     class CultivationBook
     {
 
@@ -7,10 +15,30 @@
 
         public int rank;//品级，10级一阶
 
+        private uint allowedCultiSystem;//允许修炼的修炼体系
+
+        private CultivationBookType bookType;//功法类型
+
         public ExtensionSpell[] spells;
 
         public MoreStats[] stats;//各个境界加成
 
+        public ChineseElement element;
+
+        internal CultivationBookType BookType { get => bookType;}
+        internal bool allowCultiSystem(uint cultiSystemID)
+        {
+            return (allowedCultiSystem & cultiSystemID) >0;
+        }
+        internal bool allowActor(ExtendedActor pActor)
+        {
+            return this.allowCultiSystem(AddAssetManager.cultisystemLibrary.get(pActor.extendedData.status.cultisystem).flag)
+                && ChineseElement.isMatch(pActor.extendedData.status.chineseElement, element);
+        }
+        internal float getMatchDegree(ExtendedActor pActor)
+        {
+            return 0f;
+        }
         public void levelUp()
         {
             rank++;
@@ -52,6 +80,8 @@
             spells = new ExtensionSpell[10];
 
             stats = new MoreStats[20];
+
+            
 
             for (int i = 0; i < 20; i++)
             {

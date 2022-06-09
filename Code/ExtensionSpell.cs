@@ -81,8 +81,8 @@
             }
             else if (pAttacker.objectType == MapObjectType.Actor && pTarget.objectType == MapObjectType.Actor)
             {
-                ActorStatus attackerData = ((Actor)pAttacker).GetData();
-                ActorStatus targetData = ((Actor)pTarget).GetData();
+                ActorStatus attackerData = ((ExtendedActor)pAttacker).easyData;
+                ActorStatus targetData = ((ExtendedActor)pTarget).easyData;
                 //法术反制
                 if (attackerData.level >= targetData.level && Toolbox.randomChance(0.8f))
                 {

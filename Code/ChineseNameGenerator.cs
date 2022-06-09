@@ -68,7 +68,10 @@ namespace Cultivation_Way
             this.year = MapBox.instance.mapStats.year;
             this.prepare();
             */
-
+            if (!isBeingUsed)
+            {
+                return true;
+            }
             __instance.race = pRace.id;
             __instance.list_tech_ids = new List<string>();
             __instance.id = MapBox.instance.mapStats.getNextId("culture");

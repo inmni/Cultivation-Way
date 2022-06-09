@@ -30,14 +30,14 @@ namespace Cultivation_Way
             {
                 MapBox.instance.stackEffects.CallMethod("startSpawnEffect", pTile, godPower.showSpawnEffect);
             }
-            string pStatsID = "unit_Yao";
+            string pStatsID;
             ICollection<string> t = Main.instance.moreActors.protoAndYao.GetSeconds();
             int index = Toolbox.randomInt(0, t.Count);
             pStatsID = t.ElementAt(index);
 
-            Actor Yao = MapBox.instance.spawnNewUnit(pStatsID, pTile, "", godPower.actorSpawnHeight);
-            Yao.GetData().level = 5;
-            Yao.GetData().health = int.MaxValue >> 2;
+            ExtendedActor Yao = (ExtendedActor)MapBox.instance.spawnNewUnit(pStatsID, pTile, "", godPower.actorSpawnHeight);
+            Yao.easyData.level = 5;
+            Yao.easyData.health = int.MaxValue >> 2;
 
             Yao.CallMethod("setProfession", UnitProfession.Unit);
             Yao.setStatsDirty();
@@ -46,11 +46,11 @@ namespace Cultivation_Way
         public static bool spawnSheng(WorldTile pTile, string pPowerID)
         {
             GodPower godPower = AssetManager.powers.get(pPowerID);
-            if (Main.instance.creatureLimit[godPower.actorStatsId] <= 0)
+            if (ExtendedWorldData.instance.creatureLimit[godPower.actorStatsId] <= 0)
             {
                 return false;
             }
-            Main.instance.creatureLimit[godPower.actorStatsId]--;
+            ExtendedWorldData.instance.creatureLimit[godPower.actorStatsId]--;
             Sfx.play("spawn", true, -1f, -1f);
             if (godPower.spawnSound != "")
             {
@@ -61,9 +61,9 @@ namespace Cultivation_Way
                 MapBox.instance.stackEffects.CallMethod("startSpawnEffect", pTile, godPower.showSpawnEffect);
             }
             ExtendedActor Sheng = (ExtendedActor)MapBox.instance.spawnNewUnit(godPower.actorStatsId, pTile, "", godPower.actorSpawnHeight);
-            Sheng.GetData().level = 50;
+            Sheng.easyData.level = 50;
             Sheng.extendedData.status.magic = int.MaxValue >> 2;
-            Sheng.GetData().health = int.MaxValue >> 2;
+            Sheng.easyData.health = int.MaxValue >> 2;
 
             Sheng.CallMethod("setProfession", UnitProfession.Unit);
             Sheng.setStatsDirty();
@@ -77,7 +77,7 @@ namespace Cultivation_Way
             }
             pTile = pActor.currentTile;
             ExtendedActor actor = (ExtendedActor)pActor;
-            int rank = (((Actor)pActor).GetData().level - 1) / 10;
+            int rank = (actor.easyData.level - 1) / 10;
             if (rank > 9)
             {
                 rank = 9;
@@ -102,7 +102,7 @@ namespace Cultivation_Way
                 }
                 BaseEffect lightning = ((BaseEffectController)MapBox.instance.stackEffects.CallMethod("get", "lightning")).spawnAtRandomScale(pTile, size, size);
             }
-            float damage = Toolbox.randomFloat(actor.GetData().health>>4, actor.GetData().health>>2)*rank;
+            float damage = Toolbox.randomFloat(actor.easyData.health>>4, actor.easyData.health>>2)*rank;
             int num = 0;
             for(int i = 0; i < 5; i++)
             {

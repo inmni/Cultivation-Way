@@ -130,10 +130,10 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(SaveManager),"loadActors")]
         public static bool loadActors_Prefix(SaveManager __instance,int startIndex =0,int pAmount = 0)
         {
-            Main.instance.tempMoreData = new Dictionary<string, MoreData>();
+            ExtendedWorldData.instance.tempMoreData = new Dictionary<string, MoreData>();
             foreach (string id in savedModData.tempMoreData.Keys)
             {
-                Main.instance.tempMoreData[id] = savedModData.tempMoreData[id];
+                ExtendedWorldData.instance.tempMoreData[id] = savedModData.tempMoreData[id];
             }
             savedMap = Reflection.GetField(typeof(SaveManager), __instance, "data") as SavedMap;
             int num = savedMap.actors.Count;
@@ -189,7 +189,7 @@ namespace Cultivation_Way
                 }
                 else
                 {
-                    Main.instance.tempMoreData[actorData.status.actorID] = moreActorData;
+                    ExtendedWorldData.instance.tempMoreData[actorData.status.actorID] = moreActorData;
                 }
             }
             return false;
@@ -237,8 +237,6 @@ namespace Cultivation_Way
         public static SavedMap loadModData(SavedMap pData)
         {
             Main instance = Main.instance;
-            instance.actorToData.Clear();
-            instance.actorToCurStats.Clear();
             instance.tempMoreData.Clear(); 
             instance.familys.Clear();
             AddAssetManager.specialBodyLibrary.clear();
@@ -363,9 +361,9 @@ namespace Cultivation_Way
                     }
                         int limit = savedModData.kingdomBindActors[kingdom.id].Count;
                         List<string> idList = savedModData.kingdomBindActors[kingdom.id];
-                        foreach (Actor actor in kingdom.units)
+                        foreach (ExtendedActor actor in kingdom.units)
                         {
-                            if (idList.Contains(actor.GetData().actorID))
+                            if (idList.Contains(actor.easyData.actorID))
                             {
                                 instance.kingdomBindActors[kingdom.id].Add(actor);
                                 limit--;

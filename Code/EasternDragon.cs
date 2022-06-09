@@ -11,8 +11,6 @@ namespace Cultivation_Way
 
         internal bool created;
 
-        protected new MapBox world;
-
         internal Transform m_transform;
 
         internal GameObject m_gameObject;
@@ -29,13 +27,13 @@ namespace Cultivation_Way
 
         private ExtensionSpell spellPrepared;//预备施法
 
-        private bool _justGotHit;
-
         private bool _died;
 
         private static List<EasternDragonState> possibleActions = new List<EasternDragonState>();
 
         private SpriteAnimation spriteAnimation;
+        private bool _justGotHit;
+
         private void Start()
         {
             this.onStart();
@@ -137,11 +135,11 @@ namespace Cultivation_Way
         }
         private bool shouldFly()
         {
-            return (this.actor.GetData().health < this.actor.GetCurStats().health * 4 / 5) && this.actor.GetData().alive;
+            return (this.actor.easyData.health < this.actor.GetCurStats().health * 4 / 5) && this.actor.easyData.alive;
         }
         private bool shouldLand()
         {
-            return (this.actor.currentTile.Type.ground && this.actor.GetData().health > this.actor.GetCurStats().health * 9 / 10);
+            return (this.actor.currentTile.Type.ground && this.actor.easyData.health > this.actor.GetCurStats().health * 9 / 10);
         }
         public void getHit(Actor pActor)
         {
@@ -166,7 +164,7 @@ namespace Cultivation_Way
             {
                 this.animationDoneOnce = true;
             }
-            if (!this.actor.GetData().alive)
+            if (!this.actor.easyData.alive)
             {
                 this.actionTime = -1f;
             }
@@ -231,7 +229,7 @@ namespace Cultivation_Way
             {
                 return;
             }
-            if (!this.actor.GetData().alive)
+            if (!this.actor.easyData.alive)
             {
                 if (this.state.actionState != EasternDragonState.ActionState.Death)
                 {

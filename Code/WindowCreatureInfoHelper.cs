@@ -70,7 +70,7 @@ namespace Cultivation_Way
         {//加载特质
             ExtendedActor selectedUnit = (ExtendedActor)Config.selectedUnit;
             int num = 0;
-            ActorStatus data = selectedUnit.GetData();
+            ActorStatus data = selectedUnit.easyData;
 
             int count = data.traits.Count + 4;
             loadRaceButton(selectedUnit.stats.race, num, count);
@@ -82,8 +82,8 @@ namespace Cultivation_Way
             loadCultivationBookButton(selectedUnit, num, count, data.level);
             num++;
 
-            Localization.setLocalization("trait_element", selectedUnit.extendedCurStats.element.name + "灵根");
-            Localization.setLocalization("trait_cultivationBook", Main.instance.familys[selectedUnit.extendedData.status.familyID].cultivationBook.bookName);
+            Localization.setLocalization("trait_element", AddAssetManager.chineseElementLibrary.get(selectedUnit.extendedCurStats.element.id) + "灵根");
+            Localization.setLocalization("trait_cultivationBook", ExtendedWorldData.instance.familys[selectedUnit.extendedData.status.familyID].cultivationBook.bookName);
             if (data.traits != null)
             {
                 for (int i = 0; i < data.traits.Count; i++)
@@ -141,13 +141,14 @@ namespace Cultivation_Way
             float y = -11f;
             component.anchoredPosition = new Vector2(x, y);
         }
-        internal void loadRealmButton(Actor actor, int pIndex, int pTotal, int level)
+        internal void loadRealmButton(ExtendedActor actor, int pIndex, int pTotal, int level)
         {
             //境界贴图名由路线+等级组成
             //功法贴图固定
             //灵根贴图固定
             //其他待定
-            MoreStats moreStats = ((ExtendedActor)actor).extendedCurStats;
+            
+            MoreStats moreStats = actor.extendedCurStats;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
             if (moreStats.spells.Count != 0)
@@ -163,7 +164,7 @@ namespace Cultivation_Way
 
             Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("realm"));
 
-            Sprite sprite = Resources.Load<Sprite>("ui/Icons/" + ((ExtendedActor)actor).extendedData.status.cultisystem + "_" + 1);
+            Sprite sprite = Resources.Load<Sprite>("ui/Icons/" + actor.extendedData.status.cultisystem + "_" + 1);
             traitButton.GetComponent<Image>().sprite = sprite;
             Localization.setLocalization("trait_realm", actor.getRealmName());
 
@@ -185,7 +186,7 @@ namespace Cultivation_Way
             ExtendedActor extendedActor = (ExtendedActor)actor;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
-                ExtensionSpell[] spells = Main.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
+                ExtensionSpell[] spells = ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
                 for(int i=0;i<spells.Length;i++)
                 {
                     if (spells[i] == null)
@@ -301,9 +302,9 @@ namespace Cultivation_Way
             float y = -11f;
             component.anchoredPosition = new Vector2(x, y);
         }
-        internal void updateFavoriteIconFor(Actor pUnit)
+        internal void updateFavoriteIconFor(ExtendedActor pUnit)
         {
-            if (pUnit.GetData().favorite)
+            if (pUnit.easyData.favorite)
             {
                 instance.iconFavorite.color = Color.white;
                 return;

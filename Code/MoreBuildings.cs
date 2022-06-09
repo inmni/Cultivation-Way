@@ -300,7 +300,7 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(Building), "startDestroyBuilding")]
         public static bool actionBeforeDestroyBuilding(Building __instance,bool pRemove)
         {
-            if (pRemove|| __instance.GetData().underConstruction)
+            if (pRemove|| __instance.getBuildingData().underConstruction)
             {
                 return true;
             }
@@ -386,8 +386,9 @@ namespace Cultivation_Way
                     level = 1;
                 }
                 data.storage.change("gold", level * 30);
-                pActor.GetData().level = level;
-                pActor.GetData().health = int.MaxValue >> 2;
+                ExtendedActor actor = (ExtendedActor)pActor;
+                actor.easyData.level = level;
+                actor.easyData.health = int.MaxValue >> 2;
                 pActor.setStatsDirty();
             }
         }

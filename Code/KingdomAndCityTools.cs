@@ -6,15 +6,15 @@ namespace Cultivation_Way
 {
     static class KingdomAndCityTools
     {
-        public static Actor getMaxLevelActor(this Kingdom kingdom)
+        public static ExtendedActor getMaxLevelActor(this Kingdom kingdom)
         {
-            Actor res = null;
+            ExtendedActor res = null;
             int maxLevel = 0;
-            foreach (Actor actor in kingdom.units)
+            foreach (ExtendedActor actor in kingdom.units)
             {
-                if (actor.GetData().level > maxLevel)
+                if (actor.easyData.level > maxLevel)
                 {
-                    maxLevel = actor.GetData().level;
+                    maxLevel = actor.easyData.level;
                     res = actor;
                 }
             }
@@ -40,19 +40,19 @@ namespace Cultivation_Way
             }
             return actor.stats.race != "Yao" || MapBox.instance.worldLaws.dict["YaoKingdom"].boolVal;
         }
-        public static Actor getMaxLevelActor(this City city)
+        public static ExtendedActor getMaxLevelActor(this City city)
         {
-            Actor res = null;
+            ExtendedActor res = null;
             int maxLevel = 0;
             if (city == null || city.units == null)
             {
                 return null;
             }
-            foreach (Actor actor in city.units)
+            foreach (ExtendedActor actor in city.units)
             {
-                if (actor.GetData().level > maxLevel)
+                if (actor.easyData.level > maxLevel)
                 {
-                    maxLevel = actor.GetData().level;
+                    maxLevel = actor.easyData.level;
                     res = actor;
                 }
             }
@@ -65,14 +65,14 @@ namespace Cultivation_Way
             city.CallMethod("setKingdom", pKingdom);
             city.CallMethod("switchedKingdom");
         }
-        public static Actor getRandomParent(this City city, Actor ignoreActor)
+        public static ExtendedActor getRandomParent(this City city, ExtendedActor ignoreActor)
         {
             List<Actor> list = city.units.getSimpleList();
             list.Shuffle();
             for (int i = 0; i < list.Count; i++)
             {
-                Actor actor = list[i];
-                if (actor.GetData().alive && !(actor == ignoreActor) && !actor.haveTrait("plague") && actor.GetData().age > 18 && actor.stats.procreate)
+                ExtendedActor actor = (ExtendedActor)list[i];
+                if (actor.easyData.alive && !(actor == ignoreActor) && !actor.haveTrait("plague") && actor.easyData.age > 18 && actor.stats.procreate)
                 {
                     return actor;
                 }
@@ -89,7 +89,7 @@ namespace Cultivation_Way
             {
                 return true;
             }
-            if (city.leader.GetData().level < kingdom.king.GetData().level)
+            if (((ExtendedActor)city.leader).easyData.level < ((ExtendedActor)kingdom.king).easyData.level)
             {
                 return true;
             }
@@ -98,17 +98,11 @@ namespace Cultivation_Way
         //神明加成
         public static int moreProduceMin(this City city)
         {
-            if (city.leader != null && city.leader.kingdom.raceID == "EasternHuman")
+            if (city.leader == null || city.leader.kingdom==null|| ExtendedKingdomStats.getStatus(city.leader.kingdom.id,"Hymen")==0f)
             {
-                foreach(Actor actor in Main.instance.kingdomBindActors[city.leader.kingdom.id])
-                {
-                    if (actor.stats.id == "Hymen")
-                    {
-                        return Toolbox.randomInt(1, city.status.population / 7+2);
-                    }
-                }
+                return 1;
             }
-            return 1;
+            return Toolbox.randomInt(1, city.status.population / 7 + 2);
         }
         public static int produceMore(Actor pActor,BuildingType buildingType)
         {
@@ -116,16 +110,13 @@ namespace Cultivation_Way
             {
                 return 0;
             }
-            List<Actor> gods = null;
-            if (!Main.instance.kingdomBindActors.TryGetValue(pActor.kingdom.id, out gods))
+            if(buildingType <= BuildingType.Mineral || buildingType >= BuildingType.Tree)
             {
-                return 0;
+                return (int)ExtendedKingdomStats.getStatus(pActor.kingdom.id,"MountainGod");//1
             }
-            if (gods.Exists(a => 
-                  (a.stats.id == "MountainGod"&&(buildingType<=BuildingType.Mineral||buildingType>=BuildingType.Tree))
-                ||(a.stats.id=="EarthGod"&&buildingType==BuildingType.Wheat)))
+            else if(buildingType == BuildingType.Wheat)
             {
-                return 1;
+                return (int)ExtendedKingdomStats.getStatus(pActor.kingdom.id,"EarthGod");//1
             }
             return 0;
         }
@@ -135,16 +126,7 @@ namespace Cultivation_Way
             {
                 return 5;
             }
-            List<Actor> gods = null;
-            if (!Main.instance.kingdomBindActors.TryGetValue(pActor.kingdom.id, out gods))
-            {
-                return 5;
-            }
-            if (gods.Exists(actor => actor.stats.id == "Mammon"))
-            {
-                return 8;
-            }
-            return 5;
+            return (int)ExtendedKingdomStats.getStatus(pActor.kingdom.id,"Mammon");//8
         }
         public static bool checkAchelous(ActorBase pActor)
         {
@@ -152,16 +134,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            if (pActor.city == null)
-            {
-                return false;
-            }
-            List<Actor> gods = null;
-            if (!Main.instance.kingdomBindActors.TryGetValue(pActor.kingdom.id, out gods))
-            {
-                return false;
-            }
-            return gods.Exists(actor => actor.stats.id == "Achelous");
+            return ExtendedKingdomStats.getStatus(pActor.kingdom.id,"Achelous")==0f;
         }
         public static bool checkZhongKui(Actor pActor)
         {
@@ -169,16 +142,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            if (pActor.city == null)
-            {
-                return false;
-            }
-            List<Actor> gods = null;
-            if (!Main.instance.kingdomBindActors.TryGetValue(pActor.kingdom.id, out gods))
-            {
-                return false;
-            }
-            return gods.Exists(actor => actor.stats.id == "ZhongKui");
+            return ExtendedKingdomStats.getStatus(pActor.kingdom.id,"ZhongKui")==0f;
         }
     }
 }

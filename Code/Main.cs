@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.Purchasing.MiniJSON;
 using static Config;
 using System.IO;
+//using UnityEditor;
 /*
 MonoBehaviour.print("[修真之路Cultivation Way]:测试点n");//测试用测试点格式
 
@@ -38,6 +39,8 @@ namespace CultivationWay
 
         public CustomPrefabs prefabs = new CustomPrefabs();
 
+        public ExtendedWorldData worldData = new ExtendedWorldData();
+
         public List<BonusStatsManager> bonusStatsManagers = new List<BonusStatsManager>();
 
         internal Transform transformUnits;
@@ -49,25 +52,15 @@ namespace CultivationWay
         private float controlDeltTime = 0.5f;
 
         internal int SpecialBodyLimit = 200;
+        internal Dictionary<string,ExtendedKingdomStats> kingdomStats = new Dictionary<string,ExtendedKingdomStats>();
         internal Dictionary<string, List<Actor>> kingdomBindActors = new Dictionary<string, List<Actor>>();//国家id与其绑定的生物
         internal Dictionary<string, string> godList = new Dictionary<string, string>();//神明列表及其中文名
         internal Dictionary<string, int> creatureLimit = new Dictionary<string, int>();//生物限制
-        #region 映射词典
-        public List<MapChunk> chunks = new List<MapChunk>();//方便获取区块
-
-        public Dictionary<int, ActorStatus> actorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
-
-        public Dictionary<int, BaseStats> actorToCurStats = new Dictionary<int, BaseStats>();//单位与属性映射
-
-        public Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//未生成单位的属性
-
-        public Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
-
-        public Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族映射表
-
-        public Dictionary<string, ExtendedActorStats> raceFeatures = new Dictionary<string, ExtendedActorStats>();//种族id与种族特色对照
-        #endregion
-
+        internal Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//未生成单位的属性
+        internal Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
+        internal Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族映射表
+        internal Dictionary<string, ExtendedActorStats> extendedActorStatsLibrary = new Dictionary<string, ExtendedActorStats>();//种族id与种族特色对照
+        internal List<MapChunk> chunks = new List<MapChunk>();//方便获取区块
         #region 更多玩意
         public MoreItems moreItems = new MoreItems();
         public MoreTraits moreTraits = new MoreTraits();
@@ -88,7 +81,6 @@ namespace CultivationWay
         public List<string> addRaces = new List<string>();
         public Dictionary<string, Vector2> addProjectiles = new Dictionary<string, Vector2>();
         #endregion
-
         #region 初始化n件套
         private bool initiated = false;
         void Awake()
@@ -126,6 +118,7 @@ namespace CultivationWay
                 #region 初始化
                 initWindows();//窗口
                 //sfx_MusicMan_racesAdd();
+                WorldLawHelper.initWorldLaws();
                 MoreRaces.kingdomColorsDataInit();//国家颜色数据
                 initChunkElement();//区块元素
                 moreMapModes.add();//地图显示模式
@@ -135,6 +128,7 @@ namespace CultivationWay
                 prefabs.init();//预制体初始化
                 instance.gameStatsData = Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data") as GameStatsData;
                 instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
+                //PrefabUtility.SaveAsPrefabAsset((GameObject)Resources.Load("actors/p_unit", typeof(GameObject)), "p_unit.prefab");
 
                 #endregion
             }
@@ -452,20 +446,20 @@ namespace CultivationWay
                     }
                 }
             }
-            if (MapBox.instance.worldLaws.dict["MoreDisasters"].boolVal &&MapBox.instance.mapStats.month == 2&&instance.creatureLimit["Nian"]>0&&MapBox.instance.mapStats.year%2022==0)
-            {
-                WorldTile tile = MapBox.instance.tilesList.GetRandom();
-                Actor Nian = MapBox.instance.spawnNewUnit("Nian", tile);
-                int level = MapBox.instance.mapStats.year / 2022*10 + 1;
-                if (level > 110)
-                {
-                    level = 110;
-                }
-                Nian.GetData().level = level;
-                Nian.GetData().health = int.MaxValue >> 2;
-                instance.creatureLimit["Nian"]--;
-                WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning,true)}>年兽入侵！</color>", "iconKingslayer",tile);
-            }
+            //if (MapBox.instance.worldLaws.dict["MoreDisasters"].boolVal &&MapBox.instance.mapStats.month == 2&&instance.creatureLimit["Nian"]>0&&MapBox.instance.mapStats.year%2022==0)
+            //{
+            //    WorldTile tile = MapBox.instance.tilesList.GetRandom();
+            //    Actor Nian = MapBox.instance.spawnNewUnit("Nian", tile);
+            //    int level = MapBox.instance.mapStats.year / 2022*10 + 1;
+            //    if (level > 110)
+            //    {
+            //        level = 110;
+            //    }
+            //    Nian.easyData.level = level;
+            //    Nian.easyData.health = int.MaxValue >> 2;
+            //    instance.creatureLimit["Nian"]--;
+            //    WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning,true)}>年兽入侵！</color>", "iconKingslayer",tile);
+            //}
         }
         
         #endregion

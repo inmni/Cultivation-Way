@@ -7,7 +7,6 @@ using UnityEngine;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-
 namespace Cultivation_Way
 {
     class MoreKingdoms
@@ -207,7 +206,7 @@ namespace Cultivation_Way
         {
             if (pCity.getMaxLevelActor() != null)
             {
-                if (pCity.getMaxLevelActor().GetData().level > 10)
+                if (pCity.getMaxLevelActor().easyData.level > 10)
                 {
                     return false;
                 }
@@ -223,6 +222,7 @@ namespace Cultivation_Way
             {
                 return true;
             }
+            
             pActor.CallMethod("setProfession", UnitProfession.Warrior);
             __instance.status.warriorCurrent++;
             //强制征兵，不做冷却限制，如果该单位没有装备栏
@@ -245,7 +245,7 @@ namespace Cultivation_Way
                 return false;
             }
             ExtendedActor randomParent2 = (ExtendedActor)pCity.getRandomParent(randomParent);
-            randomParent.GetData().children++;
+            randomParent.easyData.children++;
             pCity.status.housingFree--;
             CityData cityData = Reflection.GetField(typeof(City), pCity, "data") as CityData;
             if (randomParent.kingdom != null)
@@ -261,15 +261,15 @@ namespace Cultivation_Way
             actorData.status.statsID = stats.id;
             ActorBase.generateCivUnit(stats, actorData.status, AssetManager.raceLibrary.get(stats.race));
             actorData.status.generateTraits(stats, AssetManager.raceLibrary.get(stats.race));
-            actorData.status.inheritTraits(randomParent.GetData().traits);
+            actorData.status.inheritTraits(randomParent.easyData.traits);
             actorData.status.hunger = stats.maxHunger / 2;
             if (randomParent2 != null)
             {
-                actorData.status.inheritTraits(randomParent2.GetData().traits);
-                randomParent2.GetData().children++;
+                actorData.status.inheritTraits(randomParent2.easyData.traits);
+                randomParent2.easyData.children++;
             }
             actorData.status.skin = ai.ActorTool.getBabyColor(randomParent, randomParent2);
-            actorData.status.skin_set = randomParent.GetData().skin_set;
+            actorData.status.skin_set = randomParent.easyData.skin_set;
             Culture babyCulture = (Culture)Reflection.CallStaticMethod(typeof(ai.behaviours.CityBehProduceUnit), "getBabyCulture", randomParent, randomParent2);
             if (babyCulture != null)
             {
@@ -279,7 +279,7 @@ namespace Cultivation_Way
             #region 设置出生属性
             MoreData moreData = new MoreData();
             actorData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
-            Main.instance.tempMoreData[actorData.status.actorID] = moreData;
+            ExtendedWorldData.instance.tempMoreData[actorData.status.actorID] = moreData;
             moreData.status.element = new ChineseElement().baseElementContainer;
             //获取修炼体系
             if (babyCulture != null)
@@ -313,7 +313,7 @@ namespace Cultivation_Way
             {
                 moreData.status.familyID = stats.unit ? AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() : AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
             }
-            Family family = Main.instance.familys[moreData.status.familyID];
+            Family family = ExtendedWorldData.instance.familys[moreData.status.familyID];
             family.num++;
             //设置名字
             moreData.status.familyName = randomParent.extendedData.status.familyName;
@@ -353,10 +353,10 @@ namespace Cultivation_Way
                 actor.GetComponent<Baby>().timerGrow = (float)actor.stats.timeToGrow;
             }
 
-            actor.extendedData = Main.instance.tempMoreData[pData.status.actorID];
+            actor.extendedData = ExtendedWorldData.instance.tempMoreData[pData.status.actorID];
             actor.extendedCurStats.element = new ChineseElement(actor.extendedData.status.element);
 
-            Main.instance.tempMoreData.Remove(pData.status.actorID);
+            ExtendedWorldData.instance.tempMoreData.Remove(pData.status.actorID);
             pData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
             return false;
         }
@@ -372,15 +372,15 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(KingdomManager), "destroyKingdom")]
         public static void destroyKingdom_Postfix(Kingdom pKingdom)
         {
-            List<Actor> actors = null;
-            if (!Main.instance.kingdomBindActors.TryGetValue(pKingdom.id, out actors))
+            List<ExtendedActor> actors;
+            if (!ExtendedWorldData.instance.kingdomBindActors.TryGetValue(pKingdom.id, out actors))
             {
                 return;
             }
             for (int i = 0; i < actors.Count; i++)
             {
-                Actor actor = actors[i];
-                string id = actor.GetData().actorID;
+                ExtendedActor actor = actors[i];
+                string id = actor.easyData.actorID;
                 actors.RemoveAt(i);
                 i--;
                 actor.killHimself(true, AttackType.Other, true, true);

@@ -103,8 +103,8 @@ namespace Cultivation_Way
             float combat2 = 0f;
             actors.Sort((a1, a2) =>
             {
-                ActorStatus data1 = a1.GetData();
-                ActorStatus data2 = a2.GetData();
+                ActorStatus data1 = a1.easyData;
+                ActorStatus data2 = a2.easyData;
                 if (data1.level > data2.level)
                 {
                     return -1;
@@ -149,9 +149,9 @@ namespace Cultivation_Way
                 }
             });
             int index = 0;
-            foreach (Actor pActor in actors)
+            foreach (ExtendedActor pActor in actors)
             {
-                actorData = pActor.GetData();
+                actorData = pActor.easyData;
                 showElement(pActor, index);
                 index++;
                 if (index > 9)
@@ -169,8 +169,8 @@ namespace Cultivation_Way
             float combat2 = 0f;
             actors.Sort((a1, a2) =>
             {
-                ActorStatus data1 = a1.GetData();
-                ActorStatus data2 = a2.GetData();
+                ActorStatus data1 = a1.easyData;
+                ActorStatus data2 = a2.easyData;
                 if (data1.level > data2.level)
                 {
                     return -1;
@@ -215,9 +215,9 @@ namespace Cultivation_Way
                 }
             });
             int index = 0;
-            foreach (Actor pActor in actors)
+            foreach (ExtendedActor pActor in actors)
             {
-                actorData = pActor.GetData();
+                actorData = pActor.easyData;
                 if (!actorData.alive)
                 {
                     continue;
@@ -268,9 +268,9 @@ namespace Cultivation_Way
                 }
             });
             int index = 0;
-            foreach (Actor pActor in actors)
+            foreach (ExtendedActor pActor in actors)
             {
-                actorData = pActor.GetData();
+                actorData = pActor.easyData;
                 if (!actorData.alive)
                 {
                     continue;
@@ -296,16 +296,16 @@ namespace Cultivation_Way
         {
             actors.Clear();
             actors = new List<ExtendedActor>(MapBox.instance.units.Count+50);
-            foreach (Actor actor in MapBox.instance.units)
+            foreach (ExtendedActor actor in MapBox.instance.units)
             {
-                if (actor.stats.id.StartsWith("summon") || !actor.GetData().alive)
+                if (actor.stats.id.StartsWith("summon") || !actor.easyData.alive)
                 {
                     continue;
                 }
-                actors.Add((ExtendedActor)actor);
+                actors.Add(actor);
             }
         }
-        private void showElement(Actor pActor, int index)
+        private void showElement(ExtendedActor pActor, int index)
         {
             GameObject actorBackground = setBackground(index);
             setInspect(pActor, actorBackground);
@@ -409,7 +409,7 @@ namespace Cultivation_Way
             Vector2 sizeDelta = new Vector2(100f, 100f);
             setText(elemName, elemPosition, 18 * curWidth / maxWidth, fontColor, fontWrap, textStr, sizeDelta, parent);
         }
-        private void setLevel(Actor actor, GameObject parent)
+        private void setLevel(ExtendedActor actor, GameObject parent)
         {
 
             int realm = actor.getRealm();

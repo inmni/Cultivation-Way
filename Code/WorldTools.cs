@@ -13,11 +13,12 @@ namespace Cultivation_Way
         }
         public static void logUnite(Kingdom pKingdom)
         {
-            WorldLogMessage worldLogMessage = new WorldLogMessage("Yao_unite", pKingdom.name, pKingdom.king.GetData().firstName, null);
+            ExtendedActor king = (ExtendedActor)pKingdom.king;
+            WorldLogMessage worldLogMessage = new WorldLogMessage("Yao_unite", pKingdom.name, king.easyData.firstName, null);
             KingdomColor kingdomColor = Reflection.GetField(typeof(Kingdom), pKingdom, "kingdomColor") as KingdomColor;
             worldLogMessage.color_special1 = kingdomColor.colorBorderOut;
-            worldLogMessage.unit = pKingdom.king;
-            worldLogMessage.location = pKingdom.king.currentPosition;
+            worldLogMessage.unit = king;
+            worldLogMessage.location = king.currentPosition;
             worldLogMessage.kingdom = pKingdom;
             worldLogMessage.add();
         }
@@ -41,7 +42,8 @@ namespace Cultivation_Way
                     break;
                 case "Yao_unite":
                     string text = Localization.getLocalization(pMessage.text);
-                    text = text.Replace("$king$", string.Concat(new string[] { "<color=", Toolbox.colorToHex(pMessage.color_special1, true), ">", pMessage.unit.GetData().firstName, "</color>" }));
+                    ExtendedActor king = (ExtendedActor)pMessage.unit;
+                    text = text.Replace("$king$", string.Concat(new string[] { "<color=", Toolbox.colorToHex(pMessage.color_special1, true), ">", king.easyData.firstName, "</color>" }));
                     text = text.Replace("$kingdom$", string.Concat(new string[] { "<color=", Toolbox.colorToHex(pMessage.color_special1, true), ">", pMessage.kingdom.name, "</color>" }));
                     pMessage.icon = "iconKingdom";
                     __result = text;

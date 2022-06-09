@@ -65,17 +65,17 @@ namespace Cultivation_Way
             stringBuilder.Append("区块编号：" + chunk.id + "\n");
             stringBuilder.Append("x：" + chunk.x + "\n");
             stringBuilder.Append("y：" + chunk.y + "\n");
-            stringBuilder.Append("元素纯度：" + (int)(125 / Main.instance.chunkToElement[chunk.id].getImPurity() - 25) + "%\n");
+            stringBuilder.Append("元素纯度：" + (int)(125 / ExtendedWorldData.instance.chunkToElement[chunk.id].getImPurity() - 25) + "%\n");
             string[] t = new string[5] { "elementGold", "elementWood", "elementWater", "elementFire", "elementGround" };
             for (int i = 0; i < 5; i++)
             {
-                if (Main.instance.chunkToElement[chunk.id].baseElementContainer[i] > 9)
+                if (ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[i] > 9)
                 {
-                    stringBuilder.Append(Localization.getLocalization(t[i]) + "                   " + Main.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
+                    stringBuilder.Append(Localization.getLocalization(t[i]) + "                   " + ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
                 }
                 else
                 {
-                    stringBuilder.Append(Localization.getLocalization(t[i]) + "                     " + Main.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
+                    stringBuilder.Append(Localization.getLocalization(t[i]) + "                     " + ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[i] + "%\n");
                 }
             }
             return stringBuilder.ToString();

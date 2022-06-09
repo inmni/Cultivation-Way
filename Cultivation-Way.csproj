@@ -260,12 +260,15 @@
     <Compile Include="Code\CultisystemAsset.cs" />
     <Compile Include="Code\CultisystemLibrary.cs" />
     <Compile Include="Code\CultivationBook.cs" />
+    <Compile Include="Code\CultivationBookContainer.cs" />
     <Compile Include="Code\CustomPrefabs.cs" />
     <Compile Include="Code\EasternDragon.cs" />
     <Compile Include="Code\EasternDragonAsset.cs" />
     <Compile Include="Code\EasternDragonAssetContainer.cs" />
     <Compile Include="Code\EasternDragonState.cs" />
     <Compile Include="Code\ElementBaseType.cs" />
+    <Compile Include="Code\ExtendedKingdomStats.cs" />
+    <Compile Include="Code\ExtendedWorldData.cs" />
     <Compile Include="Code\MoreAiBehaviours.CityBehBuildWall.cs" />
     <Compile Include="Code\MoreAiBehaviours.BehaviourTaskCityLibrary.cs" />
     <Compile Include="Code\ExtensionSpellActionLibrary.cs" />
@@ -305,8 +308,9 @@
     <Compile Include="Code\SpecialActorState.cs" />
     <Compile Include="Code\SpecialBody.cs" />
     <Compile Include="Code\SpecialBodyLibrary.cs" />
-    <Compile Include="Code\SpellAction.cs" />
+    <Compile Include="Code\Delegates.cs" />
     <Compile Include="Code\StackSpellEffects.cs" />
+    <Compile Include="Code\Useless.cs" />
     <Compile Include="Code\Utils.OthersHelper.cs" />
     <Compile Include="Code\Utils.ResourcesHelper.cs" />
     <Compile Include="Code\Utils.TabHelper.cs" />

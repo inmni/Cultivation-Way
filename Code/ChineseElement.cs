@@ -9,10 +9,6 @@ namespace Cultivation_Way
         /// </summary>
         public int[] baseElementContainer;
         /// <summary>
-        /// 名字
-        /// </summary>
-        public string name;
-        /// <summary>
         /// 对应的id
         /// </summary>
         public string id;
@@ -52,7 +48,6 @@ namespace Cultivation_Way
             if (isAll)
             {
                 ChineseElementAsset allElement = elementLibrary.get("AllElement");
-                name = allElement.name;
                 id = allElement.id;
             }
             Tuple<string, int> maxMembership = new Tuple<string, int>("All", 100000);
@@ -73,7 +68,6 @@ namespace Cultivation_Way
                 }
             }
             ChineseElementAsset element = elementLibrary.get(maxMembership.Item1);
-            name = element.name;
             id = element.id;
         }
         /// <summary>
@@ -142,6 +136,11 @@ namespace Cultivation_Way
         public ChineseElement()
         {
             getRandom();
+        }
+
+        public static bool isMatch(ChineseElement e1,ChineseElement e2)        
+        {
+            return true;
         }
     }
 }

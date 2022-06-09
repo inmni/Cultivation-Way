@@ -126,8 +126,7 @@ namespace Cultivation_Way
             {
                 __instance.CallMethod("create");
             }
-            ProjectileAsset asset = (ProjectileAsset)Reflection.GetField(typeof(Projectile), __instance, "asset");
-            asset = AssetManager.projectiles.get(pAssetID);
+            ProjectileAsset asset = AssetManager.projectiles.get(pAssetID);
             Sprite[] _frames = (Sprite[])Reflection.GetField(typeof(ProjectileAsset), asset, "_frames");
             if (_frames == null || _frames.Length == 0)
             {
