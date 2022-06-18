@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    enum DirectionType
+    internal enum DirectionType
     {
         toUp,
         toDown,

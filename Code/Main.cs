@@ -1,19 +1,18 @@
 using Cultivation_Way;
-using Cultivation_Way.Utils;
 using Cultivation_Way.MoreAiBehaviours;
+using Cultivation_Way.Utils;
 using HarmonyLib;
 using NCMS;
 using ReflectionUtility;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Purchasing.MiniJSON;
 using static Config;
-using System.IO;
 //using UnityEditor;
 /*
 MonoBehaviour.print("[修真之路Cultivation Way]:测试点n");//测试用测试点格式
@@ -22,7 +21,7 @@ MonoBehaviour.print("[修真之路Cultivation Way]:测试点n");//测试用测�
 namespace CultivationWay
 {
     [ModEntry]
-    class Main : MonoBehaviour
+    internal class Main : MonoBehaviour
     {
         //注意：Culture.create()已在ChineseNameGenerator添加完全拦截
         //注意：智慧种族的声音未解决
@@ -48,19 +47,11 @@ namespace CultivationWay
         internal GameStatsData gameStatsData;
         internal ZoneCalculator zoneCalculator;
         public string addMapMode = "";
-        
-        private float controlDeltTime = 0.5f;
 
+        private float controlDeltTime = 0.5f;
+        private Func<MapBox,bool> canInspectWithMainTouch;
+        private Func<MapBox,bool> canInspectWithRightClick;
         internal int SpecialBodyLimit = 200;
-        internal Dictionary<string,ExtendedKingdomStats> kingdomStats = new Dictionary<string,ExtendedKingdomStats>();
-        internal Dictionary<string, List<Actor>> kingdomBindActors = new Dictionary<string, List<Actor>>();//国家id与其绑定的生物
-        internal Dictionary<string, string> godList = new Dictionary<string, string>();//神明列表及其中文名
-        internal Dictionary<string, int> creatureLimit = new Dictionary<string, int>();//生物限制
-        internal Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//未生成单位的属性
-        internal Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
-        internal Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族映射表
-        internal Dictionary<string, ExtendedActorStats> extendedActorStatsLibrary = new Dictionary<string, ExtendedActorStats>();//种族id与种族特色对照
-        internal List<MapChunk> chunks = new List<MapChunk>();//方便获取区块
         #region 更多玩意
         public MoreItems moreItems = new MoreItems();
         public MoreTraits moreTraits = new MoreTraits();
@@ -74,8 +65,11 @@ namespace CultivationWay
         public MoreCultureTech moreCultureTechs = new MoreCultureTech();
         public MoreMapModes moreMapModes = new MoreMapModes();
         public MoreWorldLaws moreWorldLaws = new MoreWorldLaws();
+        public MoreStatusEffects moreStatusEffects = new MoreStatusEffects();
         public MoreTopTileType moreTopTileTypes = new MoreTopTileType();
         public BehaviourTaskCityLibrary moreCityTasks = new BehaviourTaskCityLibrary();
+        public Dictionary<string, ExtendedActorStats> extendedActorStatsLibrary = new Dictionary<string, ExtendedActorStats>();
+        public Dictionary<string, ExtendedItemStats> extendedItemStatsLibrary = new Dictionary<string, ExtendedItemStats>();
         public List<string> addActors = new List<string>();
         public List<string> addItems = new List<string>();
         public List<string> addRaces = new List<string>();
@@ -83,12 +77,14 @@ namespace CultivationWay
         #endregion
         #region 初始化n件套
         private bool initiated = false;
-        void Awake()
+
+        private void Awake()
         {
             instance = this;
             MonoBehaviour.print("[修真之路Cultivation Way]:开始加载");
         }
-        void Start()
+
+        private void Start()
         {
             //创建按钮栏
             MorePowers.createPowerTab();
@@ -103,10 +99,10 @@ namespace CultivationWay
             //开启拦截
             patchHarmony();
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
-            spellEffects = this.transform.gameObject.AddComponent<StackSpellEffects>();
-// spellEffects.Awake();
+            spellEffects = transform.gameObject.AddComponent<StackSpellEffects>();
         }
-        void Update()
+
+        private void Update()
         {
             if (!gameLoaded)
             {
@@ -116,6 +112,8 @@ namespace CultivationWay
             {
                 initiated = true;
                 #region 初始化
+                canInspectWithMainTouch = (Func<MapBox,bool>)MapBox.instance.GetFastMethod("canInspectWithMainTouch");
+                canInspectWithRightClick = (Func<MapBox,bool>)MapBox.instance.GetFastMethod("canInspectWithRightClick");
                 initWindows();//窗口
                 //sfx_MusicMan_racesAdd();
                 WorldLawHelper.initWorldLaws();
@@ -132,7 +130,7 @@ namespace CultivationWay
 
                 #endregion
             }
-            if (instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6)
+            if (ExtendedWorldData.instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6)
             {
                 initChunkElement();
             }
@@ -143,7 +141,8 @@ namespace CultivationWay
             }
             updateControl();
         }
-        void updateControl()
+
+        private void updateControl()
         {
             if (instance.addMapMode == "")
             {
@@ -161,8 +160,8 @@ namespace CultivationWay
             {
                 return;
             }
-            if (!(bool)Reflection.GetField(typeof(MapBox), MapBox.instance, "alreadyUsedZoom") && ((bool)MapBox.instance.CallMethod("canInspectWithMainTouch") || (bool)MapBox.instance.CallMethod("canInspectWithRightClick"))
-                && ((float)Reflection.GetField(typeof(MapBox), MapBox.instance, "inspectTimerClick") < 0.2f) && !MapBox.instance.isActionHappening() && !MoveCamera.cameraDragActivated)
+            if (!MapBox.instance.GetValue<bool>("alreadyUsedZoom")&& (canInspectWithMainTouch(MapBox.instance) || canInspectWithRightClick(MapBox.instance))
+                && ((float)MapBox.instance.GetValue<float>("inspectTimerClick") < 0.2f) && !MapBox.instance.isActionHappening() && !MoveCamera.cameraDragActivated)
             {
                 WorldTile mouseTilePos = MapBox.instance.getMouseTilePos();
 
@@ -178,7 +177,8 @@ namespace CultivationWay
                 }
             }
         }
-        void patchHarmony()
+
+        private void patchHarmony()
         {
             Harmony.CreateAndPatchAll(typeof(AddAssetManager));
             MonoBehaviour.print("Create and patch all:AddAssetManager");
@@ -215,7 +215,8 @@ namespace CultivationWay
             Harmony.CreateAndPatchAll(typeof(WorldLawHelper));
             MonoBehaviour.print("Create and patch all:WorldLawHelper");
         }
-        void initWindows()
+
+        private void initWindows()
         {
             moreWorldLaws.init();
             WindowAboutThis.init();
@@ -226,35 +227,36 @@ namespace CultivationWay
         }
         public void initChunkElement()
         {
-            instance.chunkToElement.Clear();
-            instance.chunks = ((MapChunkManager)Reflection.GetField(typeof(MapBox), MapBox.instance, "mapChunkManager")).list;
-            foreach (MapChunk chunk in chunks)
+            ExtendedWorldData.instance.chunkToElement.Clear();
+            ExtendedWorldData.instance.chunks = ((MapChunkManager)Reflection.GetField(typeof(MapBox), MapBox.instance, "mapChunkManager")).list;
+            foreach (MapChunk chunk in ExtendedWorldData.instance.chunks)
             {
-                instance.chunkToElement.Add(chunk.id, new ChineseElement(new int[] { 20, 20, 20, 20, 20 }).getRandom());
+                ExtendedWorldData.instance.chunkToElement.Add(chunk.id, new ChineseElement(new int[] { 20, 20, 20, 20, 20 }).getRandom());
             }
         }
         public void createOrResetFamily()
         {
-            instance.familys.Clear();
+            ExtendedWorldData.instance.familys.Clear();
             foreach (string familyName in ChineseNameAsset.familyNameTotal)
             {
-                if (!familys.ContainsKey(familyName))
+                if (!ExtendedWorldData.instance.familys.ContainsKey(familyName))
                 {
-                    familys.Add(familyName, new Family(familyName));
+                    ExtendedWorldData.instance.familys.Add(familyName, new Family(familyName));
                 }
             }
         }
         public void resetCreatureLimit()
         {
             Dictionary<string, int> temp = new Dictionary<string, int>();
-            foreach (string id in instance.creatureLimit.Keys)
+            foreach (string id in ExtendedWorldData.instance.creatureLimit.Keys)
             {
                 temp[id] = 1;
             }
-            instance.creatureLimit.Clear();
-            instance.creatureLimit = temp;
+            ExtendedWorldData.instance.creatureLimit.Clear();
+            ExtendedWorldData.instance.creatureLimit = temp;
         }
-        void updateChunkElement()
+
+        private void updateChunkElement()
         {
             /*采用原地算法
              * 
@@ -272,43 +274,43 @@ namespace CultivationWay
             //initChunkElement();
             #endregion
             #region 更新
-            List<MapChunk> mapChunks = ((MapChunkManager)Reflection.GetField(typeof(MapBox), MapBox.instance, "mapChunkManager")).list;
-            foreach (MapChunk chunk in mapChunks)
+            foreach (MapChunk chunk in ExtendedWorldData.instance.chunks)
             {
                 for (int type = 0; type < 5; type++)
                 {
-                    instance.chunkToElement[chunk.id].baseElementContainer[type] +=
-                        instance.chunkToElement[chunk.id].baseElementContainer[type] << 10;
+                    ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[type] +=
+                        ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[type] << 10;
                 }
 
                 foreach (MapChunk neighbourChunk in chunk.neighbours)
                 {
                     for (int type = 0; type < 5; type++)
                     {
-                        instance.chunkToElement[chunk.id].baseElementContainer[type] +=
-                            (instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBePromotedBy(type)] % 1024) >> 4;
-                        instance.chunkToElement[chunk.id].baseElementContainer[type] -=
-                            (instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBeOppsitedBy(type)] % 1024) >> 4;
+                        ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[type] +=
+                            (ExtendedWorldData.instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBePromotedBy(type)] % 1024) >> 4;
+                        ExtendedWorldData.instance.chunkToElement[chunk.id].baseElementContainer[type] -=
+                            (ExtendedWorldData.instance.chunkToElement[neighbourChunk.id].baseElementContainer[OthersHelper.getBeOppsitedBy(type)] % 1024) >> 4;
                     }
                 }
             }
             #endregion
             #region 总结
-            foreach (int chunkID in instance.chunkToElement.Keys)
+            foreach (int chunkID in ExtendedWorldData.instance.chunkToElement.Keys)
             {
                 for (int i = 0; i < 5; i++)
                 {
-                    instance.chunkToElement[chunkID].baseElementContainer[i] >>= 10;
-                    if (instance.chunkToElement[chunkID].baseElementContainer[i] > 100) { instance.chunkToElement[chunkID].baseElementContainer[i] = 100; }
-                    if (instance.chunkToElement[chunkID].baseElementContainer[i] < 0) { instance.chunkToElement[chunkID].baseElementContainer[i] = 0; }
+                    ExtendedWorldData.instance.chunkToElement[chunkID].baseElementContainer[i] >>= 10;
+                    if (ExtendedWorldData.instance.chunkToElement[chunkID].baseElementContainer[i] > 100) { ExtendedWorldData.instance.chunkToElement[chunkID].baseElementContainer[i] = 100; }
+                    if (ExtendedWorldData.instance.chunkToElement[chunkID].baseElementContainer[i] < 0) { ExtendedWorldData.instance.chunkToElement[chunkID].baseElementContainer[i] = 0; }
                 }
-                instance.chunkToElement[chunkID].normalize();
+                ExtendedWorldData.instance.chunkToElement[chunkID].normalize();
             }
             #endregion
             Thread.CurrentThread.Abort();
             Thread.CurrentThread.DisableComObjectEagerCleanup();
         }
-        void clearMemory()
+
+        private void clearMemory()
         {
             //Dictionary<int, ActorStatus> TempactorToData = new Dictionary<int, ActorStatus>();//单位与单位数据映射
 
@@ -323,9 +325,9 @@ namespace CultivationWay
             //actorToCurStats = TempactorToCurStats;
             //actorToData = TempactorToData;
             Thread.CurrentThread.Abort();
-            Thread.CurrentThread.DisableComObjectEagerCleanup();      
+            Thread.CurrentThread.DisableComObjectEagerCleanup();
         }
-        
+
         #endregion
 
         #region 一些不知道放哪的拦截
@@ -344,13 +346,13 @@ namespace CultivationWay
             instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
             foreach (string key in WorldLawHelper.originLaws.Keys)
             {
-                MapBox.instance.worldLaws.dict[key]=WorldLawHelper.originLaws[key];
+                MapBox.instance.worldLaws.dict[key] = WorldLawHelper.originLaws[key];
             }
 
         }
         //语言材质加载
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(LocalizedTextManager),"setLanguage")]
+        [HarmonyPatch(typeof(LocalizedTextManager), "setLanguage")]
         public static void setLanguage_Postfix(string pLanguage)
         {
             if (pLanguage != "cz")
@@ -363,12 +365,12 @@ namespace CultivationWay
                 ChineseNameGenerator.isBeingUsed = true;
             }
             string text = ResourcesHelper.LoadTextAsset("languages/" + pLanguage + ".txt");
-            Dictionary<string, object> textDic = Json.Deserialize(text) as Dictionary<string,object>;
+            Dictionary<string, object> textDic = Json.Deserialize(text) as Dictionary<string, object>;
             Dictionary<string, string> localizedText = Reflection.GetField(typeof(LocalizedTextManager), LocalizedTextManager.instance, "localizedText") as Dictionary<string, string>;
-            foreach(string key in textDic.Keys)
+            foreach (string key in textDic.Keys)
             {
                 localizedText[key] = textDic[key] as string;
-                
+
             }
         }
         //解决控制问题
@@ -382,7 +384,7 @@ namespace CultivationWay
             }
             return true;
         }
-        
+
         //百年事件（更新灵气，清理内存，以及其他
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MapBox), "updateObjectAge")]
@@ -413,7 +415,7 @@ namespace CultivationWay
                         ExtendedActor User = (ExtendedActor)kingdom.getMaxLevelActor();
                         if (User.stats.id == "unit_Tian")
                         {
-                            foreach(ExtensionSpell spell in User.extendedCurStats.spells)
+                            foreach (ExtensionSpell spell in User.extendedCurStats.spells)
                             {
                                 if (spell.spellAssetID == "summonTian")
                                 {
@@ -461,7 +463,7 @@ namespace CultivationWay
             //    WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning,true)}>年兽入侵！</color>", "iconKingslayer",tile);
             //}
         }
-        
+
         #endregion
 
         #region 乱七八糟的初始化

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Cultivation_Way.Utils
 {
-    class OthersHelper
+    internal class OthersHelper
     {
         public delegate bool checker<T>(T key);
         private static int[][] pureElementColor = new int[5][]
@@ -94,12 +94,12 @@ namespace Cultivation_Way.Utils
                 int membership = 1;
                 for (int i = 0; i < 5; i++)
                 {
-                    membership *= Math.Abs(element.baseElementContainer[i]- idToElement[key][i]) + 1;
+                    membership *= Math.Abs(element.baseElementContainer[i] - idToElement[key][i]) + 1;
                 }
 
                 if (membership < maxMembership)
                 {
-                    maxMembership =  membership;
+                    maxMembership = membership;
                     id = key;
                 }
             }
@@ -238,7 +238,7 @@ namespace Cultivation_Way.Utils
         {
             List<Actor> enemies = getEnemyObjectInRange(pUser, pTargetTile, range);
 
-            List<WorldTile>  tiles = getTilesInRange(pTargetTile, range);
+            List<WorldTile> tiles = getTilesInRange(pTargetTile, range);
             if (spell == null)
             {
                 foreach (ExtendedActor actor in enemies)
@@ -308,7 +308,7 @@ namespace Cultivation_Way.Utils
                         continue;
                     }
                     //if (!list.Contains(actor) && (pUser.kingdom == null || actor.kingdom == null || !pUser.kingdom.isCiv()||!actor.kingdom.isCiv()||!pUser.kingdom.isNomads()||!actor.kingdom.isNomads()||pUser.kingdom.isEnemy(actor.kingdom)))
-                    if(!list.Contains(actor)&&(pUser.kingdom==null||actor.kingdom==null||pUser.kingdom.isEnemy(actor.kingdom)))
+                    if (!list.Contains(actor) && (pUser.kingdom == null || actor.kingdom == null || pUser.kingdom.isEnemy(actor.kingdom)))
                     {
                         list.Add(actor);
                     }
@@ -360,20 +360,20 @@ namespace Cultivation_Way.Utils
             //添加tile
             //WorldTile.neighbours中0-3对应left,right,down,up
             //确定方向
-            int[][] dir = new int[4][]{ 
+            int[][] dir = new int[4][]{
                 new int[2]{ 1, 3}, //右上
                 new int[2]{ 1, 2}, //右下
                 new int[2]{ 0, 3}, //左上
                 new int[2]{ 0, 2} //左下
             };
             //添加至tiles，但原点未添加，四条轴各存在一次重复，采用去重，不采用加入时判断
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 WorldTile readyToAdd = center;//水平移动用于添加
                 WorldTile yLine = center;     //竖直移动，以校准x=0
-                for(int yPos = 0; yPos < right.Count; yPos++)
+                for (int yPos = 0; yPos < right.Count; yPos++)
                 {
-                    for(int xPos = 0; xPos < right[yPos]; xPos++)
+                    for (int xPos = 0; xPos < right[yPos]; xPos++)
                     {
                         tiles.Add(readyToAdd);
                         if (readyToAdd.world_edge)
@@ -396,17 +396,17 @@ namespace Cultivation_Way.Utils
             int upLim = 1;
             int downLim = 1;
             int centerLim = 3;
-            for(int i = 0; i < tiles.Count; i++)
+            for (int i = 0; i < tiles.Count; i++)
             {
-                if(tiles[i].x == center.x && tiles[i].y == center.y && centerLim > 0)
+                if (tiles[i].x == center.x && tiles[i].y == center.y && centerLim > 0)
                 {
                     centerLim--;
                     tiles.RemoveAt(i);
                     i--;
                 }
-                else if(tiles[i].x == center.x)
+                else if (tiles[i].x == center.x)
                 {
-                    if (tiles[i].y < center.y&&downLim>0)
+                    if (tiles[i].y < center.y && downLim > 0)
                     {
                         downLim--;
                         tiles.RemoveAt(i);
@@ -419,7 +419,7 @@ namespace Cultivation_Way.Utils
                         i--;
                     }
                 }
-                else if(tiles[i].y == center.y)
+                else if (tiles[i].y == center.y)
                 {
                     if (tiles[i].x < center.x && leftLim > 0)
                     {
@@ -437,7 +437,7 @@ namespace Cultivation_Way.Utils
             }
             return tiles;
         }
-        public static Projectile startProjectile(string id, BaseSimObject pUser,BaseSimObject pTarget,float xOffset=0f,float yOffset = 0f)
+        public static Projectile startProjectile(string id, BaseSimObject pUser, BaseSimObject pTarget, float xOffset = 0f, float yOffset = 0f)
         {
             Vector3 target = new Vector3(pTarget.currentPosition.x, pTarget.currentPosition.y);
             float pZ = (float)pTarget.CallMethod("getZ");
@@ -446,7 +446,7 @@ namespace Cultivation_Way.Utils
             end.y += 0.1f;
             Vector3 start = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, end.x, end.y - 0.1f, (float)((BaseStats)Reflection.GetField(typeof(BaseSimObject), pUser, "curStats")).size, true);
             start.x += xOffset;
-            start.y += 0.5f+yOffset;
+            start.y += 0.5f + yOffset;
 
             return (Projectile)MapBox.instance.stackEffects.CallMethod("startProjectile", start, end, id, pZ);
         }
@@ -461,10 +461,11 @@ namespace Cultivation_Way.Utils
             }
         }
     }
-    class BiDictionary<TFirst, TSecond>
+
+    internal class BiDictionary<TFirst, TSecond>
     {
-        IDictionary<TFirst, TSecond> firstToSecond = new Dictionary<TFirst, TSecond>();
-        IDictionary<TSecond, TFirst> secondToFirst = new Dictionary<TSecond, TFirst>();
+        private IDictionary<TFirst, TSecond> firstToSecond = new Dictionary<TFirst, TSecond>();
+        private IDictionary<TSecond, TFirst> secondToFirst = new Dictionary<TSecond, TFirst>();
         #region 直接操作函数
         public void add(TFirst first, TSecond second)
         {
@@ -569,8 +570,9 @@ namespace Cultivation_Way.Utils
         #endregion
         public int Count
         {
-            get { 
-                return firstToSecond.Count; 
+            get
+            {
+                return firstToSecond.Count;
             }
         }
         public void Clear()
@@ -579,20 +581,21 @@ namespace Cultivation_Way.Utils
             secondToFirst.Clear();
         }
     }
-    class Matrix
+
+    internal class Matrix
     {
         public int x
         {
             get
             {
-                return this.x;
+                return x;
             }
         }
         public int y
         {
             get
             {
-                return this.y;
+                return y;
             }
         }
         public Matrix()

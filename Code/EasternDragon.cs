@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Cultivation_Way
 {
-    class EasternDragon : BaseActorComponent
+    internal class EasternDragon : BaseActorComponent
     {
 
         internal ExtendedActor actor;
@@ -36,25 +36,24 @@ namespace Cultivation_Way
 
         private void Start()
         {
-            this.onStart();
-            if (!this.created)
+            onStart();
+            if (!created)
             {
-                this.create();
+                create();
             }
         }
         internal void create()
         {
-            this.actor = (ExtendedActor)base.gameObject.GetComponent<Actor>();
-            this.created = true;
-            this.m_gameObject = base.gameObject;
-            this.m_transform = this.m_gameObject.transform;
-            this.setWorld();
-            this.spriteAnimation = base.GetComponent<SpriteAnimation>();
-            this.easternDragonAsset = getAsset();
-            this.actor.callbacks_get_hit.Add(new BaseActionActor(this.getHit));
-            
-            this.actor.setStatsDirty();
+            created = true;
+            actor = gameObject.GetComponent<ExtendedActor>();
+            m_gameObject = gameObject;
+            m_transform = m_gameObject.transform;
+            spriteAnimation = GetComponent<SpriteAnimation>();
+            easternDragonAsset = getAsset();
+            actor.callbacks_get_hit.Add(new BaseActionActor(getHit));
+            actor.setStatsDirty();
             setState(new EasternDragonState());
+            //setWorld();
         }
         //待修改
         private EasternDragonAsset getAsset()
@@ -66,16 +65,16 @@ namespace Cultivation_Way
             //MonoBehaviour.print("当前状态");
             //MonoBehaviour.print(pState.shape.ToString());
             //MonoBehaviour.print(pState.actionState.ToString());
-            this.state = pState;
-            EasternDragonAssetContainer asset = this.easternDragonAsset.getAsset(pState);
-            this.animationDoneOnce = false;
-            if (this.state.shape != EasternDragonState.Shape.Human)
+            state = pState;
+            EasternDragonAssetContainer asset = easternDragonAsset.getAsset(pState);
+            animationDoneOnce = false;
+            if (state.shape != EasternDragonState.Shape.Human)
             {
-                switch (this.state.actionState)
+                switch (state.actionState)
                 {
                     case EasternDragonState.ActionState.Move:
                         List<WorldTile> possibleTiles = Utils.OthersHelper.getTilesInRange(actor.currentTile, 5f);
-                        this.actor.moveTo(possibleTiles.GetRandom());
+                        actor.moveTo(possibleTiles.GetRandom());
                         break;
                     case EasternDragonState.ActionState.Attack:
                         setFlying(true);
@@ -84,7 +83,7 @@ namespace Cultivation_Way
 
                         break;
                     case EasternDragonState.ActionState.Death:
-                        this.spriteAnimation.looped = false;
+                        spriteAnimation.looped = false;
                         break;
                     case EasternDragonState.ActionState.Up:
 
@@ -94,14 +93,14 @@ namespace Cultivation_Way
             }
             else
             {
-                switch (this.state.actionState)
+                switch (state.actionState)
                 {
                     case EasternDragonState.ActionState.Move:
-                        List<WorldTile> possibleTiles =Utils.OthersHelper.getTilesInRange(actor.currentTile, 5f);
-                        this.actor.moveTo(possibleTiles.GetRandom());
+                        List<WorldTile> possibleTiles = Utils.OthersHelper.getTilesInRange(actor.currentTile, 5f);
+                        actor.moveTo(possibleTiles.GetRandom());
                         break;
                     case EasternDragonState.ActionState.Death:
-                        this.spriteAnimation.looped = false;
+                        spriteAnimation.looped = false;
                         break;
                     case EasternDragonState.ActionState.Landing:
                         setFlying(false);
@@ -117,33 +116,33 @@ namespace Cultivation_Way
                 }
                 spriteAnimation.CallMethod("updateFrame");
             }
-            this.spriteAnimation.timeBetweenFrames = asset.frameSpeed;
-            this.spriteAnimation.resetAnim(0);
+            spriteAnimation.timeBetweenFrames = asset.frameSpeed;
+            spriteAnimation.resetAnim(0);
         }
         private void setFlying(bool flying)
         {
-            ReflectionUtility.Reflection.SetField(this.actor, "flying", flying);
-            ReflectionUtility.Reflection.SetField(this.actor, "hitboxZ", flying ? 8f : 2f);
+            ReflectionUtility.Reflection.SetField(actor, "flying", flying);
+            ReflectionUtility.Reflection.SetField(actor, "hitboxZ", flying ? 8f : 2f);
         }
         protected override void onStart()
         {
-            this.setWorld();
+            setWorld();
         }
         internal EasternDragonState getState()
         {
-            return this.state;
+            return state;
         }
         private bool shouldFly()
         {
-            return (this.actor.easyData.health < this.actor.GetCurStats().health * 4 / 5) && this.actor.easyData.alive;
+            return (actor.easyData.health < actor.easyCurStats.health * 4 / 5) && actor.easyData.alive;
         }
         private bool shouldLand()
         {
-            return (this.actor.currentTile.Type.ground && this.actor.easyData.health > this.actor.GetCurStats().health * 9 / 10);
+            return (actor.currentTile.Type.ground && actor.easyData.health > actor.easyCurStats.health * 9 / 10);
         }
         public void getHit(Actor pActor)
         {
-            this._justGotHit = true;
+            _justGotHit = true;
             BaseSimObject target = (BaseSimObject)Reflection.GetField(typeof(Actor), pActor, "attackTarget");
             if (target == null)
             {
@@ -151,7 +150,7 @@ namespace Cultivation_Way
             }
             if (target.objectType == MapObjectType.Actor)
             {
-                this.actorToAttack = (Actor)Reflection.GetField(typeof(Actor), pActor, "attackTarget");
+                actorToAttack = (Actor)Reflection.GetField(typeof(Actor), pActor, "attackTarget");
             }
             else
             {
@@ -160,36 +159,36 @@ namespace Cultivation_Way
         }
         public override void update(float pElapsed)
         {
-            if (this.spriteAnimation.currentFrameIndex > 0)
+            if (spriteAnimation.currentFrameIndex > 0)
             {
-                this.animationDoneOnce = true;
+                animationDoneOnce = true;
             }
-            if (!this.actor.easyData.alive)
+            if (!actor.easyData.alive)
             {
-                this.actionTime = -1f;
+                actionTime = -1f;
             }
             //死亡的情况
-            if (this.state.actionState == EasternDragonState.ActionState.Death
-                && this.spriteAnimation.currentFrameIndex == this.spriteAnimation.frames.Length - 1)
+            if (state.actionState == EasternDragonState.ActionState.Death
+                && spriteAnimation.currentFrameIndex == spriteAnimation.frames.Length - 1)
             {
-                this.actor.CallMethod("updateDeadBlackAnimation");
-                if (this._died)
+                actor.CallMethod("updateDeadBlackAnimation");
+                if (_died)
                 {
                     return;
                 }
-                this._died = true;
+                _died = true;
 
                 return;
             }
             //施法的情况
-            if (this.state.actionState == EasternDragonState.ActionState.Spell
-                && this.spriteAnimation.currentFrameIndex == 11)
+            if (state.actionState == EasternDragonState.ActionState.Spell
+                && spriteAnimation.currentFrameIndex == 11)
             {
                 bool flip = (bool)Reflection.GetField(typeof(Actor), actor, "flip");
-                Projectile p = Utils.OthersHelper.startProjectile("water_orb", actor, actorToAttack,flip?23f:-23f,0f);
-                
+                Projectile p = Utils.OthersHelper.startProjectile("water_orb", actor, actorToAttack, flip ? 23f : -23f, 0f);
+
                 Reflection.SetField(p, "byWho", actor);
-                p.setStats(actor.GetCurStats());
+                p.setStats(actor.easyCurStats);
                 p.targetObject = actorToAttack;
                 if (spellPrepared != null)
                 {
@@ -198,60 +197,60 @@ namespace Cultivation_Way
                 }
             }
             //落地的高度变化
-            if(this.state.actionState == EasternDragonState.ActionState.Landing)
+            if (state.actionState == EasternDragonState.ActionState.Landing)
             {
                 float height = 2f;
-                height +=6f*this.spriteAnimation.currentFrameIndex / this.spriteAnimation.frames.Length;
-                Reflection.SetField(this.actor, "hitboxZ", 6f-height);
-                Reflection.SetField(this.actor,"_positionDirty",true);
+                height += 6f * spriteAnimation.currentFrameIndex / spriteAnimation.frames.Length;
+                Reflection.SetField(actor, "hitboxZ", 6f - height);
+                Reflection.SetField(actor, "_positionDirty", true);
             }
             //if ((bool)Reflection.GetField(typeof(Actor), this.actor, "is_moving"))
             //{
             //    return;
             //}
-            if (this.shouldLand() && this.state.shape == EasternDragonState.Shape.Dragon)
+            if (shouldLand() && state.shape == EasternDragonState.Shape.Dragon)
             {
-                this._justGotHit = false;
-                this.actionTime = -1f;
+                _justGotHit = false;
+                actionTime = -1f;
             }
-            if (this.actionTime > 0f)
+            if (actionTime > 0f)
             {
-                this.actionTime -= pElapsed;
+                actionTime -= pElapsed;
                 return;
             }
-            this.nextAction();
+            nextAction();
 
         }
         private void nextAction()
         {
             EasternDragonState newState = new EasternDragonState();
-            if (this.spriteAnimation.currentFrameIndex != 0 || !this.animationDoneOnce)
+            if (spriteAnimation.currentFrameIndex != 0 || !animationDoneOnce)
             {
                 return;
             }
-            if (!this.actor.easyData.alive)
+            if (!actor.easyData.alive)
             {
-                if (this.state.actionState != EasternDragonState.ActionState.Death)
+                if (state.actionState != EasternDragonState.ActionState.Death)
                 {
-                    this.setState(new EasternDragonState() { actionState = EasternDragonState.ActionState.Death });
+                    setState(new EasternDragonState() { actionState = EasternDragonState.ActionState.Death });
                     return;
                 }
             }
             //如果是人形态，并且血量健康，则执行原动作
-            if (this.state.shape == EasternDragonState.Shape.Human && !this.shouldFly())
+            if (state.shape == EasternDragonState.Shape.Human && !shouldFly())
             {
-                if (this.actorToAttack == null)
+                if (actorToAttack == null)
                 {
-                    this.setState(new EasternDragonState() { shape = EasternDragonState.Shape.Human, actionState = EasternDragonState.ActionState.Move });
+                    setState(new EasternDragonState() { shape = EasternDragonState.Shape.Human, actionState = EasternDragonState.ActionState.Move });
                 }
                 else
                 {
-                    this.setState(new EasternDragonState() { shape = EasternDragonState.Shape.Human, actionState = EasternDragonState.ActionState.Attack });
+                    setState(new EasternDragonState() { shape = EasternDragonState.Shape.Human, actionState = EasternDragonState.ActionState.Attack });
                 }
                 return;
             }
             //如果血量不健康，则切换为龙形态
-            else if (this.state.shape == EasternDragonState.Shape.Human)
+            else if (state.shape == EasternDragonState.Shape.Human)
             {
                 newState.shape = EasternDragonState.Shape.Dragon;
                 newState.actionState = EasternDragonState.ActionState.Up;
@@ -259,7 +258,7 @@ namespace Cultivation_Way
                 return;
             }
             //如果不是人形态（上面已经检验过了）,且血量健康，则切换为人形态
-            else if (this.shouldLand())
+            else if (shouldLand())
             {
                 newState.shape = EasternDragonState.Shape.Human;
                 newState.actionState = EasternDragonState.ActionState.Landing;
@@ -271,7 +270,7 @@ namespace Cultivation_Way
                 //return;
             }
             //如果切换龙形态完成，直接进入攻击
-            if (this.state.actionState == EasternDragonState.ActionState.Up)
+            if (state.actionState == EasternDragonState.ActionState.Up)
             {
                 newState.shape = EasternDragonState.Shape.Dragon;
                 newState.actionState = EasternDragonState.ActionState.Attack;
@@ -279,7 +278,7 @@ namespace Cultivation_Way
                 return;
             }
             //如果切换人形态完成，则暂停一段时间
-            else if (this.state.actionState == EasternDragonState.ActionState.Landing)
+            else if (state.actionState == EasternDragonState.ActionState.Landing)
             {
                 newState.shape = EasternDragonState.Shape.Human;
                 newState.actionState = EasternDragonState.ActionState.Stop;
@@ -287,10 +286,10 @@ namespace Cultivation_Way
                 return;
             }
             //如果正在攻击
-            if (this.state.actionState == EasternDragonState.ActionState.Attack)
+            if (state.actionState == EasternDragonState.ActionState.Attack)
             {
                 //如果攻击目标不存在
-                if (this.actorToAttack == null)
+                if (actorToAttack == null)
                 {
                     List<Actor> targets = Utils.OthersHelper.getEnemyObjectInRange(actor, actor.currentTile, 8f);
                     if (targets.Count == 0)
@@ -302,16 +301,16 @@ namespace Cultivation_Way
                     }
                     else
                     {
-                        this.actorToAttack = targets.GetRandom();
+                        actorToAttack = targets.GetRandom();
                     }
                 }
-                foreach (ExtensionSpell spell in this.actor.extendedCurStats.spells)
+                foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
                 {
                     if (actor.extendedData.status.magic > spell.cost && spell.leftCool == 0)
                     {
                         if (spell.GetSpellAsset().type.attacking)
                         {
-                            this.spellPrepared = spell;
+                            spellPrepared = spell;
                             break;
                         }
                     }
@@ -327,17 +326,17 @@ namespace Cultivation_Way
                 //return;
             }
             //如果施法结束
-            if (this.state.actionState == EasternDragonState.ActionState.Spell
-                && this.spriteAnimation.currentFrameIndex == this.spriteAnimation.frames.Length - 1)
+            if (state.actionState == EasternDragonState.ActionState.Spell
+                && spriteAnimation.currentFrameIndex == spriteAnimation.frames.Length - 1)
             {
                 newState.shape = EasternDragonState.Shape.Dragon;
                 newState.actionState = EasternDragonState.ActionState.Attack;
                 setState(newState);
             }
             //如果无攻击动作，则寻找攻击目标，如攻击目标不存在，则继续移动 
-            if (this.state.actionState == EasternDragonState.ActionState.Stop || this.state.actionState == EasternDragonState.ActionState.Move)
+            if (state.actionState == EasternDragonState.ActionState.Stop || state.actionState == EasternDragonState.ActionState.Move)
             {
-                if (this.actorToAttack == null)
+                if (actorToAttack == null)
                 {
                     List<Actor> targets = Utils.OthersHelper.getEnemyObjectInRange(actor, actor.currentTile, 30f);
                     if (targets.Count == 0)
@@ -349,7 +348,7 @@ namespace Cultivation_Way
                     }
                     else
                     {
-                        this.actorToAttack = targets.GetRandom();
+                        actorToAttack = targets.GetRandom();
                         newState.shape = EasternDragonState.Shape.Dragon;
                         newState.actionState = EasternDragonState.ActionState.Attack;
                         setState(newState);

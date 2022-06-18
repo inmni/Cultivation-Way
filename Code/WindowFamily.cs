@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using CultivationWay;
+﻿using CultivationWay;
 using NCMS.Utils;
-using UnityEngine.UI;
 using ReflectionUtility;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class WindowFamily
+    internal class WindowFamily
     {
         private const int lineLength = 50;
 

@@ -61,6 +61,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\worldbox_Data\Managed\Purchasing.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Sigil">
+      <HintPath>Assemblies\Sigil.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -240,6 +243,7 @@
     <None Include="Code\obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
     <None Include="Code\obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <None Include="mod.json" />
+    <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
@@ -267,11 +271,13 @@
     <Compile Include="Code\EasternDragonAssetContainer.cs" />
     <Compile Include="Code\EasternDragonState.cs" />
     <Compile Include="Code\ElementBaseType.cs" />
+    <Compile Include="Code\ExtendedItemStats.cs" />
+    <Compile Include="Code\ExtendedItemTools.cs" />
     <Compile Include="Code\ExtendedKingdomStats.cs" />
     <Compile Include="Code\ExtendedWorldData.cs" />
     <Compile Include="Code\MoreAiBehaviours.CityBehBuildWall.cs" />
     <Compile Include="Code\MoreAiBehaviours.BehaviourTaskCityLibrary.cs" />
-    <Compile Include="Code\ExtensionSpellActionLibrary.cs" />
+    <Compile Include="Code\ExtendedWorldActions.cs" />
     <Compile Include="Code\ExtensionSpellAsset.cs" />
     <Compile Include="Code\ExtensionSpellLibrary.cs" />
     <Compile Include="Code\ExtensionSpellType.cs" />
@@ -283,7 +289,11 @@
     <Compile Include="Code\ExtendedActor.cs" />
     <Compile Include="Code\ExtendedBuilding.cs" />
     <Compile Include="Code\MoreData.cs" />
+    <Compile Include="Code\MoreStatusEffects.cs" />
     <Compile Include="Code\MoreTopTileType.cs" />
+    <Compile Include="Code\NewEffectController.cs" />
+    <Compile Include="Code\NewEffectManager.cs" />
+    <Compile Include="Code\NewSpriteAnimation.cs" />
     <Compile Include="Code\PowerActionLibrary.cs" />
     <Compile Include="Code\ExtendedActorStats.cs" />
     <Compile Include="Code\ResourcesBuffer.cs" />
@@ -310,8 +320,10 @@
     <Compile Include="Code\SpecialBodyLibrary.cs" />
     <Compile Include="Code\Delegates.cs" />
     <Compile Include="Code\StackSpellEffects.cs" />
+    <Compile Include="Code\Types.cs" />
     <Compile Include="Code\Useless.cs" />
     <Compile Include="Code\Utils.OthersHelper.cs" />
+    <Compile Include="Code\Utils.FastReflection.cs" />
     <Compile Include="Code\Utils.ResourcesHelper.cs" />
     <Compile Include="Code\Utils.TabHelper.cs" />
     <Compile Include="Code\Utils.WorldLawHelper.cs" />

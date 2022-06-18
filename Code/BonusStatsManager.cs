@@ -1,8 +1,6 @@
-﻿using CultivationWay;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    class BonusStatsManager
+    internal class BonusStatsManager
     {
         internal Actor actor;
         internal MoreStats bonusStats;

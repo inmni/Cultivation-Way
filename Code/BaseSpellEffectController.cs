@@ -6,7 +6,7 @@ namespace Cultivation_Way
     /// <summary>
     /// Copied from game
     /// </summary>
-    class BaseSpellEffectController : MonoBehaviour
+    internal class BaseSpellEffectController : MonoBehaviour
     {
 
         public Transform prefab;//动画模板
@@ -35,32 +35,32 @@ namespace Cultivation_Way
 
         internal void create()
         {
-            this.created = true;
-            this.m_gameObject = base.gameObject;
-            this.m_transform = this.m_gameObject.transform;
-            this.setWorld();
-            this.list = new List<BaseSpellEffect>();
-            this.timer_interval = 0.9f;
+            created = true;
+            m_gameObject = base.gameObject;
+            m_transform = m_gameObject.transform;
+            setWorld();
+            list = new List<BaseSpellEffect>();
+            timer_interval = 0.9f;
         }
         public BaseSpellEffect GetObject()
         {
             BaseSpellEffect baseEffect;
-            if (this.list.Count > this.activeIndex)
+            if (list.Count > activeIndex)
             {
-                baseEffect = this.list[this.activeIndex];
+                baseEffect = list[activeIndex];
             }
             else
             {
-                baseEffect = UnityEngine.Object.Instantiate<Transform>(this.prefab).gameObject.GetComponent<BaseSpellEffect>();
-                this.addNewObject(baseEffect);
+                baseEffect = UnityEngine.Object.Instantiate<Transform>(prefab).gameObject.GetComponent<BaseSpellEffect>();
+                addNewObject(baseEffect);
                 if (!baseEffect.created)
                 {
                     baseEffect.create();
                 }
-                this.list.Add(baseEffect);
-                baseEffect.effectIndex = this.list.Count;
+                list.Add(baseEffect);
+                baseEffect.effectIndex = list.Count;
             }
-            this.activeIndex++;
+            activeIndex++;
             baseEffect.active = true;
             baseEffect.gameObject.SetActive(true);
             baseEffect.state = 1;
@@ -79,22 +79,22 @@ namespace Cultivation_Way
             {
                 return;
             }
-            this.makeInactive(pObject);
+            makeInactive(pObject);
             int num = pObject.effectIndex - 1;
-            int num2 = this.activeIndex - 1;
+            int num2 = activeIndex - 1;
             if (num != num2)
             {
-                this.switchObject = this.list[num2];
-                this.list[num2] = pObject;
-                this.list[num] = this.switchObject;
+                switchObject = list[num2];
+                list[num2] = pObject;
+                list[num] = switchObject;
                 pObject.effectIndex = num2 + 1;
-                this.switchObject.effectIndex = num + 1;
+                switchObject.effectIndex = num + 1;
             }
-            if (this.activeIndex > 0)
+            if (activeIndex > 0)
             {
-                this.activeIndex--;
+                activeIndex--;
             }
-            this.switchObject = null;
+            switchObject = null;
         }
         private void makeInactive(BaseSpellEffect pObject)
         {
@@ -104,24 +104,24 @@ namespace Cultivation_Way
         }
         public void setWorld()
         {
-            this.world = MapBox.instance;
+            world = MapBox.instance;
         }
         protected virtual void onStart()
         {
-            this.setWorld();
+            setWorld();
         }
         private void Start()
         {
-            this.onStart();
-            if (!this.created)
+            onStart();
+            if (!created)
             {
-                this.create();
+                create();
             }
         }
         public void update(float pElapsed)
         {
-            this.updateChildren(pElapsed);
-            this.updateSpawn(pElapsed);
+            updateChildren(pElapsed);
+            updateSpawn(pElapsed);
         }
 
         private void updateSpawn(float pElapsed)
@@ -130,23 +130,23 @@ namespace Cultivation_Way
             {
                 return;
             }
-            if (this.useInterval)
+            if (useInterval)
             {
-                if (this.timer > 0f)
+                if (timer > 0f)
                 {
-                    this.timer -= pElapsed;
+                    timer -= pElapsed;
                     return;
                 }
-                this.timer = this.timer_interval;
-                this.spawn();
+                timer = timer_interval;
+                spawn();
             }
         }
 
         private void updateChildren(float pElapsed)
         {
-            for (int i = this.activeIndex - 1; i >= 0; i--)
+            for (int i = activeIndex - 1; i >= 0; i--)
             {
-                BaseSpellEffect baseEffect = this.list[i];
+                BaseSpellEffect baseEffect = list[i];
                 if (baseEffect.created && baseEffect.active)
                 {
                     baseEffect.update(pElapsed);
@@ -160,11 +160,11 @@ namespace Cultivation_Way
 
         public BaseSpellEffect spawnNew()
         {
-            if (this.isInLimit())
+            if (isInLimit())
             {
                 return null;
             }
-            BaseSpellEffect @object = this.GetObject();
+            BaseSpellEffect @object = GetObject();
             if (@object.spriteAnimation != null)
             {
                 @object.spriteAnimation.resetAnim(0);
@@ -174,11 +174,11 @@ namespace Cultivation_Way
 
         internal virtual BaseSpellEffect spawnAt(WorldTile pTile, float pScale = 0.5f, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
         {
-            if (this.isInLimit())
+            if (isInLimit())
             {
                 return null;
             }
-            BaseSpellEffect @object = this.GetObject();
+            BaseSpellEffect @object = GetObject();
             @object.prepare(pTile, pScale);
             @object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
             return @object;
@@ -186,22 +186,22 @@ namespace Cultivation_Way
 
         internal virtual BaseSpellEffect spawnAt(Vector3 pVector, float pScale = 0.5f, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
         {
-            if (this.isInLimit())
+            if (isInLimit())
             {
                 return null;
             }
-            BaseSpellEffect @object = this.GetObject();
+            BaseSpellEffect @object = GetObject();
             @object.prepare(pVector, pScale);
             @object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
             return @object;
         }
         internal virtual BaseSpellEffect spawnAt(Vector3 pVector, Vector3 scale, Vector3 eulerAngle, bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
         {
-            if (this.isInLimit())
+            if (isInLimit())
             {
                 return null;
             }
-            BaseSpellEffect @object = this.GetObject();
+            BaseSpellEffect @object = GetObject();
             @object.prepare(pVector, scale, eulerAngle);
             @object.setCycle(cycle, follow, totalTime, Xoffset, Yoffset);
             return @object;
@@ -209,11 +209,11 @@ namespace Cultivation_Way
 
         public BaseSpellEffect spawnAtRandomScale(WorldTile pTile, float pScaleMin = 1f, float pScaleMax = 1f)
         {
-            if (this.isInLimit())
+            if (isInLimit())
             {
                 return null;
             }
-            BaseSpellEffect @object = this.GetObject();
+            BaseSpellEffect @object = GetObject();
             float pScale = Toolbox.randomFloat(pScaleMin, pScaleMax);
             @object.prepare(pTile, pScale);
             return @object;
@@ -221,17 +221,17 @@ namespace Cultivation_Way
 
         private bool isInLimit()
         {
-            return this.objectLimit != 0 && this.activeIndex > this.objectLimit;
+            return objectLimit != 0 && activeIndex > objectLimit;
         }
 
         internal void clear()
         {
-            for (int i = 0; i < this.list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                BaseSpellEffect pObject = this.list[i];
-                this.makeInactive(pObject);
+                BaseSpellEffect pObject = list[i];
+                makeInactive(pObject);
             }
-            this.activeIndex = 0;
+            activeIndex = 0;
         }
 
         public BaseSpellEffectController()

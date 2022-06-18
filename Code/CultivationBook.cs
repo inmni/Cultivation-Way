@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    enum CultivationBookType
+    internal enum CultivationBookType
     {
         NONE,
         GONG,
@@ -8,7 +8,8 @@
         SHU,
         FA
     }
-    class CultivationBook
+
+    internal class CultivationBook
     {
 
         public string bookName;
@@ -25,14 +26,14 @@
 
         public ChineseElement element;
 
-        internal CultivationBookType BookType { get => bookType;}
+        internal CultivationBookType BookType { get => bookType; }
         internal bool allowCultiSystem(uint cultiSystemID)
         {
-            return (allowedCultiSystem & cultiSystemID) >0;
+            return (allowedCultiSystem & cultiSystemID) > 0;
         }
         internal bool allowActor(ExtendedActor pActor)
         {
-            return this.allowCultiSystem(AddAssetManager.cultisystemLibrary.get(pActor.extendedData.status.cultisystem).flag)
+            return allowCultiSystem(AddAssetManager.cultisystemLibrary.get(pActor.extendedData.status.cultisystem).flag)
                 && ChineseElement.isMatch(pActor.extendedData.status.chineseElement, element);
         }
         internal float getMatchDegree(ExtendedActor pActor)
@@ -43,7 +44,7 @@
         {
             rank++;
             bookName = bookName.Remove(bookName.Length - 4, 4) + "(" + ChineseNameAsset.rankName[(rank + 9) / 10] + "阶)";
-            
+
             if (rank % 10 == 0 || Toolbox.randomChance(1 - rank / 110f))
             {
                 string gainSpellID = ((ExtensionSpellLibrary)AssetManager.instance.dict["extensionSpell"]).spellList.GetRandom();
@@ -60,7 +61,7 @@
                     }
                 }
                 ExtensionSpell gainSpell = new ExtensionSpell(gainSpellID);
-                for(int i = 0; i < spells.Length; i++)
+                for (int i = 0; i < spells.Length; i++)
                 {
                     if (spells[i] == null)
                     {
@@ -69,7 +70,7 @@
                     }
                 }
             }
-            
+
         }
         public CultivationBook()
         {
@@ -81,7 +82,7 @@
 
             stats = new MoreStats[20];
 
-            
+
 
             for (int i = 0; i < 20; i++)
             {

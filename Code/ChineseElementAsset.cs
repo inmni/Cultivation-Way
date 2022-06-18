@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    class ChineseElementAsset : Asset
+    internal class ChineseElementAsset : Asset
     {
         /*
          * 组成灵根，

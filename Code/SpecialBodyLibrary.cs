@@ -6,7 +6,7 @@ namespace Cultivation_Way
         public override void init()
         {
             base.init();
-            this.add(new SpecialBody
+            add(new SpecialBody
             {
                 id = "LXST",
                 madeBy = "凌霄",
@@ -20,7 +20,7 @@ namespace Cultivation_Way
                 mod_speed = -20,
                 rank = 3,
             });
-            this.add(new SpecialBody
+            add(new SpecialBody
             {
                 id = "XTDT",
                 madeBy = "天",
@@ -32,7 +32,7 @@ namespace Cultivation_Way
                 spellRelief = 0.4f,
                 rank = 3,
             });
-            this.add(new SpecialBody
+            add(new SpecialBody
             {
                 id = "HWMT",
                 madeBy = "荒",
@@ -43,7 +43,7 @@ namespace Cultivation_Way
                 mod_attack_speed = 30,
                 rank = 3,
             });
-            this.add(new SpecialBody
+            add(new SpecialBody
             {
                 id = "FT",
                 madeBy = "凡者",
@@ -55,14 +55,14 @@ namespace Cultivation_Way
         }
         internal void reset()
         {
-            this.dict.Clear();
+            dict.Clear();
             Main.instance.SpecialBodyLimit = 200;
             init();
         }
         internal void clear()
         {
-            this.dict.Clear();
-            this.list.Clear();
+            dict.Clear();
+            list.Clear();
             Main.instance.SpecialBodyLimit = 200;
         }
     }

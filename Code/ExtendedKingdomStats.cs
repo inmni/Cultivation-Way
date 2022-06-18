@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CultivationWay;
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    class ExtendedKingdomStats
+    internal class ExtendedKingdomStats
     {
         internal string kingdom_id;
 
@@ -16,26 +10,39 @@ namespace Cultivation_Way
             kingdom_id = kingdomID;
             if (loadStats == null)
             {
-                this.curStatus = new KingdomStats();
+                curStatus = new KingdomStats();
             }
             else
             {
-                this.curStatus = loadStats;
+                curStatus = loadStats;
             }
         }
         public Kingdom getKingdom()
         {
-            return MapBox.instance.kingdoms.getKingdomByID(this.kingdom_id);
+            return MapBox.instance.kingdoms.getKingdomByID(kingdom_id);
         }
-        public static float getStatus(string kingdomID,string id,float defaultVal = 0f)
+        public static float getStatus(string kingdomID, string id, float defaultVal = 0f)
         {
             ExtendedKingdomStats stats;
-            if(ExtendedWorldData.instance.kingdomStats.TryGetValue(kingdomID,out stats))
+            if (ExtendedWorldData.instance.kingdomStats.TryGetValue(kingdomID, out stats))
             {
                 return stats.getStatus(id, defaultVal);
             }
             ExtendedWorldData.instance.kingdomStats[kingdomID] = new ExtendedKingdomStats(kingdomID);
             return defaultVal;
+        }
+        public static void setStatus(string kingdomID, string id, float val)
+        {
+            ExtendedKingdomStats stats;
+            if (ExtendedWorldData.instance.kingdomStats.TryGetValue(kingdomID, out stats))
+            {
+                stats.setStatus(id, val);
+                return;
+            }
+            stats = new ExtendedKingdomStats(kingdomID);
+            stats.setStatus(id, val);
+            ExtendedWorldData.instance.kingdomStats[kingdomID] = stats;
+            return;
         }
         public void setStatus(string id, float val)
         {
@@ -43,7 +50,7 @@ namespace Cultivation_Way
             statVal.value = val;
             curStatus.dict[id] = statVal;
         }
-        public float getStatus(string id,float defaultVal=0f)
+        public float getStatus(string id, float defaultVal = 0f)
         {
             KingdomStatVal val;
             if (curStatus.dict.TryGetValue(id, out val))

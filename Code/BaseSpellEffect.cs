@@ -7,7 +7,7 @@ namespace Cultivation_Way
     /// </summary>
     public class BaseSpellEffect : MonoBehaviour
     {
-        
+
 
         public const int STATE_START = 1;
 
@@ -59,37 +59,37 @@ namespace Cultivation_Way
 
         private void Awake()
         {
-            this.spriteRenderer = base.GetComponent<SpriteRenderer>();
+            spriteRenderer = base.GetComponent<SpriteRenderer>();
         }
         internal void create()
         {
-            this.created = true;
-            this.m_gameObject = base.gameObject;
-            this.m_transform = this.m_gameObject.transform;
-            this.world = MapBox.instance;
-            this.spriteAnimation = base.gameObject.GetComponent<SpriteAnimation>();
-            if (this.spriteAnimation != null)
+            created = true;
+            m_gameObject = base.gameObject;
+            m_transform = m_gameObject.transform;
+            world = MapBox.instance;
+            spriteAnimation = base.gameObject.GetComponent<SpriteAnimation>();
+            if (spriteAnimation != null)
             {
-                this.spriteAnimation.create();
+                spriteAnimation.create();
             }
         }
         //设置特效控制器
         internal void makeParentController()
         {
-            base.transform.SetParent(this.controller.transform, true);
+            base.transform.SetParent(controller.transform, true);
         }
         internal virtual void prepare(WorldTile tile, float pScale = 0.5f)
         {
-            this.state = STATE_START;
+            state = STATE_START;
             float z = 0f;
-            if (this.autoYZ)
+            if (autoYZ)
             {
                 z = (float)tile.pos.y;
             }
             base.transform.localEulerAngles = Vector3.zero;
             base.transform.localPosition = new Vector3((float)tile.pos.x + 0.5f, (float)tile.pos.y, z);
-            this.setScale(pScale);
-            this.setAlpha(1f);
+            setScale(pScale);
+            setAlpha(1f);
             if (base.GetComponent<SpriteAnimation>() != null)
             {
                 base.GetComponent<SpriteAnimation>().resetAnim(0);
@@ -97,16 +97,16 @@ namespace Cultivation_Way
         }
         internal virtual void prepare(Vector3 pVector, float pScale = 1f)
         {
-            this.state = STATE_START;
+            state = STATE_START;
             float z = 0f;
-            if (this.autoYZ)
+            if (autoYZ)
             {
                 z = pVector.y;
             }
             base.transform.rotation = Quaternion.identity;
             base.transform.localPosition = new Vector3(pVector.x, pVector.y, z);
-            this.setScale(pScale);
-            this.setAlpha(1f);
+            setScale(pScale);
+            setAlpha(1f);
             if (base.GetComponent<SpriteAnimation>() != null)
             {
                 base.GetComponent<SpriteAnimation>().resetAnim(0);
@@ -114,9 +114,9 @@ namespace Cultivation_Way
         }
         internal virtual void prepare(Vector3 pVector, Vector3 scale, Vector3 eulerAngle)
         {
-            this.state = STATE_START;
+            state = STATE_START;
             float z = 0f;
-            if (this.autoYZ)
+            if (autoYZ)
             {
                 z = pVector.y;
             }
@@ -124,7 +124,7 @@ namespace Cultivation_Way
             base.transform.localPosition = new Vector3(pVector.x, pVector.y, z);
             base.transform.localScale = scale;
             base.transform.localEulerAngles = eulerAngle;
-            this.setAlpha(1f);
+            setAlpha(1f);
             if (base.GetComponent<SpriteAnimation>() != null)
             {
                 base.GetComponent<SpriteAnimation>().resetAnim(0);
@@ -141,9 +141,9 @@ namespace Cultivation_Way
                 leftTime -= pElapsed;
             }
             #region this.spriteAnimation.update(pElapsed)
-            if (this.spriteAnimation != null)
+            if (spriteAnimation != null)
             {
-                this.spriteAnimation.CallMethod("update", pElapsed);
+                spriteAnimation.CallMethod("update", pElapsed);
                 if (spriteAnimation.useNormalDeltaTime)
                 {
                     pElapsed = Time.deltaTime;
@@ -210,11 +210,11 @@ namespace Cultivation_Way
             }
             #endregion
 
-            if (this.callbackOnFrame != -1 && this.spriteAnimation.currentFrameIndex == this.callbackOnFrame)
+            if (callbackOnFrame != -1 && spriteAnimation.currentFrameIndex == callbackOnFrame)
             {
 
-                this.callback();
-                this.clear();
+                callback();
+                clear();
             }
         }
         internal void setCycle(bool cycle = false, Actor follow = null, float totalTime = 0f, float Xoffset = 0f, float Yoffset = 0f)
@@ -228,52 +228,52 @@ namespace Cultivation_Way
         //设置特效大小
         public void setScale(float pScale)
         {
-            this.scale = pScale;
-            if (this.scale < 0f)
+            scale = pScale;
+            if (scale < 0f)
             {
-                this.scale = 0f;
+                scale = 0f;
             }
             base.transform.localScale = new Vector3(pScale, pScale);
         }
         //设置特效不透明度
         protected void setAlpha(float pVal)
         {
-            this.alpha = pVal;
-            if (this.spriteRenderer == null)
+            alpha = pVal;
+            if (spriteRenderer == null)
             {
-                this.spriteRenderer = base.GetComponent<SpriteRenderer>();
+                spriteRenderer = base.GetComponent<SpriteRenderer>();
             }
-            Color color = this.spriteRenderer.color;
-            color.a = this.alpha;
-            this.spriteRenderer.color = color;
+            Color color = spriteRenderer.color;
+            color.a = alpha;
+            spriteRenderer.color = color;
         }
         //设置特效位置
         internal void setTile(WorldTile pTile)
         {
-            this.tile = pTile;
+            tile = pTile;
             base.transform.localPosition = pTile.posV3;
         }
         public void setCallback(int pFrame, BaseCallback pCallback)
         {
-            this.callbackOnFrame = pFrame;
-            this.callback = pCallback;
+            callbackOnFrame = pFrame;
+            callback = pCallback;
         }
 
         //准备结束
         internal void prepareKill()
         {
-            this.state = STATE_ON_DEATH;
+            state = STATE_ON_DEATH;
         }
         //删除对象
         public void kill()
         {
-            this.state = STATE_KILLED;
-            this.controller.killObject(this);
+            state = STATE_KILLED;
+            controller.killObject(this);
         }
         public void clear()
         {
-            this.callback = null;
-            this.callbackOnFrame = -1;
+            callback = null;
+            callbackOnFrame = -1;
         }
     }
 }

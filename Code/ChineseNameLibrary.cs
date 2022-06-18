@@ -2,8 +2,17 @@
 
 namespace Cultivation_Way
 {
-    class ChineseNameLibrary : AssetLibrary<ChineseNameAsset>
+    internal class ChineseNameLibrary : AssetLibrary<ChineseNameAsset>
     {
+        public override ChineseNameAsset get(string pID)
+        {
+            ChineseNameAsset asset;
+            if(!dict.TryGetValue(pID,out asset))
+            {
+                return dict["default_name"];
+            }
+            return asset;
+        }
         //初始化
         public override void init()
         {
@@ -11,33 +20,33 @@ namespace Cultivation_Way
 
             #region 国家名
             //人类
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "human_kingdom",
                 onlyByTemplate = false,
                 fixedNameChance = 0.005f
             });
-            this.t.addition_startList = new List<string> { "远古", "上古", "永恒", "无上", " ", " " };
-            this.t.addition_endList = new List<string> { "王朝", "帝国", "国", "朝", "国", "周朝", "天庭", "魔庭", "皇庭", "妖庭", "神殿", "仙域", "仙国", "玄域", "神庙", "圣院", "宇宙", "道观", "秦朝", "宋朝", "汉朝", "唐朝", "元朝", "楚朝", "齐朝", "仙宫", "圣族", "神族", "圣地", "神宗", "灵族", "剑宗", "剑域", "道宗", "火域", "刀宗", "刀域", "文域", "擎域", "天域", "圣宗", "圣域", "宫", "燕朝", "魏朝", "蜀朝", "吴朝", "古朝", "乾朝", "商朝", "隋朝", "夏朝", "剑宗", "晋朝", "天朝", "武朝", "庆朝", "魔族", "神殿", "神国", "佛国", "灵域", "枪宗", "灵宗", "炎宗", "妖族", "帝族", "圣族", "神族", "大陆", "大陆", "之地", "魔族", "仙族", "帝族", "皇族", "源族", "天族", "天庭", "源宗" };
-            this.t.partsList = new List<string>
+            t.addition_startList = new List<string> { "远古", "上古", "永恒", "无上", " ", " " };
+            t.addition_endList = new List<string> { "王朝", "帝国", "国", "朝", "国", "周朝", "天庭", "魔庭", "皇庭", "妖庭", "神殿", "仙域", "仙国", "玄域", "神庙", "圣院", "宇宙", "道观", "秦朝", "宋朝", "汉朝", "唐朝", "元朝", "楚朝", "齐朝", "仙宫", "圣族", "神族", "圣地", "神宗", "灵族", "剑宗", "剑域", "道宗", "火域", "刀宗", "刀域", "文域", "擎域", "天域", "圣宗", "圣域", "宫", "燕朝", "魏朝", "蜀朝", "吴朝", "古朝", "乾朝", "商朝", "隋朝", "夏朝", "剑宗", "晋朝", "天朝", "武朝", "庆朝", "魔族", "神殿", "神国", "佛国", "灵域", "枪宗", "灵宗", "炎宗", "妖族", "帝族", "圣族", "神族", "大陆", "大陆", "之地", "魔族", "仙族", "帝族", "皇族", "源族", "天族", "天庭", "源宗" };
+            t.partsList = new List<string>
           { "曦日","九阳","九阴","九劫","九天","雷霆","云霄","浩瀚","龙虎","血虎","天火","邪火","邪虎","神虎","白虎","玲珑","朱雀","凤凰","赤雀","玄武","鬼狐","天狐","圣龙","蟒雀","青龙","炎龙","冰星","魔龙","神龙","妖龙","麒麟","妖元","星河","飘渺","时空","时光","炎","乾坤","易","水","武","天","北","金","玉","木","正玄","土","火","地","神","源","元","清","林","草","北","无极","无情","乱","古","琴","棋","书","画","正","洪","山","海","皇","龙","原","尸","血","邪","王","妖","灵","永","星","光","暗","太极","痕","宝","紫","极","耀","河","邪","媺","烽","武庚","陌周","神威","尚书","春秋","九鼎","坎水","神农","燎野","鸿蒙","天命","三皇","奇门","天道","轩辕","东皇","伏羲","阎罗","上清","女娲","奇经","神农","五帝","神奉","仁善","冥咒","巫祖","屹昂","山海","万氏","神祭","天灵","火焰","大水","源木","金命","土灵","伊始","星寰","星宇","天冰","风雷","始光","星棋盘","精灵","五行","灵墟","长生","太阳","月亮","阴阳","大暗","平等","冥术","元素","时光","易空","神锻","神武","伊命","星锻","星宇","粹炼","天雷","太光","命定","真言","赤炎","炎祖","炎帝","战神","锻天","焚灭","火神","焰韵","大蛮","凶神","神腾","图腾","天兽","巨灵","巫族","山海","盘古","刑天","蚩尤","九黎","巫祖","大羌","蛮兵","征伐","命战","血狱","赤帝","不死","轮回","地狱","天灾","万妖","堕落",  "太古","神话","九州","华夏","天泉","南默","金霞","灵虚","玉鼎","太乙","太一","烟霞","紫阳","夕月","逍遥","拜月","合欢","万劫","恒宇","幻灭","广寒","封魔","紫薇","九霄","虚无","玄源","太玄","太虚","玉虚","古华","漠北","正北","平洲","轩宇","昊天","天羽","悟空","姑苏","月神","石川","平江","永年","轮回","无极","长生","青华","紫薇","勾陈","天启","云烟","云岩","封","月","鬼","鬼魅","琴","音","炼器","神器","锻器","万药","炼丹","飞云","墨隐","九天","修罗","后土","太初","恒古","末影","天霄","龙霆","忘情","天师","逍遥","九劫","天谴","封印","玲珑","鬼谷","巫山","剑","天剑","魔剑","万剑","万劫","刀","魔刀","天刀","枪","妖","玉清","开天","东部","不灭","西漠","北极","南蛮","太上","太玄","镇魔","太初","远古","冥古","太平","始源","洪荒","太古","上古","中部","外域","东皇","星辰","邪妄","万古","噬元","魂","圣剑","天魔","霸枪","灵剑","乾元","鬼刃","天弓","玄机","离火","神斧","龙源","龙岩","龙渊","真武","菩提","玉清","五蕴","玄武","囚龙","自在","极意","无垢","灵虚","玉虚","千羽","青羽","无涯","赤阳","红尘","三尸","天雷","太光","命定","真言","赤炎","炎祖","炎帝","战神","锻天","焚灭","火神","焰韵","大蛮","大食","凶神","神腾","图腾","蚀精","七星","西苍","东赫","龙承","天若","天慈","破航","西武","天承","佛武","武天","海络","北魔","隼络","九星","凤剑","圣","焚天","凶冥","天极","炼器","炼丹","练气","虹光","青光","遮那","逆天","琉焰","悲问","大易","冰蚕","山海","天兽","巨灵","山海","盘古","刑天","蚩尤","九黎","大羌","蛮兵","森罗","白虹","寰宇","悟道","神盗","天煞","古剑","妖刀"
 
            };
-            this.t.fixedList = new List<string> { "星棋盘王朝", "屹昂帝国" ,"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
+            t.fixedList = new List<string> { "星棋盘王朝", "屹昂帝国" ,"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
                                                   "北凉帝国", "太平盛世", "震离古国", "子轩汗国", "策正公国", "洪武帝国", "山海国", "观海国", "夸父古国", "烽鼎国", "武庚国", "天南国", "南阳国", "平安古族", "山东国", "长城军", "建元帝国", "黄龙帝国", "剑昭国", "鸿嘉国", "建武国", "嘉平朝", "景平朝", "义熙天朝", "天鉴国", "永定国", };
-            this.t.templates = new string[] { "R.3Faddition_start", "part1", "addition_end" };
+            t.templates = new string[] { "R.3Faddition_start", "part1", "addition_end" };
             #endregion
             #region 冥族天族国名
 
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "tianming_kingdom",
                 onlyByTemplate = false,
                 fixedNameChance = 0.005f
             });
 
-            this.t.addition_endList = new List<string> { "王朝", "帝国", "国", "天朝", "盛世", "族" };
-            this.t.partsList = new List<string>
+            t.addition_endList = new List<string> { "王朝", "帝国", "国", "天朝", "盛世", "族" };
+            t.partsList = new List<string>
           {    "太武","太礼","太初","孔圣","玄祭","星命","天卜","人圣","启明","神迹","九宗","燎野","鸿蒙","天命","三皇",
                "炎黄","五帝","神奉","天庭","仁善","冥咒","巫祖","山海","万氏","天河","燎野","周易","奇门","奇经","神农",
                "灵州","灵月","九灵","万物","自然","神祭","天灵","神然","天明","火焰","大水","源木","金命","土灵","伊始",
@@ -48,26 +57,28 @@ namespace Cultivation_Way
                "星图","大羌","蛮兵","命战","天匈","血狱","赤帝","龙族","神话","神祇","少昊","九蛮","凶灵"
 
            };
-            this.t.fixedList = new List<string> { "启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
+            t.fixedList = new List<string> { "启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
                                                   "北凉帝国", "太平盛世", "震离古国", "子轩汗国", "策正公国", "洪武帝国", "山海国", "观海国", "夸父古国", "烽鼎国", "武庚国", "天南国", "南阳国", "平安古族", "山东国", "长城军", "建元帝国", "黄龙帝国", "剑昭国", "鸿嘉国", "建武国", "嘉平朝", "景平朝", "义熙天朝", "天鉴国", "永定国", };
-            this.t.templates = new string[] { "part1", "addition_end" };
+            t.templates = new string[] { "part1", "addition_end" };
 
             //天族
-            this.clone("Tian_kingdom", "tianming_kingdom");
+            clone("Tian_kingdom", "tianming_kingdom");
             //冥族
-            this.clone("Ming_kingdom", "tianming_kingdom");
+            clone("Ming_kingdom", "tianming_kingdom");
+            //巫族
+            clone("Wu_kingdom", "tianming_kingdom");
             #endregion
             #region 兽人国名
 
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "orc_kingdom",
                 onlyByTemplate = false,
                 fixedNameChance = 0.001f
             });
 
-            this.t.addition_endList = new List<string> { "王朝", "帝国", "汗国", "族", "部落", "联盟", "妖朝", "妖庭", "妖族", "灵族", "兽族", "之地", "禁地", "皇族", "仙族", "王族", "遗族", "古族", "圣族", "圣地", "疆域", "禁域", };
-            this.t.partsList = new List<string>
+            t.addition_endList = new List<string> { "王朝", "帝国", "汗国", "族", "部落", "联盟", "妖朝", "妖庭", "妖族", "灵族", "兽族", "之地", "禁地", "皇族", "仙族", "王族", "遗族", "古族", "圣族", "圣地", "疆域", "禁域", };
+            t.partsList = new List<string>
           {  "九黎", "蚩尤", "昼虎", "焺翼", "天狗", "怒豹", "夔牛", "玄鸟", "幽狱", "貔貅",
              "大食", "烛龙", "北莽", "巨象", "天狼", "勾陈", "腾蛇", "金犼", "少昊", "青狮",
              "凶兽", "亢龙", "潜蛟", "天鲲", "睚眦", "龙腾", "天兽", "血牙", "金乌", "大蛮",
@@ -78,62 +89,62 @@ namespace Cultivation_Way
 
 
            };
-            this.t.fixedList = new List<string> {"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
+            t.fixedList = new List<string> {"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
                                                  "北凉帝国", "太平盛世", "震离古国", "子轩汗国", "策正公国", "洪武帝国", "山海国", "观海国", "夸父古国", "烽鼎国", "武庚国", "天南国", "南阳国", "平安古族", "山东国", "长城军", "建元帝国", "黄龙帝国", "剑昭国", "鸿嘉国", "建武国", "嘉平朝", "景平朝", "义熙天朝", "天鉴国", "永定国", };
-            this.t.templates = new string[] { "part1", "addition_end" };
+            t.templates = new string[] { "part1", "addition_end" };
             //兽人
-            this.clone("Yao_kingdom", "orc_kingdom");
+            clone("Yao_kingdom", "orc_kingdom");
             #endregion
             #region 矮人国名
 
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "dwarf_kingdom",
                 onlyByTemplate = false,
                 fixedNameChance = 0.001f
             });
 
-            this.t.addition_endList = new List<string> { "联邦", "公国", "帝国", "领域", "邦国", "联盟", "国", "皇庭", "玄域", "神庙", "圣院", "仙宫", "圣族", "神族", "圣地", "神宗", "灵族", "剑宗", "剑域", "火域", "刀宗", "刀域", "文域", "擎域", "天域", "圣宗", "圣域", "宫", "武朝", "神殿", "佛国", "灵域", "枪宗", "灵宗", "炎宗", "帝族", "圣族", "神族", "大陆", "大陆", "之地", "仙族", "帝族", "皇族", "源族", "天族", "器宗", "源宗" };
-            this.t.partsList = new List<string>
+            t.addition_endList = new List<string> { "联邦", "公国", "帝国", "领域", "邦国", "联盟", "国", "皇庭", "玄域", "神庙", "圣院", "仙宫", "圣族", "神族", "圣地", "神宗", "灵族", "剑宗", "剑域", "火域", "刀宗", "刀域", "文域", "擎域", "天域", "圣宗", "圣域", "宫", "武朝", "神殿", "佛国", "灵域", "枪宗", "灵宗", "炎宗", "帝族", "圣族", "神族", "大陆", "大陆", "之地", "仙族", "帝族", "皇族", "源族", "天族", "器宗", "源宗" };
+            t.partsList = new List<string>
           {  "天工", "神锻", "百炼", "战锤", "圣武", "浴火", "神武", "焠焰", "火神", "神兵", "昭烈",
              "火凤", "烈阳", "火工", "祝融", "赤焰", "炼器", "灵武", "千煅", "匠人",
              "神匠", "天火", "巨匠", "真炎", "神机", "焰炉", "圣器", "炎帝", "炎名", "真火", "武焱",
            };
-            this.t.fixedList = new List<string> {"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
+            t.fixedList = new List<string> {"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
                                                  "北凉帝国", "太平盛世", "震离古国", "子轩汗国", "策正公国", "洪武帝国", "山海国", "观海国", "夸父古国", "烽鼎国", "武庚国", "天南国", "南阳国", "平安古族", "山东国", "长城军", "建元帝国", "黄龙帝国", "剑昭国", "鸿嘉国", "建武国", "嘉平朝", "景平朝", "义熙天朝", "天鉴国", "永定国", };
-            this.t.templates = new string[] { "part1", "addition_end" };
+            t.templates = new string[] { "part1", "addition_end" };
 
 
             #endregion
             #region 精灵国名
 
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "elf_kingdom",
                 onlyByTemplate = false,
                 fixedNameChance = 0.001f
             });
 
-            this.t.addition_endList = new List<string> { "联邦", "帝国", "领域", "联盟", "天庭", "皇庭", "神殿", "仙域", "仙国", "玄域", "神庙", "圣院", "宇宙", "道观", "仙宫", "圣族", "神族", "圣地", "神宗", "灵族", "剑宗", "剑域", "道宗", "火域", "刀宗", "刀域", "文域", "擎域", "天域", "圣宗", "圣域", "宫", "天朝", "魔族", "神殿", "神国", "佛国", "灵域", "枪宗", "灵宗", "炎宗", "帝族", "圣族", "神族", "大陆", "大陆", "之地", "仙族", "帝族", "皇族", "源族", "天族", "天庭", "源宗" };
-            this.t.partsList = new List<string>
+            t.addition_endList = new List<string> { "联邦", "帝国", "领域", "联盟", "天庭", "皇庭", "神殿", "仙域", "仙国", "玄域", "神庙", "圣院", "宇宙", "道观", "仙宫", "圣族", "神族", "圣地", "神宗", "灵族", "剑宗", "剑域", "道宗", "火域", "刀宗", "刀域", "文域", "擎域", "天域", "圣宗", "圣域", "宫", "天朝", "魔族", "神殿", "神国", "佛国", "灵域", "枪宗", "灵宗", "炎宗", "帝族", "圣族", "神族", "大陆", "大陆", "之地", "仙族", "帝族", "皇族", "源族", "天族", "天庭", "源宗" };
+            t.partsList = new List<string>
           {   "炎灵", "武灵", "冥动", "冰灵", "幽暗", "灵神", "圣水", "灵冰", "雷巫", "灵木", "木巫",
               "火巫", "灵冥", "灵动", "冬灭", "光明", "雷灵", "紫灵", "金灵", "自然",
               "天晟", "火灵", "冥柳", "余烬", "羽天", "生灵", "龙神", "雪巫", "灵巫", "圣使", "玲珑",
               "共工", "冰龙", "御风", "赤羽", "青羽", "土灵", "灵河", "月神", "天昭", "天灵",
               "曦日","九阳","九阴","九劫","九天","雷霆","云霄","浩瀚","龙虎","血虎","天火","邪火","星河","飘渺","时空","时光","炎","乾坤","易","水","武","天","北","金","玉","木","正玄","土","火","地","神","源","元","清","林","草","北","无极","无情","乱","古","琴","棋","书","画","正","洪","山","海","皇","龙","原","尸","血","邪","王","妖","灵","永","星","光","暗","太极","痕","宝","紫","极","耀","河","邪","媺","烽","武庚","陌周","神威","尚书","春秋","九鼎","坎水","神农","燎野","鸿蒙","天命","三皇","奇门","天道","轩辕","东皇","伏羲","阎罗","上清","女娲","奇经","神农","五帝","神奉","仁善","冥咒","巫祖","屹昂","山海","万氏","神祭","天灵","火焰","大水","源木","金命","土灵","伊始","星寰","星宇","天冰","风雷","始光","星棋盘","精灵","五行","灵墟","长生","太阳","月亮","阴阳","大暗","平等","冥术","元素","时光","易空","神锻","神武","伊命","星锻","星宇","粹炼","天雷","太光","命定","真言","赤炎","炎祖","炎帝","战神","锻天","焚灭","火神","焰韵","大蛮","凶神","神腾","图腾","天兽","巨灵","巫族","山海","盘古","刑天","蚩尤","九黎","巫祖","大羌","蛮兵","征伐","命战","血狱","赤帝","不死","轮回","地狱","天灾","万妖","堕落",    "太古","神话","九州","华夏","天泉","南默","金霞","灵虚","玉鼎","太乙","太一","烟霞","紫阳","夕月","逍遥","拜月","合欢","万劫","恒宇","幻灭","广寒","封魔","紫薇","九霄","虚无","玄源","太玄","太虚","玉虚","古华","漠北","正北","平洲","轩宇","昊天","天羽","悟空","姑苏","月神","石川","平江","永年","轮回","无极","长生","青华","紫薇","勾陈","天启","云烟","云岩","封","月","鬼","鬼魅","琴","音","炼器","神器","锻器","万药","炼丹","飞云","墨隐","九天","修罗","后土","太初","恒古","末影","天霄","龙霆","忘情","天师","逍遥","九劫","天谴","封印","玲珑","鬼谷","巫山","剑","天剑","魔剑","万剑","万劫","刀","魔刀","天刀","枪","妖","玉清","开天","东部","不灭","西漠","北极","南蛮","太上","太玄","镇魔","太初","远古","冥古","太平","始源","洪荒","太古","上古","中部","外域","东皇","星辰","邪妄","万古","噬元","魂","圣剑","天魔","霸枪","灵剑","乾元","鬼刃","天弓","玄机","离火","神斧","龙源","龙岩","龙渊","真武","菩提","玉清","五蕴","玄武","囚龙","自在","极意","无垢","灵虚","玉虚","千羽","青羽","无涯","赤阳","红尘","三尸","天雷","太光","命定","真言","赤炎","炎祖","炎帝","战神","锻天","焚灭","火神","焰韵","大蛮","大食","凶神","神腾","图腾","蚀精","七星","西苍","东赫","龙承","天若","天慈","破航","西武","天承","佛武","武天","海络","北魔","隼络","九星","凤剑","圣","焚天","凶冥","天极","炼器","炼丹","练气","虹光","青光","遮那","逆天","琉焰","悲问","大易","冰蚕","山海","天兽","巨灵","山海","盘古","刑天","蚩尤","九黎","大羌","蛮兵","森罗","白虹","寰宇","悟道","神盗","天煞","古剑","妖刀"
            };
-            this.t.fixedList = new List<string> {"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
+            t.fixedList = new List<string> {"启源天朝","大唐帝国","大明帝国","大秦帝国","华夏天朝","蒙古帝国","漠北汗国","离阳王朝", "天威帝国", "孔子文国", "洛阳盛世", "天甲国", "公孙汗国","轩辕帝国","长孙公国", "慕容汗国","鲜于汗国","宇文世家","百里世家",
                                                  "北凉帝国", "太平盛世", "震离古国", "子轩汗国", "策正公国", "洪武帝国", "山海国", "观海国", "夸父古国", "烽鼎国", "武庚国", "天南国", "南阳国", "平安古族", "山东国", "长城军", "建元帝国", "黄龙帝国", "剑昭国", "鸿嘉国", "建武国", "嘉平朝", "景平朝", "义熙天朝", "天鉴国", "永定国", };
-            this.t.templates = new string[] { "part1", "addition_end" };
+            t.templates = new string[] { "part1", "addition_end" };
 
             #endregion
 
             #region 城市名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "chengshi_name"
             });
-            this.t.addition_startList = new List<string>
+            t.addition_startList = new List<string>
             {
              "天南","南阳","平安","山东","长城","建元","黄龙","剑昭","鸿嘉","建武","嘉平","景平","义熙","天鉴","永定",
             "天康","智德","崇明","太极","天佑","宝元","广明","永隆","开耀","河清","皇始","坤亥","项燕","周易","乾陌",
@@ -147,22 +158,22 @@ namespace Cultivation_Way
              "曦日","九阳","九阴","九劫","九天","雷霆","云霄","浩瀚","龙虎","血虎","天火","邪火","邪虎","神虎","白虎","玲珑","朱雀","凤凰","赤雀","玄武","鬼狐","天狐","圣龙","蟒雀","青龙","炎龙","冰星","魔龙","神龙","妖龙","麒麟","妖元","星河","飘渺","时空","时光","炎","乾坤","易","水","武","天","北","金","玉","木","正玄","土","火","地","神","源","元","清","林","草","北","无极","无情","乱","古","琴","棋","书","画","正","洪","山","海","皇","龙","原","尸","血","邪","王","妖","灵","永","星","光","暗","太极","痕","宝","紫","极","耀","河","邪","媺","烽","武庚","陌周","神威","尚书","春秋","九鼎","坎水","神农","燎野","鸿蒙","天命","三皇","奇门","天道","轩辕","东皇","伏羲","阎罗","上清","女娲","奇经","神农","五帝","神奉","仁善","冥咒","巫祖","屹昂","山海","万氏","神祭","天灵","火焰","大水","源木","金命","土灵","伊始","星寰","星宇","天冰","风雷","始光","星棋盘","精灵","五行","灵墟","长生","太阳","月亮","阴阳","大暗","平等","冥术","元素","时光","易空","神锻","神武","伊命","星锻","星宇","粹炼","天雷","太光","命定","真言","赤炎","炎祖","炎帝","战神","锻天","焚灭","火神","焰韵","大蛮","凶神","神腾","图腾","天兽","巨灵","巫族","山海","盘古","刑天","蚩尤","九黎","巫祖","大羌","蛮兵","征伐","命战","血狱","赤帝","不死","轮回","地狱","天灾","万妖","堕落", "太古","神话","九州","华夏","天泉","南默","金霞","灵虚","玉鼎","太乙","太一","烟霞","紫阳","夕月","逍遥","拜月","合欢","万劫","恒宇","幻灭","广寒","封魔","紫薇","九霄","虚无","玄源","太玄","太虚","玉虚","古华","漠北","正北","平洲","轩宇","昊天","天羽","悟空","姑苏","月神","石川","平江","永年","轮回","无极","长生","青华","紫薇","勾陈","天启","云烟","云岩","封","月","鬼","鬼魅","琴","音","炼器","神器","锻器","万药","炼丹","飞云","墨隐","九天","修罗","后土","太初","恒古","末影","天霄","龙霆","忘情","天师","逍遥","九劫","天谴","封印","玲珑","鬼谷","巫山","剑","天剑","魔剑","万剑","万劫","刀","魔刀","天刀","枪","妖","玉清","开天","东部","不灭","西漠","北极","南蛮","太上","太玄","镇魔","太初","远古","冥古","太平","始源","洪荒","太古","上古","中部","外域","东皇","星辰","邪妄","万古","噬元","魂","圣剑","天魔","霸枪","灵剑","乾元","鬼刃","天弓","玄机","离火","神斧","龙源","龙岩","龙渊","真武","菩提","玉清","五蕴","玄武","囚龙","自在","极意","无垢","灵虚","玉虚","千羽","青羽","无涯","赤阳","红尘","三尸","天雷","太光","命定","真言","赤炎","炎祖","炎帝","战神","锻天","焚灭","火神","焰韵","大蛮","大食","凶神","神腾","图腾","蚀精","七星","西苍","东赫","龙承","天若","天慈","破航","西武","天承","佛武","武天","海络","北魔","隼络","九星","凤剑","圣","焚天","凶冥","天极","炼器","炼丹","练气","虹光","青光","遮那","逆天","琉焰","悲问","大易","冰蚕","山海","天兽","巨灵","山海","盘古","刑天","蚩尤","九黎","大羌","蛮兵","森罗","白虹","寰宇","悟道","神盗","天煞","古剑","妖刀"
             };
 
-            this.clone("human_city", "chengshi_name");
-            this.t.addition_endList = new List<string> { "城", "域", "州", "神州", "城", "镇", "禁地", "州", "之地" };
-            this.t.fixedList = new List<string> { "星棋盘州", "人间府" };
-            this.t.templates = new string[] { "addition_start", "addition_end" };
+            clone("human_city", "chengshi_name");
+            t.addition_endList = new List<string> { "城", "域", "州", "神州", "城", "镇", "禁地", "州", "之地" };
+            t.fixedList = new List<string> { "星棋盘州", "人间府" };
+            t.templates = new string[] { "addition_start", "addition_end" };
 
             //天族，直接复制人类
-            this.clone("Tian_city", "human_city");
+            clone("Tian_city", "human_city");
             //冥族，直接复制人类
-            this.clone("Ming_city", "human_city");
+            clone("Ming_city", "human_city");
             #endregion
             #region 矮兽精城市名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "aishoujing_name"
             });
-            this.t.addition_startList = new List<string>
+            t.addition_startList = new List<string>
             {
              "天工", "神锻", "百炼", "战锤", "圣武", "浴火", "神武", "焠焰", "火神", "神兵", "昭烈", "火凤", "烈阳", "火工", "祝融", "赤焰", "炼器", "灵武", "千煅", "匠人",
              "神匠", "天火", "巨匠", "真炎", "神机", "焰炉", "圣器", "炎帝", "炎名", "真火", "武焱",
@@ -174,28 +185,28 @@ namespace Cultivation_Way
             };
 
 
-            this.t.addition_endList = new List<string> { "城", "城邦", "之地", "域", "州", "城镇", "域" };
+            t.addition_endList = new List<string> { "城", "城邦", "之地", "域", "州", "城镇", "域" };
 
-            this.t.templates = new string[] { "addition_start", "addition_end" };
+            t.templates = new string[] { "addition_start", "addition_end" };
             //兽人
-            this.clone("orc_city", "aishoujing_name");
+            clone("orc_city", "aishoujing_name");
             //精灵
-            this.clone("elf_city", "aishoujing_name");
+            clone("elf_city", "aishoujing_name");
             //矮人
-            this.clone("dwarf_city", "aishoujing_name");
+            clone("dwarf_city", "aishoujing_name");
             //妖族
-            this.clone("Yao_city", "aishoujing_name");
+            clone("Yao_city", "aishoujing_name");
             #endregion
 
             #region 文化名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "wenhua_name",
             });
 
 
 
-            this.t.addition_startList = new List<string>
+            t.addition_startList = new List<string>
             {
                "太武","太礼","太初","孔圣","玄祭","星命","天卜","人圣","启明","神迹","九宗","燎野","鸿蒙","天命","三皇",
                "炎黄","五帝","神奉","天庭","仁善","冥咒","巫祖","山海","万氏","天河","燎野","周易","奇门","奇经","神农",
@@ -206,32 +217,34 @@ namespace Cultivation_Way
                "大食","凶神","冥族","部落","神腾","图腾","天兽","巨灵","巫族","山海","盘古","刑天","蚩尤","九黎","巫祖",
                "星图","大羌","蛮兵","命战","天匈","血狱","赤帝","龙族","神话","神祇","少昊","九蛮","凶灵"
             };
-            this.t.addition_endList = new List<string> { "文化", "氏" };
-            this.t.fixedList = new List<string> { "一米氏", "人间文化" };
-            this.t.templates = new string[] { "addition_start", "addition_end" };
-            this.clone("human_culture", "wenhua_name");
+            t.addition_endList = new List<string> { "文化", "氏" };
+            t.fixedList = new List<string> { "一米氏", "人间文化" };
+            t.templates = new string[] { "addition_start", "addition_end" };
+            clone("human_culture", "wenhua_name");
             //兽人，统一词库
-            this.clone("orc_culture", "human_culture");
+            clone("orc_culture", "human_culture");
             //精灵，统一词库
-            this.clone("elf_culture", "human_culture");
+            clone("elf_culture", "human_culture");
             //矮人，统一词库
-            this.clone("dwarf_culture", "human_culture");
+            clone("dwarf_culture", "human_culture");
             //天族，统一词库
-            this.clone("Tian_culture", "human_culture");
+            clone("Tian_culture", "human_culture");
             //冥族，统一词库
-            this.clone("Ming_culture", "human_culture");
+            clone("Ming_culture", "human_culture");
+            //巫族，统一词库
+            clone("Wu_culture", "human_culture");
             //妖族
-            this.clone("Yao_culture", "human_culture");
+            clone("Yao_culture", "human_culture");
             #endregion
 
             #region 国家格言
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "kingdom_mottos",
                 onlyByTemplate = false,
                 fixedNameChance = 1f
             });
-            this.t.fixedList = new List<string>
+            t.fixedList = new List<string>
             {
                 "有志者自有千计万计，无志者只感千难万难。",
                 "不安于现状，不甘于平庸！",
@@ -318,14 +331,14 @@ namespace Cultivation_Way
             #endregion
 
             #region 人名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "human_name",
                 onlyByTemplate = true
             });
 
             //姓氏
-            this.t.addition_startList = new List<string>
+            t.addition_startList = new List<string>
             {
             "赵", "钱", "孙", "李", "周", "吴", "郑", "王", "冯", "陈",
             "褚", "卫", "蒋", "沈", "韩", "杨", "朱", "秦", "尤", "许",
@@ -365,7 +378,7 @@ namespace Cultivation_Way
              "火","炎","焰","焱","灵","龙","圣","炎","千官","炼","战","武","天工","楚上","无双","炉","幽仁","帝昊","将","轩辕","斩兵"
             };
             //辈分
-            this.t.partsList = new List<string>
+            t.partsList = new List<string>
             {
                 "诚","朴","雄","伟","励","学","敦","行", "富","强","民","主","文","明","和","谐", "自","由","平","等","公","正","法","治", "爱","国","敬","业","诚","信","友","善", "天","地","玄","黄","宇","宙","洪","荒", "安","石","寓","丝","竹","方","朔","杂", "诙","谐","昂","霄","气","概","古","来", "无","地","可","容","才","不","见","骑", "鲸","仙","伯","唾","手","功","名","事", "了","猿","鹤","与","同","侪","有","意",
             "谢","轩","冕","无","计","避","嫌","猜", "静","中","乐","山","照","座","月","浮", "杯","忘","形","湛","辈","一","笑","丘", "壑","写","高","怀","只","恐","天","催", "玉","斧","为","破","烟","尘","昏","翳", "人","自","日","边","来","东","阁","动", "天","乙","开","运","太","岳","钟","英", "荣","河","温","洛","睿","哲","初","生", "甘","泉","濯","耳","畴","产","并","耕", "尚","书","道","博","说","文","义","精",
@@ -374,7 +387,7 @@ namespace Cultivation_Way
              "曦","阳","九","劫","天","霆","霄","瀚","龙","血","火","邪","虎","神","白","珑","雀","凰","赤","武","狐","元","河","渺","空","光","炎","坤","易","水","武","天","北","金","玉","木","玄","土","火","地","神","源","元","清","林","草","北","无极","无","乱","古","琴","棋","书","画","正","洪","山","海","皇","龙","原","尸","血","邪","王","妖","灵","永","星","光","暗","太极","痕","宝","紫","极","耀","河","邪","媺","烽","庚","陌","威","尚","春","鼎","蒙","皇","门","道","辕","皇","羲","阎","清","娲",
             };
             //最后一个字
-            this.t.addition_endList = new List<string>
+            t.addition_endList = new List<string>
             {
             "天南","南阳","平安","山东","长城","建元","黄龙","剑昭","鸿嘉","建武","嘉平","景平","义熙","天鉴","永定",
             "天康","智德","崇明","太极","天佑","宝元","广明","永隆","开耀","河清","皇始","坤亥","项燕","周易","乾陌",
@@ -401,23 +414,25 @@ namespace Cultivation_Way
 
 
             };
-            this.t.templates = new string[] { "addition_end" };
+            t.templates = new string[] { "addition_end" };
             //兽人，直接复制人类
-            this.clone("orc_name", "human_name");
+            clone("orc_name", "human_name");
 
             //天族，直接复制人类
-            this.clone("Tian_name", "human_name");
+            clone("Tian_name", "human_name");
             //冥族，直接复制人类
-            this.clone("Ming_name", "human_name");
+            clone("Ming_name", "human_name");
+            //巫族，直接复制人类
+            clone("Wu_name", "human_name");
             #endregion
             #region 矮精族名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "aijing_name",
                 onlyByTemplate = true
             });
 
-            this.t.addition_endList = new List<string>
+            t.addition_endList = new List<string>
             {
 
                 "天工", "神锻", "百炼", "战锤", "圣武", "浴火", "神武", "焠焰", "火神", "神兵", "昭烈", "火凤", "烈阳", "火工", "祝融", "赤焰", "炼器", "灵武", "千煅", "匠人",
@@ -425,25 +440,25 @@ namespace Cultivation_Way
                 "炎灵", "武灵", "冥动", "冰灵", "幽暗", "灵神", "圣水", "灵冰", "雷巫", "灵木", "木巫", "火巫", "灵冥", "灵动", "冬灭", "光明", "雷灵", "紫灵", "金灵", "自然",
                 "天晟", "火灵", "冥柳", "余烬", "羽天", "生灵", "龙神", "雪巫", "灵巫", "圣使", "玲珑", "共工", "冰龙", "御风", "赤羽", "青羽", "土灵", "灵河", "月神", "天昭", "天灵"
             };
-            this.t.addition_startList = new List<string>
+            t.addition_startList = new List<string>
             {
                 "火","炎","焰","焱","灵","龙","圣","炎","千官","炼","战","武","天工","楚上","无双","炉","幽仁","帝昊","将","轩辕","斩兵"
             };
-            this.t.templates = new string[] { "addition_end" };
+            t.templates = new string[] { "addition_end" };
             //精灵
-            this.clone("elf_name", "aijing_name");
+            clone("elf_name", "aijing_name");
             //矮人
-            this.clone("dwarf_name", "aijing_name");
+            clone("dwarf_name", "aijing_name");
             #endregion
 
             #region 其他生物名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "sheep_name",
                 onlyByTemplate = true
             });
-            this.t.partsList = new List<string> { "甲", "乙", "戊", "己", "庚", "角", "亢", "玄", "奎", "虚", "灵", "天", "地", "山", "岩", "离", "古", "荒", "羽", "金", "木", "水", "火", "土", "风", "雷", "光", "暗", "血", "魔", "仙", "元", "圣", "灵", "魂", "焚", "炎", "冰", "青", "雪", "狱", "羽", "道", "墨", "冥", "天", "地", "亚", "战", "玄", "幻", "影", "神", "奇", "异", "毒", "骨", "蛮", "浴", "大", };
-            this.t.partsList2 = new List<string>
+            t.partsList = new List<string> { "甲", "乙", "戊", "己", "庚", "角", "亢", "玄", "奎", "虚", "灵", "天", "地", "山", "岩", "离", "古", "荒", "羽", "金", "木", "水", "火", "土", "风", "雷", "光", "暗", "血", "魔", "仙", "元", "圣", "灵", "魂", "焚", "炎", "冰", "青", "雪", "狱", "羽", "道", "墨", "冥", "天", "地", "亚", "战", "玄", "幻", "影", "神", "奇", "异", "毒", "骨", "蛮", "浴", "大", };
+            t.partsList2 = new List<string>
             {
                 "子", "金", "木", "水", "火", "土", "风", "雷", "电", "雪", "皇", "帝","兵", "甲", "乾","坤",
                 "灵", "冰", "焱", "炎", "赤", "月", "日", "源", "虚", "烬", "羽", "空", "沌", "虚", "无", "源",
@@ -451,97 +466,97 @@ namespace Cultivation_Way
                 "易", "赤", "阳", "地", "离", "血", "牙", "星", "虚", "道", "武", "玄"
             };
             addAddtion_endList(new List<string> { "羊", "灵羊" });
-            this.t.templates = new string[] { "part1", "part2" };
+            t.templates = new string[] { "part1", "part2" };
             //其他生物与羊同理
-            this.clone("penguin_name", "sheep_name");
+            clone("penguin_name", "sheep_name");
             addAddtion_endList(new List<string> { "企鹅" });
-            this.clone("turtle_name", "sheep_name");
+            clone("turtle_name", "sheep_name");
             addAddtion_endList(new List<string> { "龟", "玄龟", "灵龟", "玄武", "魔龟", "蛇龟", "火龟", "棋龟", "岩龟" });
-            this.clone("wolf_name", "sheep_name");
+            clone("wolf_name", "sheep_name");
             addAddtion_endList(new List<string> { "狼", "妖狼", "天狼", "天狗", "邪狼", "火狼", "冰狼", "魔狼", "神狼", "玄狼", "祖狼", "血狼", "妖狼" });
-            this.clone("greg_name", "sheep_name");
+            clone("greg_name", "sheep_name");
             addAddtion_endList(new List<string> { "格雷格" });
-            this.clone("chicken_name", "sheep_name");
+            clone("chicken_name", "sheep_name");
             addAddtion_endList(new List<string> { "鸡", "玄雏", "鸾鸟", "凤", "翅雀", "赤雀", "妖雀", "火凤", "彩凤", "冰凤", "雷凤", "凤凰", "妖凤", "诡凤", "灵凤", "血凤", "古凤", "神凤", "赤凤" });
-            this.clone("cock_name", "chicken_name");
-            this.clone("alien_name", "sheep_name");
+            clone("cock_name", "chicken_name");
+            clone("alien_name", "sheep_name");
             addAddtion_endList(new List<string> { "异人", "异者" });
-            this.clone("ufo_name", "sheep_name");
+            clone("ufo_name", "sheep_name");
             addAddtion_endList(new List<string> { "飞船", "天舟", "方舟" });
-            this.clone("cold_one_name", "sheep_name");
+            clone("cold_one_name", "sheep_name");
             addAddtion_endList(new List<string> { "冰魔", "冰灵", "恶灵", "魔灵", "恶魔" });
-            this.clone("bug_name", "sheep_name");
+            clone("bug_name", "sheep_name");
             addAddtion_endList(new List<string> { "虫", "蜂", "蝶" });
-            this.clone("ant_name", "sheep_name");
+            clone("ant_name", "sheep_name");
             addAddtion_endList(new List<string> { "蚁" });
-            this.clone("demon_name", "sheep_name");
+            clone("demon_name", "sheep_name");
             addAddtion_endList(new List<string> { "火魔", "火灵", "恶灵", "魔灵", "恶魔" });
-            this.clone("fairy_name", "sheep_name");
+            clone("fairy_name", "sheep_name");
             addAddtion_endList(new List<string> { "精灵", "天灵" });
-            this.clone("crab_name", "sheep_name");
+            clone("crab_name", "sheep_name");
             addAddtion_endList(new List<string> { "螃蟹", "灵蟹", "炎蟹", "神蟹", "岩蟹", "巨蟹", "水蟹" });
-            this.clone("cow_name", "sheep_name");
+            clone("cow_name", "sheep_name");
             addAddtion_endList(new List<string> { "牛", "灵牛", "神牛", "妖牛", "仙牛", "金牛", "魔牛", "水牛", "天牛", "血牛", "牛" });
-            this.clone("evil_mage_name", "sheep_name");
+            clone("evil_mage_name", "sheep_name");
             addAddtion_endList(new List<string> { "法师", "术士", "天师" });
-            this.clone("rhino_name", "sheep_name");
+            clone("rhino_name", "sheep_name");
             addAddtion_endList(new List<string> { "犀牛", "角牛", "灵犀", "魔犀", "古犀", "巨犀", "火犀", "冰犀", "犀牛" });
-            this.clone("monkey_name", "sheep_name");
+            clone("monkey_name", "sheep_name");
             addAddtion_endList(new List<string> { "猴", "猿", "灵猿", "神猴", "妖猴", "石猴", "水猴", "金猿", "木猴", "火猴", "神猿", "灵猴" });
-            this.clone("buffalo_name", "sheep_name");
+            clone("buffalo_name", "sheep_name");
             addAddtion_endList(new List<string> { "水牛", "夔牛", "灵牛", "牛" });
-            this.clone("fox_name", "sheep_name");
+            clone("fox_name", "sheep_name");
             addAddtion_endList(new List<string> { "狐", "灵狐", "妖狐", "九尾狐", "鬼狐", "仙狐", "天狐" });
-            this.clone("hyena_name", "sheep_name");
+            clone("hyena_name", "sheep_name");
             addAddtion_endList(new List<string> { "狗", "犬", "灵犬", "天狗" });
-            this.clone("dog_name", "hyena_name");
-            this.clone("crocodile_name", "sheep_name");
+            clone("dog_name", "hyena_name");
+            clone("crocodile_name", "sheep_name");
             addAddtion_endList(new List<string> { "鳄", "妖鳄", "血鳄", "灵鳄" });
-            this.clone("snake_name", "sheep_name");
+            clone("snake_name", "sheep_name");
             addAddtion_endList(new List<string> { "蛇", "妖蛇", "灵蛇" });
-            this.clone("frog_name", "sheep_name");
+            clone("frog_name", "sheep_name");
             addAddtion_endList(new List<string> { "蛙" });
-            this.clone("bioblob_name", "sheep_name");
+            clone("bioblob_name", "sheep_name");
             addAddtion_endList(new List<string> { "生物质" });
-            this.clone("assimilator_name", "sheep_name");
+            clone("assimilator_name", "sheep_name");
             addAddtion_endList(new List<string> { "同化者" });
-            this.clone("fire_skull_name", "sheep_name");
+            clone("fire_skull_name", "sheep_name");
             addAddtion_endList(new List<string> { "火灵" });
-            this.clone("acid_blob_name", "sheep_name");
+            clone("acid_blob_name", "sheep_name");
             addAddtion_endList(new List<string> { "腐蚀者" });
-            this.clone("jumpy_skull_name", "sheep_name");
+            clone("jumpy_skull_name", "sheep_name");
             addAddtion_endList(new List<string> { "头颅", "死灵" });
-            this.clone("lil_pumpkin_name", "sheep_name");
+            clone("lil_pumpkin_name", "sheep_name");
             addAddtion_endList(new List<string> { "南瓜", "木灵" });
-            this.clone("rat_name", "sheep_name");
+            clone("rat_name", "sheep_name");
             addAddtion_endList(new List<string> { "鼠", "灵鼠", "妖鼠" });
-            this.clone("ratKing_name", "sheep_name");
+            clone("ratKing_name", "sheep_name");
             addAddtion_endList(new List<string> { "鼠王", "灵鼠王", "妖鼠王" });
-            this.clone("cat_name", "sheep_name");
+            clone("cat_name", "sheep_name");
             addAddtion_endList(new List<string> { "猫", "灵猫", "妖猫", "猫" });
-            this.clone("rabbit_name", "sheep_name");
+            clone("rabbit_name", "sheep_name");
             addAddtion_endList(new List<string> { "兔", "月兔", "灵兔" });
-            this.clone("piranha_name", "sheep_name");
+            clone("piranha_name", "sheep_name");
             addAddtion_endList(new List<string> { "鱼", "鲨", "鲸" });
-            this.clone("snowman_name", "sheep_name");
+            clone("snowman_name", "sheep_name");
             addAddtion_endList(new List<string> { "雪灵" });
-            this.clone("bear_name", "sheep_name");
+            clone("bear_name", "sheep_name");
             addAddtion_endList(new List<string> { "熊", "魔熊", "妖熊", "巨熊" });
-            this.clone("skeleton_name", "sheep_name");
+            clone("skeleton_name", "sheep_name");
             addAddtion_endList(new List<string> { "死灵" });
-            this.clone("homie_name", "sheep_name");
+            clone("homie_name", "sheep_name");
             addAddtion_endList(new List<string> { "房子", "宅灵", "殿灵" });
-            this.clone("living_plant_name", "sheep_name");
+            clone("living_plant_name", "sheep_name");
             addAddtion_endList(new List<string> { "妖树", "灵树", "灵木", "妖木" });
-            this.clone("reindeer_name", "sheep_name");
+            clone("reindeer_name", "sheep_name");
             addAddtion_endList(new List<string> { "灵鹿", "巨鹿" });
-            this.clone("lobster_name", "sheep_name");
+            clone("lobster_name", "sheep_name");
             addAddtion_endList(new List<string> { "灵虾", "神虾", "巨虾", "水虾" });
-            this.clone("default_name", "sheep_name");
+            clone("default_name", "sheep_name");
             addAddtion_endList(new List<string> { "天灵", "圣灵", "魔灵" });
-            this.clone("tiger_name", "sheep_name");
+            clone("tiger_name", "sheep_name");
             addAddtion_endList(new List<string> { "虎" });
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "MengZhu_name",
                 fixedNameChance = 1.2f,
@@ -549,78 +564,78 @@ namespace Cultivation_Way
                 fixedList = new List<string> { "変態盟主" },
                 addition_endList = new List<string> { "変態" },
                 templates = null
-            }) ;
+            });
             #endregion
 
             #region 功法名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "book_name",
                 fixedNameChance = 0.0001f,
                 onlyByTemplate = false,
                 templates = new string[] { "part1", "part2", "addition_end" }
             });
-            this.t.addition_endList = new List<string> { "功法", "圣典", "道卷", "宝录", "古经", "灵谱", "剑罡" };
-            this.t.partsList = new List<string> { "天","地","玄","黄","灵", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸","道", "法", "元", "仙", "魔","圣", "神", "煞"
+            t.addition_endList = new List<string> { "功法", "圣典", "道卷", "宝录", "古经", "灵谱", "剑罡" };
+            t.partsList = new List<string> { "天","地","玄","黄","灵", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸","道", "法", "元", "仙", "魔","圣", "神", "煞"
             };
-            this.t.partsList2 = new List<string> { "水", "火", "金", "土", "木", "元", "灵", "威", "风", "雷", "观", "魂", "元", "冰", "焱", "血", "仙", "子", "丑", "寅", "辰", "卯", "巳", "午", "未", "申", "酉", "戌", "亥", "道" };
-            this.t.fixedList = new List<string> { "道心种魔大法", "混沌九转灭神霸决", "降妖伏魔弑神诛仙破天裂地纵横四海横扫八荒唯我独尊圣典", "启源圣典", "棋盘圣录", "人间道卷", "一米圣典", "玄玄子心法", "盲鱼圣录", "盟主心经", "仙庭宝典", "星剑剑道", "屹昂剑谱", "面包人心法" };
+            t.partsList2 = new List<string> { "水", "火", "金", "土", "木", "元", "灵", "威", "风", "雷", "观", "魂", "元", "冰", "焱", "血", "仙", "子", "丑", "寅", "辰", "卯", "巳", "午", "未", "申", "酉", "戌", "亥", "道" };
+            t.fixedList = new List<string> { "道心种魔大法", "混沌九转灭神霸决", "降妖伏魔弑神诛仙破天裂地纵横四海横扫八荒唯我独尊圣典", "启源圣典", "棋盘圣录", "人间道卷", "一米圣典", "玄玄子心法", "盲鱼圣录", "盟主心经", "仙庭宝典", "星剑剑道", "屹昂剑谱", "面包人心法" };
             #endregion
 
             #region 体质名
-            this.add(new ChineseNameAsset
+            add(new ChineseNameAsset
             {
                 id = "specialBody_name1",
                 onlyByTemplate = true,
                 templates = new string[] { "part1", "addition_end" }
             });
-            this.t.partsList = new List<string> {"凡" };
-            this.t.addition_endList = new List<string> { "体"};
-            this.add(new ChineseNameAsset
+            t.partsList = new List<string> { "凡" };
+            t.addition_endList = new List<string> { "体" };
+            add(new ChineseNameAsset
             {
                 id = "specialBody_name2",
                 onlyByTemplate = true,
                 templates = new string[] { "part1", "addition_end" }
             });
-            this.t.partsList = new List<string> { "灵力","石头","火气","冰之","金之","木之","水之","火之","土之","金银","铁之","剑之","刀之","枪之","棍之","斧之","矛之","盾之","地甲","勾魂","夺魄","蛮","兽","妖之","鬼之","灵之","黄天","玄气","元","气源","源力","巨力","大力","虎狮","妖力","力之","玄之","蛮力","迅捷","敏之","血之","铁臂","妖媚","魅惑","千钧","影子","治疗","瞳之","双瞳","火瞳","水瞳","金瞳","木瞳","土瞳","御空","灵眸","避水","避火","雾之","脱凡","狂暴","狂之","影之","毒之","地之","魂之","风之","电之","雷之","控水","控火","控金","控木","控土","剑心","刀心","将之","乾天","兑泽","离火","震雷","簨风","坎水","艮山","坤地","枯木","草木","硬石" };
-            this.t.addition_endList = new List<string> { "凡体", "体", "血脉", "凡脉" };
-            this.add(new ChineseNameAsset
+            t.partsList = new List<string> { "灵力", "石头", "火气", "冰之", "金之", "木之", "水之", "火之", "土之", "金银", "铁之", "剑之", "刀之", "枪之", "棍之", "斧之", "矛之", "盾之", "地甲", "勾魂", "夺魄", "蛮", "兽", "妖之", "鬼之", "灵之", "黄天", "玄气", "元", "气源", "源力", "巨力", "大力", "虎狮", "妖力", "力之", "玄之", "蛮力", "迅捷", "敏之", "血之", "铁臂", "妖媚", "魅惑", "千钧", "影子", "治疗", "瞳之", "双瞳", "火瞳", "水瞳", "金瞳", "木瞳", "土瞳", "御空", "灵眸", "避水", "避火", "雾之", "脱凡", "狂暴", "狂之", "影之", "毒之", "地之", "魂之", "风之", "电之", "雷之", "控水", "控火", "控金", "控木", "控土", "剑心", "刀心", "将之", "乾天", "兑泽", "离火", "震雷", "簨风", "坎水", "艮山", "坤地", "枯木", "草木", "硬石" };
+            t.addition_endList = new List<string> { "凡体", "体", "血脉", "凡脉" };
+            add(new ChineseNameAsset
             {
                 id = "specialBody_name3",
                 onlyByTemplate = true,
                 templates = new string[] { "part1", "addition_end" }
             });
-            this.t.partsList = new List<string> { "黄金","白银","白云","风之","雷之","冰之","水火","水木","金水","水土","金火","金木","金土","火土","火木","土木","鬼影","幽之","光之","暗之","金之","木之","火之","水之","土之","吞炎","烈焰","寒冰","炎月","火炎","火焰","火魔","金刚","铜皮","铁骨","玄冰","冰弦","玄冥","邪魔","闪电","鬼魅","魅惑","雾之","白雾","妖","魔","地","玄黄","玄冥","幽之","紫湟","巫妖","巫之","冰天","冰雪","邪瞳","紫瞳","冰碧","雪之","九心","六欲","邪火","寒风","风火","风灵","蓝银","磁之","源天","战之","剑之","刀之","枪之","棍之","斧之","矛之","天星","星灵","地煞","素女","坎离","坎火","坎水","坎土","坎金","坎木","烈日","烈阳","幽月","幽剑","无影","青炎","银霜","追日","苍炎","苍焰","风雨","归一","青雷","阴之","阳之","武","金","木","水","火","土","雷","电","妖","兽","狂战","冰","雾","双刀","双剑","炎剑","乾天","兑泽","离火","震雷","簨风","坎水","艮山","坤地","水雷","阴雷","阳雷","雷火","磐石","瑞金" };
-            this.t.addition_endList = new List<string> { "灵体", "血脉", "灵脉" };
-            this.add(new ChineseNameAsset
+            t.partsList = new List<string> { "黄金", "白银", "白云", "风之", "雷之", "冰之", "水火", "水木", "金水", "水土", "金火", "金木", "金土", "火土", "火木", "土木", "鬼影", "幽之", "光之", "暗之", "金之", "木之", "火之", "水之", "土之", "吞炎", "烈焰", "寒冰", "炎月", "火炎", "火焰", "火魔", "金刚", "铜皮", "铁骨", "玄冰", "冰弦", "玄冥", "邪魔", "闪电", "鬼魅", "魅惑", "雾之", "白雾", "妖", "魔", "地", "玄黄", "玄冥", "幽之", "紫湟", "巫妖", "巫之", "冰天", "冰雪", "邪瞳", "紫瞳", "冰碧", "雪之", "九心", "六欲", "邪火", "寒风", "风火", "风灵", "蓝银", "磁之", "源天", "战之", "剑之", "刀之", "枪之", "棍之", "斧之", "矛之", "天星", "星灵", "地煞", "素女", "坎离", "坎火", "坎水", "坎土", "坎金", "坎木", "烈日", "烈阳", "幽月", "幽剑", "无影", "青炎", "银霜", "追日", "苍炎", "苍焰", "风雨", "归一", "青雷", "阴之", "阳之", "武", "金", "木", "水", "火", "土", "雷", "电", "妖", "兽", "狂战", "冰", "雾", "双刀", "双剑", "炎剑", "乾天", "兑泽", "离火", "震雷", "簨风", "坎水", "艮山", "坤地", "水雷", "阴雷", "阳雷", "雷火", "磐石", "瑞金" };
+            t.addition_endList = new List<string> { "灵体", "血脉", "灵脉" };
+            add(new ChineseNameAsset
             {
                 id = "specialBody_name4",
                 onlyByTemplate = true,
                 templates = new string[] { "part1", "addition_end" }
             });
-            this.t.partsList = new List<string> { "半仙","地仙","化仙","凡极","七杀","血煞","追魂","星罗","雷电","冰火","风暴","飓风","暴风","雷暴","风雷","冰雷","冰风","大愚","八卦","探天","探禁","禁忌","修罗","地狱","炼狱","天使","万妖","金刚","昊天","杀戮","狱火","重水","天极","天金","万森","厚土","生死","冥","血","战天","博仙","天极","仙凡","武阳","天","圣莲","御魂","灵咒","清涟","琉璃","疾风","狂战","战龙","雪澜","封魔","道源","道灵","太康","龙渊","刀剑","天剑","绝刀","乾元","七星","天刑","九煞","天煞","天武","极火","焚世","邪月","离火","昭天","自在","逍遥","焚月","焚火","青云","天火","紫电","青霜","寒霜","罗刹","奔雷","纯阳","纯阴","霸刀","霸气","霸","玄龟","地罡","太易","阳雷","阴雷","天泽","风天","登天","玄雷","紫府","大地","三阴","混灵","长生","玄灵","元灵","登虚","焚心","灾星","摘星","逆生","白龙","化龙","凌云","山河","骨之","魔化","妖化" };
-            this.t.addition_endList = new List<string> { "王体", "体", "血脉", "战体", "剑体", "灵脉",  "战脉" };
-            this.add(new ChineseNameAsset
+            t.partsList = new List<string> { "半仙", "地仙", "化仙", "凡极", "七杀", "血煞", "追魂", "星罗", "雷电", "冰火", "风暴", "飓风", "暴风", "雷暴", "风雷", "冰雷", "冰风", "大愚", "八卦", "探天", "探禁", "禁忌", "修罗", "地狱", "炼狱", "天使", "万妖", "金刚", "昊天", "杀戮", "狱火", "重水", "天极", "天金", "万森", "厚土", "生死", "冥", "血", "战天", "博仙", "天极", "仙凡", "武阳", "天", "圣莲", "御魂", "灵咒", "清涟", "琉璃", "疾风", "狂战", "战龙", "雪澜", "封魔", "道源", "道灵", "太康", "龙渊", "刀剑", "天剑", "绝刀", "乾元", "七星", "天刑", "九煞", "天煞", "天武", "极火", "焚世", "邪月", "离火", "昭天", "自在", "逍遥", "焚月", "焚火", "青云", "天火", "紫电", "青霜", "寒霜", "罗刹", "奔雷", "纯阳", "纯阴", "霸刀", "霸气", "霸", "玄龟", "地罡", "太易", "阳雷", "阴雷", "天泽", "风天", "登天", "玄雷", "紫府", "大地", "三阴", "混灵", "长生", "玄灵", "元灵", "登虚", "焚心", "灾星", "摘星", "逆生", "白龙", "化龙", "凌云", "山河", "骨之", "魔化", "妖化" };
+            t.addition_endList = new List<string> { "王体", "体", "血脉", "战体", "剑体", "灵脉", "战脉" };
+            add(new ChineseNameAsset
             {
                 id = "specialBody_name5",
                 onlyByTemplate = true,
                 templates = new string[] { "part1", "addition_end" }
             });
-            this.t.partsList = new List<string> { "人皇","妖","仙","圣","魔","烈焰","极寒","厄运","厄毒","大日","大罗","后土","不死","不灭","吞噬","虚空","天妖","先天","道","五行","仙灵","月亮","夕日","星河","蛮雷","雷霆","风暴","妖魔","鬼","十方","八方","轮回","玲珑","万厄","大焚","万古","长青","重瞳","幽寒","九阳","九阴","十绝","星辰","死亡","堕落","日月","万森","空间","虚幻","凤龙","逆天","邪通","天","斗战","玄姹","万道","泣血","万药","太极","无敌","龙凤","玄武","昼夜","昼天","巅峰","飞仙","破穹","长生","圣泉","吞地","无垢","羽化","大荒","太上","霸血","圣血","神血","化禁","暗","光","焚","焚天","梵音","毒","祥瑞","不祥","天煞","时光","七杀","幽冥","诡匠","诡异","造化","贪婪","贪天","生死","狱火","重水","天极","天金","万森","厚土","仙极","清涟","诛仙","断天","魔魂","圣魔","封魔","封仙","封天","封灵","幻夜","清风","明月","赤霄","大夏","时之","绝代","虚空","太乙","玄天","托月","三生","红尘","乾坤","渡世","神魔","天罡","造化","瑶池","天谴","圣灵","上善","寂灭","九元","荒","道","剑","永生","道源","九幽","三清","原初","大圣","浮生","混乱","旧日" };
-            this.t.addition_endList = new List<string> { "皇体", "之体", "血脉", "仙体", "剑体", "魔体", "妖体", "尊体", "仙脉", "魂体", "皇脉", "古体" };
-            this.add(new ChineseNameAsset
+            t.partsList = new List<string> { "人皇", "妖", "仙", "圣", "魔", "烈焰", "极寒", "厄运", "厄毒", "大日", "大罗", "后土", "不死", "不灭", "吞噬", "虚空", "天妖", "先天", "道", "五行", "仙灵", "月亮", "夕日", "星河", "蛮雷", "雷霆", "风暴", "妖魔", "鬼", "十方", "八方", "轮回", "玲珑", "万厄", "大焚", "万古", "长青", "重瞳", "幽寒", "九阳", "九阴", "十绝", "星辰", "死亡", "堕落", "日月", "万森", "空间", "虚幻", "凤龙", "逆天", "邪通", "天", "斗战", "玄姹", "万道", "泣血", "万药", "太极", "无敌", "龙凤", "玄武", "昼夜", "昼天", "巅峰", "飞仙", "破穹", "长生", "圣泉", "吞地", "无垢", "羽化", "大荒", "太上", "霸血", "圣血", "神血", "化禁", "暗", "光", "焚", "焚天", "梵音", "毒", "祥瑞", "不祥", "天煞", "时光", "七杀", "幽冥", "诡匠", "诡异", "造化", "贪婪", "贪天", "生死", "狱火", "重水", "天极", "天金", "万森", "厚土", "仙极", "清涟", "诛仙", "断天", "魔魂", "圣魔", "封魔", "封仙", "封天", "封灵", "幻夜", "清风", "明月", "赤霄", "大夏", "时之", "绝代", "虚空", "太乙", "玄天", "托月", "三生", "红尘", "乾坤", "渡世", "神魔", "天罡", "造化", "瑶池", "天谴", "圣灵", "上善", "寂灭", "九元", "荒", "道", "剑", "永生", "道源", "九幽", "三清", "原初", "大圣", "浮生", "混乱", "旧日" };
+            t.addition_endList = new List<string> { "皇体", "之体", "血脉", "仙体", "剑体", "魔体", "妖体", "尊体", "仙脉", "魂体", "皇脉", "古体" };
+            add(new ChineseNameAsset
             {
                 id = "specialBody_name6",
                 onlyByTemplate = true,
                 templates = new string[] { "part1", "addition_end" }
             });
-            this.t.partsList = new List<string> { "荒古","无极","混沌","永恒","六道","禁忌","虚妄","大道","阴阳","太阳","太阴","镇狱","蛮荒","荒芜","凌霄","无始","天魔","黑暗","光明","青莲","吞天","荒古","阳阳","太虚","不死","吞噬","星空","洪荒","毁灭","创世","审判","天道","轮回","禁忌","太一","原始","紫薇","苍天","上苍","仙道","真武","至尊","祖龙","仙凤","苍穹","永恒","时空","启源","往生","痴愚","屹昂","一米","面包","星棋盘","盟主","临渊","人间"};
-            this.t.addition_endList = new List<string> { "圣体", "帝体", "帝脉", "神体", "仙体", "禁脉", "道体", "魔体", "神脉", "仙脉", "圣脉", "之源",  "禁体" };
+            t.partsList = new List<string> { "荒古", "无极", "混沌", "永恒", "六道", "禁忌", "虚妄", "大道", "阴阳", "太阳", "太阴", "镇狱", "蛮荒", "荒芜", "凌霄", "无始", "天魔", "黑暗", "光明", "青莲", "吞天", "荒古", "阳阳", "太虚", "不死", "吞噬", "星空", "洪荒", "毁灭", "创世", "审判", "天道", "轮回", "禁忌", "太一", "原始", "紫薇", "苍天", "上苍", "仙道", "真武", "至尊", "祖龙", "仙凤", "苍穹", "永恒", "时空", "启源", "往生", "痴愚", "屹昂", "一米", "面包", "星棋盘", "盟主", "临渊", "人间" };
+            t.addition_endList = new List<string> { "圣体", "帝体", "帝脉", "神体", "仙体", "禁脉", "道体", "魔体", "神脉", "仙脉", "圣脉", "之源", "禁体" };
             #endregion
         }
         private void addAddtion_endList(List<string> list)
         {
-            this.t.addition_endList = list;
+            t.addition_endList = list;
             ChineseNameAsset.familyNameTotal.AddRange(list);
         }
     }

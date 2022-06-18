@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Cultivation_Way
 {
-    class ExtendedWorldData
+    internal class ExtendedWorldData
     {
         public static ExtendedWorldData instance;
         public float worldLevel = 0f;
@@ -15,8 +11,9 @@ namespace Cultivation_Way
         public List<BonusStatsManager> bonusStatsManagers = new List<BonusStatsManager>();
 
         public Dictionary<string, int> creatureLimit = new Dictionary<string, int>();//生物限制
+        public Dictionary<string, string> godList = new Dictionary<string, string>();//神明
         public Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//未生成单位的属性
-        
+
         public Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族
 
         public List<MapChunk> chunks = new List<MapChunk>();//方便获取区块

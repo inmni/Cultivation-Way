@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Cultivation_Way
 {
-    class CultivationBookContainer:ObjectContainer<CultivationBook>
+    internal class CultivationBookContainer : ObjectContainer<CultivationBook>
     {
-        
+
         /// <summary>
         /// 获取随机一本匹配类型的功法
         /// </summary>
         /// <param name="pActor"></param>
         /// <param name="requireType"></param>
         /// <returns></returns>
-        public CultivationBook getRandomOne(ExtendedActor pActor,CultivationBookType requireType=CultivationBookType.NONE)
+        public CultivationBook getRandomOne(ExtendedActor pActor, CultivationBookType requireType = CultivationBookType.NONE)
         {
             List<CultivationBook> possibleBooks = new List<CultivationBook>();
             getPossibleBooks(pActor, requireType, possibleBooks);
@@ -36,7 +32,7 @@ namespace Cultivation_Way
             CultivationBook bestOne = null;
             float bestMatchDegree = 0f;
             float temp;
-            using (IEnumerator<CultivationBook> enumerator = this.GetEnumerator())
+            using (IEnumerator<CultivationBook> enumerator = GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
@@ -57,7 +53,7 @@ namespace Cultivation_Way
 
         private void getPossibleBooks(ExtendedActor pActor, CultivationBookType requireType, List<CultivationBook> possibleBooks)
         {
-            using (IEnumerator<CultivationBook> enumerator = this.GetEnumerator())
+            using (IEnumerator<CultivationBook> enumerator = GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {

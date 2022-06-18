@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cultivation_Way.MoreAiBehaviours
+﻿namespace Cultivation_Way.MoreAiBehaviours
 {
-    class BehaviourTaskCityLibrary
+    internal class BehaviourTaskCityLibrary
     {
         internal static CityBehBuildWall buildWall;
         public void init()

@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    class ExtensionSpell
+    internal class ExtensionSpell
     {
         public string spellAssetID;
 

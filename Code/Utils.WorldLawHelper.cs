@@ -1,18 +1,11 @@
-﻿using System;
+﻿using HarmonyLib;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using CultivationWay;
-using NCMS.Utils;
-using ReflectionUtility;
-using HarmonyLib;
 namespace Cultivation_Way.Utils
 {
-    class WorldLawHelper
+    internal class WorldLawHelper
     {
         /// <summary>
         /// 存放初始数据，用于重建地图时
@@ -25,20 +18,20 @@ namespace Cultivation_Way.Utils
         private static Vector2 buttonScale = new Vector2(1.5f, 1.5f);
 
         private static GameObject originLawButton = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/world_laws/Background/Scroll View/Viewport/Content/Units/Grid/world_law_old_age").GetComponent<WorldLawElement>().gameObject;
-        public static void createWorldLaw(string id,string name,string description,Transform parent,UnityAction<WorldLawElement> action,int num,bool defaultActive = true)
+        public static void createWorldLaw(string id, string name, string description, Transform parent, UnityAction<WorldLawElement> action, int num, bool defaultActive = true)
         {
             GameObject newLawButton = null;
 
-                originLawButton.SetActive(false);
-                newLawButton = GameObject.Instantiate(originLawButton);
-                originLawButton.SetActive(true);
+            originLawButton.SetActive(false);
+            newLawButton = GameObject.Instantiate(originLawButton);
+            originLawButton.SetActive(true);
             newLawButton.name = id;
             newLawButton.transform.SetParent(parent);
             newLawButton.transform.localPosition = getPos(num);
             newLawButton.transform.localScale = buttonScale;
 
             Image image = newLawButton.transform.Find("Button").Find("LawIcon").GetComponent<Image>();
-            image.sprite = Resources.Load<Sprite>($"ui/Icons/{id}");
+            image.sprite = Resources.Load<Sprite>($"ui/Icons/icon{id}");
 
             WorldLawElement wle = newLawButton.GetComponent<WorldLawElement>();
             wle.icon.color = defaultActive ? Toolbox.makeColor("#FFFFFF") : Toolbox.makeColor("#666666");
@@ -47,9 +40,9 @@ namespace Cultivation_Way.Utils
             newLawButton_button.onClick = new Button.ButtonClickedEvent();
             newLawButton_button.onClick.AddListener(() => action(wle));
 
-                PlayerOptionData data = new PlayerOptionData(id) { boolVal = defaultActive };
-            
-                originLaws.Add(id, data);
+            PlayerOptionData data = new PlayerOptionData(id) { boolVal = defaultActive };
+
+            originLaws.Add(id, data);
             newLawButton.SetActive(true);
         }
         private static Vector2 getPos(int num)
@@ -58,6 +51,8 @@ namespace Cultivation_Way.Utils
             float y = yStart + (num / 5) * yOffset;
             return new Vector2(x, y);
         }
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(WorldLaws), "init")]
         public static void initWorldLaws()
         {
             if (MapBox.instance.worldLaws.dict == null)
@@ -68,10 +63,9 @@ namespace Cultivation_Way.Utils
             {
                 MapBox.instance.worldLaws.list = new List<PlayerOptionData>();
             }
-            foreach(string id in originLaws.Keys)
+            foreach (PlayerOptionData data in originLaws.Values)
             {
-                MapBox.instance.worldLaws.add(originLaws[id]);
-                
+                MapBox.instance.worldLaws.add(data);
             }
         }
     }

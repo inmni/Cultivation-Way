@@ -2,9 +2,10 @@
 using HarmonyLib;
 using ReflectionUtility;
 using System;
+using Cultivation_Way.Utils;
 namespace Cultivation_Way
 {
-    class MoreGodPowers
+    internal class MoreGodPowers
     {
         internal void init()
         {
@@ -56,7 +57,7 @@ namespace Cultivation_Way
             power1.click_action = new PowerActionWithID((WorldTile pTile, string pPower)
                                 =>
             {
-                return (bool)AssetManager.powers.CallMethod("spawnUnit", pTile, pPower);
+                return ((Func<PowerLibrary, WorldTile, string, bool>)AssetManager.powers.GetFastMethod("spawnUnit"))(AssetManager.powers, pTile, pPower);
             });
             AssetManager.powers.add(power1);
 
@@ -76,6 +77,23 @@ namespace Cultivation_Way
                 return PowerActionLibrary.spawnYao(pTile, pPower);
             });
             AssetManager.powers.add(power2);
+
+            GodPower Wu = new GodPower();
+            Wu.id = "spawnWu";
+            Wu.name = "spawnWu";
+            Wu.rank = PowerRank.Rank0_free;
+            Wu.actorStatsId = "unit_Wu";
+            Wu.actorSpawnHeight = 3f;
+            Wu.unselectWhenWindow = true;
+            Wu.ignoreFastSpawn = false;
+            Wu.showSpawnEffect = "spawn";
+            Wu.spawnSound = "spawnOrc";
+            Wu.click_action = new PowerActionWithID((WorldTile pTile, string pPower)
+                                =>
+            {
+                return (bool)AssetManager.powers.CallMethod("spawnUnit", pTile, pPower);
+            });
+            AssetManager.powers.add(Wu);
 
             GodPower fairyFox = new GodPower();
             fairyFox.id = "spawnFairyFox";
@@ -321,7 +339,7 @@ namespace Cultivation_Way
             checkElement.force_map_text = MapMode.None;
             checkElement.map_modes_switch = true;
             checkElement.toggle_name = "map_reki_zones";
-            checkElement.toggle_action = (PowerToggleAction)Delegate.Combine(checkElement.toggle_action, new PowerToggleAction(this.toggleOption));
+            checkElement.toggle_action = (PowerToggleAction)Delegate.Combine(checkElement.toggle_action, new PowerToggleAction(toggleOption));
             AssetManager.powers.add(checkElement);
             #endregion
         }
@@ -334,7 +352,7 @@ namespace Cultivation_Way
             playerOptionData.boolVal = !playerOptionData.boolVal;
             if (playerOptionData.boolVal && godPower.map_modes_switch)
             {
-                this.disableAllOtherMapModes(pPower);
+                disableAllOtherMapModes(pPower);
                 Main.instance.addMapMode = godPower.toggle_name;
             }
             else

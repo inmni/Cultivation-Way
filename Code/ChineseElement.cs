@@ -2,7 +2,7 @@
 
 namespace Cultivation_Way
 {
-    class ChineseElement
+    internal class ChineseElement
     {
         /// <summary>
         /// 五大元素含量，顺序为金木水火土
@@ -35,7 +35,7 @@ namespace Cultivation_Way
         public void setType()
         {
             bool isAll = true;
-            for(int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (baseElementContainer[i] != 20)
                 {
@@ -43,7 +43,7 @@ namespace Cultivation_Way
                     break;
                 }
             }
-            
+
             ChineseElementLibrary elementLibrary = AddAssetManager.chineseElementLibrary;
             if (isAll)
             {
@@ -62,7 +62,7 @@ namespace Cultivation_Way
                     membership *= Math.Abs(baseElementContainer[i] - elementLibrary.dict[id].content[i]) + 1;
                 }
 
-                if (membership < maxMembership.Item2&&id!= "AllElement")
+                if (membership < maxMembership.Item2 && id != "AllElement")
                 {
                     maxMembership = new Tuple<string, int>(id, membership);
                 }
@@ -138,7 +138,7 @@ namespace Cultivation_Way
             getRandom();
         }
 
-        public static bool isMatch(ChineseElement e1,ChineseElement e2)        
+        public static bool isMatch(ChineseElement e1, ChineseElement e2)
         {
             return true;
         }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Cultivation_Way
 {
-    class SpecialActorAsset
+    internal class SpecialActorAsset
     {
         public SpecialActorAssetContainer[] list;
 
@@ -15,16 +11,16 @@ namespace Cultivation_Way
 
         public SpecialActorAssetContainer getAsset(SpecialActorState pState)
         {
-            if (this.dict == null)
+            if (dict == null)
             {
-                this.dict = new Dictionary<int, SpecialActorAssetContainer>();
-                foreach (SpecialActorAssetContainer easternDragonAssetContainer in this.list)
+                dict = new Dictionary<int, SpecialActorAssetContainer>();
+                foreach (SpecialActorAssetContainer easternDragonAssetContainer in list)
                 {
                     int id = getID(easternDragonAssetContainer.id);
-                    this.dict.Add(id, easternDragonAssetContainer);
+                    dict.Add(id, easternDragonAssetContainer);
                 }
             }
-            return this.dict[getID(pState)];
+            return dict[getID(pState)];
         }
         private int getID(SpecialActorState pState)
         {

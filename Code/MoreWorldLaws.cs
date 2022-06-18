@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NCMS.Utils;
+﻿using NCMS.Utils;
+using ReflectionUtility;
 using UnityEngine;
 using UnityEngine.UI;
-using CultivationWay;
-using ReflectionUtility;
 
 namespace Cultivation_Way
 {
-    class MoreWorldLaws
+    internal class MoreWorldLaws
     {
         private ScrollWindow window;
         private GameObject content;
@@ -37,7 +31,7 @@ namespace Cultivation_Way
             window = Windows.CreateNewWindow("window_MoreWorldLaws", "天地道则");
             content = window.transform.Find("Background").Find("Scroll View")
                                       .Find("Viewport").Find("Content").gameObject;
-            for(int i = 0; i < content.transform.childCount; i++)
+            for (int i = 0; i < content.transform.childCount; i++)
             {
                 GameObject.Destroy(content.transform.GetChild(i).gameObject);
             }
@@ -88,8 +82,8 @@ namespace Cultivation_Way
         }
         private void initButton()
         {
-            Utils.WorldLawHelper.createWorldLaw("YaoKingdom", "妖族建国", "关闭后妖族将化为一盘散沙", Civilization.transform, simpleClick,0, true);
-            Utils.WorldLawHelper.createWorldLaw("MoreDisasters", "更多天灾", "注意！！", World.transform, simpleClick,0, false);
+            Utils.WorldLawHelper.createWorldLaw("YaoKingdom", "妖族建国", "关闭后妖族将化为一盘散沙", Civilization.transform, simpleClick, 0, true);
+            Utils.WorldLawHelper.createWorldLaw("MoreDisasters", "更多天灾", "注意！！", World.transform, simpleClick, 0, false);
         }
         private void simpleClick(WorldLawElement wle)
         {

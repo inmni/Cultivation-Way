@@ -1,13 +1,6 @@
-﻿using CultivationWay;
-using HarmonyLib;
-using NCMS.Utils;
-using ReflectionUtility;
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    class MoreCultureTech
+    internal class MoreCultureTech
     {
         internal void init()
         {
@@ -16,7 +9,7 @@ namespace Cultivation_Way
                 AssetManager.culture_tech.add(new CultureTechAsset
                 {
                     id = "culti_" + cultisystem.id,
-                    path_icon = "tech/icon"+cultisystem.id,
+                    path_icon = "tech/icon" + cultisystem.id,
                     type = TechType.Rare,
                     enabled = true,
                 });

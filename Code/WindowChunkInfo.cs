@@ -1,12 +1,11 @@
-﻿using CultivationWay;
-using NCMS.Utils;
+﻿using NCMS.Utils;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class WindowChunkInfo
+    internal class WindowChunkInfo
     {
         private static ScrollWindow window;
 

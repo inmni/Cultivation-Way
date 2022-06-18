@@ -10,7 +10,7 @@ namespace Cultivation_Way
         {
             base.init();
             #region 简单法术
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "example",
                 name = "简单术法",
@@ -21,10 +21,10 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 50, 20, 10, 10, 10 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.exampleSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.exampleSpell)
             });
             addSpell(t.id, t.rarity);
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "lightning",
                 name = "雷法",
@@ -37,10 +37,10 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 50, 20, 10, 10, 10 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.lightningSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.lightningSpell)
             });
             addSpell(t.id, t.rarity);
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "default_lightning",
                 name = "引雷",
@@ -53,10 +53,10 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 50, 20, 10, 10, 10 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.lightning1Spell)
+                spellAction = new SpellAction(ExtendedWorldActions.lightning1Spell)
             });
             addSpell(t.id, t.rarity);
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "default_fire",
                 name = "基础火法",
@@ -69,10 +69,10 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 0, 0, 0, 100, 0 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.defaultFire)
+                spellAction = new SpellAction(ExtendedWorldActions.defaultFire)
             });
             addSpell(t.id, t.rarity);
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "swordsArray",
                 name = "剑阵",
@@ -85,10 +85,10 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 100, 0, 0, 0, 0 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.swordsArray)
+                spellAction = new SpellAction(ExtendedWorldActions.swordsArray)
             });
             addSpell(t.id, t.rarity);
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "base",
                 name = "简单术法",
@@ -98,10 +98,10 @@ namespace Cultivation_Way
                 bannedCultisystem = new List<string>() { "bodying" },
                 bannedRace = new List<string>(),
                 might = 1f,
-                type = new ExtensionSpellType() { requiredLevel = 5},
+                type = new ExtensionSpellType() { requiredLevel = 5 },
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.baseSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.baseSpell)
             });
             addSpell(t.id, t.rarity);
             #endregion
@@ -109,7 +109,7 @@ namespace Cultivation_Way
 
             #endregion
             #region 圣体显化
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "STXH",
                 name = "圣体显化",
@@ -122,12 +122,12 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.none,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.Shengtixianhua)
+                spellAction = new SpellAction(ExtendedWorldActions.Shengtixianhua)
             });
             addSpell(t.id, t.rarity);
             #endregion
             #region 特殊法术
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "JiaoDragon_laser",
                 name = "太虚吐息",
@@ -140,9 +140,9 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.laserSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.laserSpell)
             });
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "goldBar",
                 name = "闷棍",
@@ -155,9 +155,9 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.barSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.barSpell)
             });
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "goldBarDown",
                 name = "昏棍",
@@ -170,11 +170,11 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.barDownSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.barDownSpell)
             });
             #endregion
             #region 种族法术
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "summonTian",
                 name = "折跃航标",
@@ -187,9 +187,9 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.summonTianSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.summonTianSpell)
             });
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "summonTian1",
                 name = "帝卫亲临",
@@ -202,9 +202,9 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType() { attacking = false, levelUp = true, requiredLevel = 101 },
                 direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.summonTianSpell1)
+                spellAction = new SpellAction(ExtendedWorldActions.summonTianSpell1)
             });
-            this.add(new ExtensionSpellAsset
+            add(new ExtensionSpellAsset
             {
                 id = "summon",
                 name = "亡灵复生",
@@ -217,7 +217,7 @@ namespace Cultivation_Way
                 type = new ExtensionSpellType(),
                 direction = DirectionType.none,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
-                spellAction = new SpellAction(ExtensionSpellActionLibrary.summonSpell)
+                spellAction = new SpellAction(ExtendedWorldActions.summonSpell)
             });
             #endregion
         }

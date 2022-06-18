@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    class CultisystemAsset : Asset
+    internal class CultisystemAsset : Asset
     {
         public string name;//体系名
 

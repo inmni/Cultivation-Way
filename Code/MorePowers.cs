@@ -1,5 +1,4 @@
-﻿using CultivationWay;
-using NCMS.Utils;
+﻿using NCMS.Utils;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -8,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class MorePowers
+    internal class MorePowers
     {
         public static GameObject newTab;
         public static PowersTab tabComponent;
@@ -148,6 +147,11 @@ namespace Cultivation_Way
 
             Utils.TabHelper.AddButtonToTab(button);
 
+            button = PowerButtons.CreateButton("spawnWu", Resources.Load<Sprite>("ui/Icons/iconWu"),
+                "巫族", "", Vector3.zero, ButtonType.GodPower, null, null);
+
+            Utils.TabHelper.AddButtonToTab(button);
+
             Utils.TabHelper.AddLine();
 
             button = PowerButtons.CreateButton("spawnEasternDragon", Resources.Load<Sprite>("ui/Icons/iconEasternDragon"),
@@ -160,58 +164,58 @@ namespace Cultivation_Way
 
             Utils.TabHelper.AddButtonToTab(button);
             #region 妖圣
-            button = PowerButtons.CreateButton("spawnMonkeySheng1", Resources.Load<Sprite>("ui/Icons/iconMonkeySheng1"),
-                "齐天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
-            Utils.TabHelper.AddButtonToTab(button);
+            //button = PowerButtons.CreateButton("spawnMonkeySheng1", Resources.Load<Sprite>("ui/Icons/iconMonkeySheng1"),
+            //    "齐天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("spawnMonkeySheng2", Resources.Load<Sprite>("ui/Icons/iconMonkeySheng2"),
-                "通风大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //button = PowerButtons.CreateButton("spawnMonkeySheng2", Resources.Load<Sprite>("ui/Icons/iconMonkeySheng2"),
+            //    "通风大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
-            button = PowerButtons.CreateButton("spawnCowSheng", Resources.Load<Sprite>("ui/Icons/iconCowSheng"),
-                "平天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //Utils.TabHelper.AddButtonToTab(button);
+            //button = PowerButtons.CreateButton("spawnCowSheng", Resources.Load<Sprite>("ui/Icons/iconCowSheng"),
+            //    "平天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
-            button = PowerButtons.CreateButton("spawnCatSheng", Resources.Load<Sprite>("ui/Icons/iconCatSheng"),
-                "移山大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //Utils.TabHelper.AddButtonToTab(button);
+            //button = PowerButtons.CreateButton("spawnCatSheng", Resources.Load<Sprite>("ui/Icons/iconCatSheng"),
+            //    "移山大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
-            button = PowerButtons.CreateButton("spawnWolfSheng", Resources.Load<Sprite>("ui/Icons/iconWolfSheng"),
-                "驱神大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //Utils.TabHelper.AddButtonToTab(button);
+            //button = PowerButtons.CreateButton("spawnWolfSheng", Resources.Load<Sprite>("ui/Icons/iconWolfSheng"),
+            //    "驱神大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
-            button = PowerButtons.CreateButton("spawnSnakeSheng", Resources.Load<Sprite>("ui/Icons/iconSnakeSheng"),
-                "覆海大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //Utils.TabHelper.AddButtonToTab(button);
+            //button = PowerButtons.CreateButton("spawnSnakeSheng", Resources.Load<Sprite>("ui/Icons/iconSnakeSheng"),
+            //    "覆海大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
-            button = PowerButtons.CreateButton("spawnChickenSheng", Resources.Load<Sprite>("ui/Icons/iconChickenSheng"),
-                "混天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
+            //Utils.TabHelper.AddButtonToTab(button);
+            //button = PowerButtons.CreateButton("spawnChickenSheng", Resources.Load<Sprite>("ui/Icons/iconChickenSheng"),
+            //    "混天大圣", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
+            //Utils.TabHelper.AddButtonToTab(button);
             #endregion
             Utils.TabHelper.AddLine();
             #endregion
 
             #region BOSS
-            button = PowerButtons.CreateButton("spawnJiaoDragon", Resources.Load<Sprite>("ui/Icons/iconJiaoDragon"),
-                "蛟龙", "蛟，龙之属也。", Vector3.zero, ButtonType.GodPower, null, null);
-
-            Utils.TabHelper.AddButtonToTab(button);
-
-            //button = PowerButtons.CreateButton("spawnXieDragon", Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/iconXieDragon"),
-            //    "邪龙", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
+            //button = PowerButtons.CreateButton("spawnJiaoDragon", Resources.Load<Sprite>("ui/Icons/iconJiaoDragon"),
+            //    "蛟龙", "蛟，龙之属也。", Vector3.zero, ButtonType.GodPower, null, null);
 
             //Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("spawnFuRen", Resources.Load<Sprite>("ui/Icons/iconFuRen"),
-                "福人", "", Vector3.zero, ButtonType.GodPower, null, null);
+            ////button = PowerButtons.CreateButton("spawnXieDragon", Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/icons/iconXieDragon"),
+            ////    "邪龙", "我是你们爸爸", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
+            ////Utils.TabHelper.AddButtonToTab(button);
 
-            button = PowerButtons.CreateButton("spawnNian", Resources.Load<Sprite>("ui/Icons/iconNian"),
-                "年","", Vector3.zero, ButtonType.GodPower, null, null);
+            //button = PowerButtons.CreateButton("spawnFuRen", Resources.Load<Sprite>("ui/Icons/iconFuRen"),
+            //    "福人", "", Vector3.zero, ButtonType.GodPower, null, null);
 
-            Utils.TabHelper.AddButtonToTab(button);
+            //Utils.TabHelper.AddButtonToTab(button);
+
+            //button = PowerButtons.CreateButton("spawnNian", Resources.Load<Sprite>("ui/Icons/iconNian"),
+            //    "年","", Vector3.zero, ButtonType.GodPower, null, null);
+
+            //Utils.TabHelper.AddButtonToTab(button);
             #endregion
 
             #region 彩蛋

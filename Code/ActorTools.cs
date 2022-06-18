@@ -1,41 +1,12 @@
 ﻿using CultivationWay;
 using ReflectionUtility;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 
 namespace Cultivation_Way
 {
-    static class ActorTools
+    internal static class ActorTools
     {
-        /// <summary>
-        /// 返回data(ActorStatus)
-        /// </summary>
-        /// <param name="actor"></param>
-        /// <returns></returns>
-        public static ActorStatus GetData(this Actor actor)
-        {
-            if (actor == null)
-            {
-                return null;
-            }
-            return ((ExtendedActor)actor).easyData;
-        }
-        /// <summary>
-        /// 返回curStats(BaseStats)
-        /// </summary>
-        /// <param name="actor"></param>
-        /// <returns></returns>
-        public static BaseStats GetCurStats(this Actor actor)
-        {
-            if (actor == null)
-            {
-                return null;
-            }
-            return ((ExtendedActor)actor).easyCurStats;
-        }
+        
         /// <summary>
         /// 返回actor的体质
         /// </summary>
@@ -55,7 +26,7 @@ namespace Cultivation_Way
         {
             return ExtendedWorldData.instance.familys[((ExtendedActor)actor).extendedData.status.familyID];
         }
-        public static bool canCastSpell(this ExtendedActor actor,ExtensionSpell spell)
+        public static bool canCastSpell(this ExtendedActor actor, ExtensionSpell spell)
         {
             return actor.extendedData.status.magic > spell.cost && spell.leftCool == 0;
         }
@@ -117,7 +88,7 @@ namespace Cultivation_Way
             {
                 ((ExtendedActor)actor).extendedData.status.specialBody = newBody.id;
             }
-            newBody.name = ChineseNameGenerator.getName("specialBody_name"+newBody.rank)+ChineseNameAsset.rankName1[newBody.rank-1];
+            newBody.name = ChineseNameGenerator.getName("specialBody_name" + newBody.rank) + ChineseNameAsset.rankName1[newBody.rank - 1];
             newBody.mod_damage = Toolbox.randomInt(0, 20 * newBody.rank);
             newBody.mod_health = Toolbox.randomInt(0, 20 * newBody.rank);
             newBody.mod_attack_speed = Toolbox.randomInt(-10, 10 * newBody.rank);
@@ -128,8 +99,8 @@ namespace Cultivation_Way
         public static void learnNewSpell(this Actor actor)
         {
             ExtendedActor extendedActor = (ExtendedActor)actor;
-            ExtensionSpell[] spells= ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
-            for(int i = 0; i < spells.Length; i++)
+            ExtensionSpell[] spells = ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
+            for (int i = 0; i < spells.Length; i++)
             {
                 if (spells[i] == null)
                 {
@@ -288,7 +259,7 @@ namespace Cultivation_Way
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        public static void copyMore(Actor from, Actor to,bool compositionCopied = false)
+        public static void copyMore(Actor from, Actor to, bool compositionCopied = false)
         {
             ExtendedActor fromActor = (ExtendedActor)from;
             ExtendedActor toActor = (ExtendedActor)to;
@@ -303,7 +274,7 @@ namespace Cultivation_Way
             if (compositionCopied)
             {
                 toActor.extendedData.status.compositionSetting = fromActor.extendedData.status.compositionSetting;
-                foreach(BaseSimObject baseSimObject in fromActor.compositions)
+                foreach (BaseSimObject baseSimObject in fromActor.compositions)
                 {
                     ComposeTools.composeTwo(toActor, baseSimObject);
                 }
@@ -348,9 +319,9 @@ namespace Cultivation_Way
             MoreStatus moredata = actor1.extendedData.status;
             morestats.clear();
             int realm = actor1.getRealm();
-            morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[realm-1]);
+            morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[realm - 1]);
             morestats.addAnotherStats(ExtendedWorldData.instance.familys[moredata.familyID].cultivationBook.stats[realm - 1]);
-            
+
             morestats.addAnotherStats(moredata.bonusStats);
         }
         /// <summary>
@@ -363,7 +334,7 @@ namespace Cultivation_Way
             ExtendedActor actor1 = (ExtendedActor)actor;
             MoreStatus moredata = actor1.extendedData.status;
             int maxArmor = 80 + actor1.easyData.level / 6;
-            
+
             if (moredata.cultisystem == "bodying")
             {
                 maxArmor += 5;
@@ -372,9 +343,9 @@ namespace Cultivation_Way
             {
                 maxArmor = 99;
             }
-            if (actor.GetCurStats().armor > maxArmor)
+            if (actor1.easyCurStats.armor > maxArmor)
             {
-                actor.GetCurStats().armor = maxArmor;
+                actor1.easyCurStats.armor = maxArmor;
             }
             if (moredata.magic > actor1.extendedCurStats.magic)
             {
@@ -396,11 +367,11 @@ namespace Cultivation_Way
         public static float getCombat(this Actor actor)
         {
             ExtendedActor actor1 = (ExtendedActor)actor;
-            float result = 1f;
+            float result;
             float element = actor1.extendedCurStats.element.getImPurity();
             float spellCount = actor1.extendedCurStats.spells.Count;
             float specialBody = actor.GetSpecialBody().rank;
-            float baseStats = (actor.GetCurStats().health >> 7) * (actor.GetCurStats().damage >> 5) / (100-actor.GetCurStats().armor)*actor.GetCurStats().attackSpeed;
+            float baseStats = (actor1.easyCurStats.health >> 7) * (actor1.easyCurStats.damage >> 5) / (100 - actor1.easyCurStats.armor) * actor1.easyCurStats.attackSpeed;
             result = element * spellCount * specialBody * baseStats / 4;
             return result;
         }

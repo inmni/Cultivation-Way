@@ -1,20 +1,15 @@
-﻿using CultivationWay;
-using HarmonyLib;
-using ReflectionUtility;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using HarmonyLib;
 
 namespace Cultivation_Way
 {
-    class MoreTraits
+    internal class MoreTraits
     {
         internal void init()
         {
             AssetManager.traits.add(new ActorTrait
             {
                 id = "cursed_immune",
-                path_icon = "ui/Icons/iconPoisonImmune",
+                path_icon = "ui/Icons/iconCursedImmune",
                 opposite = "cursed"
             });
             AssetManager.traits.get("cursed").opposite = "cursed_immune";
@@ -30,7 +25,7 @@ namespace Cultivation_Way
                 id = "realm",
                 birth = 0f,
                 path_icon = "ui/Icons/default_1",
-                unlockedWithAchievement = true,
+                unlocked_with_achievement = true,
                 achievement_id = "Lost"
             });
             AssetManager.traits.add(new ActorTrait
@@ -38,15 +33,15 @@ namespace Cultivation_Way
                 id = "cultivationBook",
                 birth = 0f,
                 path_icon = "ui/Icons/iconCultivationBook",
-                unlockedWithAchievement=true,
-                achievement_id="Lost"
+                unlocked_with_achievement = true,
+                achievement_id = "Lost"
             });
             AssetManager.traits.add(new ActorTrait
             {
                 id = "element",
                 birth = 0f,
                 path_icon = "ui/Icons/iconTalent",
-                unlockedWithAchievement = true,
+                unlocked_with_achievement = true,
                 achievement_id = "Lost"
             });
             AssetManager.traits.add(new ActorTrait
@@ -54,7 +49,7 @@ namespace Cultivation_Way
                 id = "race",
                 birth = 0f,
                 path_icon = "ui/Icons/iconEasternHuman",
-                unlockedWithAchievement = true,
+                unlocked_with_achievement = true,
                 achievement_id = "Lost"
             });
         }

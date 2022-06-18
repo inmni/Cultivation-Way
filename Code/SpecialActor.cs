@@ -1,14 +1,10 @@
 ﻿using ReflectionUtility;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Cultivation_Way
 {
-    class SpecialActor : BaseActorComponent
+    internal class SpecialActor : BaseActorComponent
     {
         internal ExtendedActor actor;
 
@@ -26,7 +22,7 @@ namespace Cultivation_Way
 
         private float actionTime;
 
-        private Actor actorToAttack;
+        private ExtendedActor actorToAttack;
 
         private bool _died;
 
@@ -39,24 +35,24 @@ namespace Cultivation_Way
 
         private void Start()
         {
-            this.onStart();
-            if (!this.created)
+            onStart();
+            if (!created)
             {
-                this.create();
+                create();
             }
         }
         internal void create()
         {
-            this.actor = base.gameObject.GetComponent<ExtendedActor>();
-            this.created = true;
-            this.m_gameObject = base.gameObject;
-            this.m_transform = this.m_gameObject.transform;
-            this.setWorld();
-            this.spriteAnimation = base.GetComponent<SpriteAnimation>();
-            this.specialActorAsset = getAsset();
-            this.actor.callbacks_get_hit.Add(new BaseActionActor(this.getHit));
+            actor = base.gameObject.GetComponent<ExtendedActor>();
+            created = true;
+            m_gameObject = base.gameObject;
+            m_transform = m_gameObject.transform;
+            setWorld();
+            spriteAnimation = base.GetComponent<SpriteAnimation>();
+            specialActorAsset = getAsset();
+            actor.callbacks_get_hit.Add(new BaseActionActor(getHit));
 
-            this.actor.setStatsDirty();
+            actor.setStatsDirty();
             setState(new SpecialActorState());
         }
         private SpecialActorAsset getAsset()
@@ -65,17 +61,17 @@ namespace Cultivation_Way
         }
         private void setState(SpecialActorState pState)
         {
-            this.state = pState;
-            SpecialActorAssetContainer asset = this.specialActorAsset.getAsset(pState);
-            this.animationDoneOnce = false;
-            switch (this.state)
+            state = pState;
+            SpecialActorAssetContainer asset = specialActorAsset.getAsset(pState);
+            animationDoneOnce = false;
+            switch (state)
             {
                 case SpecialActorState.Move:
                     List<WorldTile> possibleTiles = Utils.OthersHelper.getTilesInRange(actor.currentTile, 10f);
-                    this.actor.moveTo(possibleTiles.GetRandom());
+                    actor.moveTo(possibleTiles.GetRandom());
                     break;
                 case SpecialActorState.Attack:
-                    if (actor.currentPosition.x <= actorToAttack.currentPosition.x+1f)
+                    if (actor.currentPosition.x <= actorToAttack.currentPosition.x + 1f)
                     {
                         Reflection.SetField(actor, "flip", true);
                     }
@@ -83,21 +79,21 @@ namespace Cultivation_Way
                     {
                         Reflection.SetField(actor, "flip", false);
                     }
-                    Utils.OthersHelper.hitEnemiesInRange(this.actor, this.actor.currentTile, 15f, this.actor.GetCurStats().damage * 10f, null);
+                    Utils.OthersHelper.hitEnemiesInRange(actor, actor.currentTile, 15f, actor.easyCurStats.damage * 10f, null);
                     break;
                 case SpecialActorState.Spell:
                     bool flip = (bool)Reflection.GetField(typeof(Actor), actor, "flip");
                     Projectile p = Utils.OthersHelper.startProjectile("red_magicArrow", actor, actorToAttack, flip ? 6f : -6f, 1.1f);
 
                     Reflection.SetField(p, "byWho", actor);
-                    p.setStats(actor.GetCurStats());
+                    p.setStats(actor.easyCurStats);
                     p.targetObject = actorToAttack;
                     break;
                 case SpecialActorState.Stop:
 
                     break;
                 case SpecialActorState.Death:
-                    this.spriteAnimation.looped = false;
+                    spriteAnimation.looped = false;
                     break;
             }
 
@@ -110,20 +106,20 @@ namespace Cultivation_Way
                 }
                 spriteAnimation.CallMethod("updateFrame");
             }
-            this.spriteAnimation.timeBetweenFrames = asset.frameSpeed;
-            this.spriteAnimation.resetAnim(0);
+            spriteAnimation.timeBetweenFrames = asset.frameSpeed;
+            spriteAnimation.resetAnim(0);
         }
         protected override void onStart()
         {
-            this.setWorld();
+            setWorld();
         }
         internal SpecialActorState getState()
         {
-            return this.state;
+            return state;
         }
         public void getHit(Actor pActor)
         {
-            this._justGotHit = true;
+            _justGotHit = true;
             BaseSimObject target = (BaseSimObject)Reflection.GetField(typeof(Actor), pActor, "attackTarget");
             if (target == null)
             {
@@ -131,7 +127,7 @@ namespace Cultivation_Way
             }
             if (target.objectType == MapObjectType.Actor)
             {
-                this.actorToAttack = (Actor)Reflection.GetField(typeof(Actor), pActor, "attackTarget");
+                actorToAttack = (ExtendedActor)Reflection.GetField(typeof(Actor), pActor, "attackTarget");
             }
             else
             {
@@ -140,97 +136,97 @@ namespace Cultivation_Way
         }
         public override void update(float pElapsed)
         {
-            this.actor.zPosition.y = -1.5f;
+            actor.zPosition.y = -1.5f;
 
-            if (this.spriteAnimation.currentFrameIndex > 0)
+            if (spriteAnimation.currentFrameIndex > 0)
             {
-                this.animationDoneOnce = true;
+                animationDoneOnce = true;
             }
-            if (!this.actor.easyData.alive)
+            if (!actor.easyData.alive)
             {
-                this.actionTime = -1f;
+                actionTime = -1f;
             }
             //死亡的情况
-            if (this.state == SpecialActorState.Death
-                && this.spriteAnimation.currentFrameIndex == this.spriteAnimation.frames.Length - 1)
+            if (state == SpecialActorState.Death
+                && spriteAnimation.currentFrameIndex == spriteAnimation.frames.Length - 1)
             {
-                this.actor.CallMethod("updateDeadBlackAnimation");
-                if (this._died)
+                actor.CallMethod("updateDeadBlackAnimation");
+                if (_died)
                 {
                     return;
                 }
-                this._died = true;
+                _died = true;
                 return;
             }
-            if ((bool)Reflection.GetField(typeof(Actor), this.actor, "is_moving"))
+            if ((bool)Reflection.GetField(typeof(Actor), actor, "is_moving"))
             {
                 return;
             }
-            if (this.actionTime > 0f)
+            if (actionTime > 0f)
             {
-                this.actionTime -= pElapsed;
+                actionTime -= pElapsed;
                 return;
             }
-            this.nextAction();
+            nextAction();
 
         }
         private void nextAction()
         {
-            if (this.spriteAnimation.currentFrameIndex != 0 || !this.animationDoneOnce)
+            if (spriteAnimation.currentFrameIndex != 0 || !animationDoneOnce)
             {
                 return;
             }
-            if (!this.actor.easyData.alive)
+            if (!actor.easyData.alive)
             {
-                if (this.state != SpecialActorState.Death)
+                if (state != SpecialActorState.Death)
                 {
-                    this.setState(SpecialActorState.Death);
+                    setState(SpecialActorState.Death);
                     return;
                 }
             }
-            if (this.actorToAttack != null && this.actorToAttack.base_data.alive)
+            if (actorToAttack != null && actorToAttack.base_data.alive)
             {
-                if (Toolbox.DistVec3(actor.currentPosition, actorToAttack.currentPosition) < this.actor.GetCurStats().size + actorToAttack.GetCurStats().size)
+                if (Toolbox.DistVec3(actor.currentPosition, actorToAttack.currentPosition) < actor.easyCurStats.size + actorToAttack.easyCurStats.size)
                 {
-                    this.setState(SpecialActorState.Attack);
+                    setState(SpecialActorState.Attack);
                 }
                 else
                 {
-                    this.setState(SpecialActorState.Spell);
+                    setState(SpecialActorState.Spell);
                 }
                 return;
             }
-            if (this.actorToAttack == null || !this.actorToAttack.base_data.alive)
+            if (actorToAttack == null || !actorToAttack.base_data.alive)
             {
-                    List<Actor> targets = Utils.OthersHelper.getEnemyObjectInRange(this.actor, this.actor.currentTile, 13f);
-                    if (targets.Count != 0)
+                List<Actor> targets = Utils.OthersHelper.getEnemyObjectInRange(actor, actor.currentTile, 13f);
+                if (targets.Count != 0)
+                {
+                    actorToAttack = (ExtendedActor)targets.GetRandom();
+                    if (Toolbox.DistVec3(actor.currentPosition, actorToAttack.currentPosition) < 3f + actor.easyCurStats.size + actorToAttack.easyCurStats.size)
                     {
-                        this.actorToAttack = targets.GetRandom();
-                        if (Toolbox.DistVec3(actor.currentPosition, actorToAttack.currentPosition) <3f+ this.actor.GetCurStats().size + actorToAttack.GetCurStats().size)
-                        {
-                            this.setState(SpecialActorState.Attack);
-                        }
-                        else
-                        {
-                            this.setState(SpecialActorState.Spell);
-                        }
-                        return;
-                    
+                        setState(SpecialActorState.Attack);
+                    }
+                    else
+                    {
+                        setState(SpecialActorState.Spell);
+                    }
+                    return;
+
                 }
                 if (Toolbox.randomBool())
                 {
-                    this.setState(SpecialActorState.Move);
+                    setState(SpecialActorState.Move);
                     return;
                 }
                 else
                 {
-                    this.setState(SpecialActorState.Stop);
+                    setState(SpecialActorState.Stop);
                     return;
                 }
             }
             if (Toolbox.randomChance(0.1f))
             {
-                this.setState(SpecialActorState.Move);
+                setState(SpecialActorState.Move);
                 return;
             }
         }

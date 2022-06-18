@@ -2,7 +2,7 @@
 
 namespace Cultivation_Way
 {
-    class EasternDragonAsset
+    internal class EasternDragonAsset
     {
         public EasternDragonAssetContainer[] list;
 
@@ -11,16 +11,16 @@ namespace Cultivation_Way
 
         public EasternDragonAssetContainer getAsset(EasternDragonState pState)
         {
-            if (this.dict == null)
+            if (dict == null)
             {
-                this.dict = new Dictionary<int, EasternDragonAssetContainer>();
-                foreach (EasternDragonAssetContainer easternDragonAssetContainer in this.list)
+                dict = new Dictionary<int, EasternDragonAssetContainer>();
+                foreach (EasternDragonAssetContainer easternDragonAssetContainer in list)
                 {
                     int id = getID(easternDragonAssetContainer.id);
-                    this.dict.Add(id, easternDragonAssetContainer);
+                    dict.Add(id, easternDragonAssetContainer);
                 }
             }
-            return this.dict[getID(pState)];
+            return dict[getID(pState)];
         }
         private int getID(EasternDragonState pState)
         {

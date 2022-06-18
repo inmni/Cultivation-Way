@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class InspectActor : MonoBehaviour
+    internal class InspectActor : MonoBehaviour
     {
         private static Sprite OnIcon;
 
@@ -24,7 +24,7 @@ namespace Cultivation_Way
         private void clickInspect()
         {
             Sfx.play("click");
-            Config.selectedUnit = this.actor;
+            Config.selectedUnit = actor;
             ScrollWindow.moveAllToLeftAndRemove(true);
             ScrollWindow.showWindow("inspect_unit");
         }

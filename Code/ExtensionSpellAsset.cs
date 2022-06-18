@@ -2,7 +2,7 @@
 
 namespace Cultivation_Way
 {
-    class ExtensionSpellAsset : Asset
+    internal class ExtensionSpellAsset : Asset
     {
         public string name;//法术名
 

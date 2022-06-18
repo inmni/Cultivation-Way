@@ -3,10 +3,16 @@ using HarmonyLib;
 using ReflectionUtility;
 using System.Linq;
 using UnityEngine;
+using Cultivation_Way.Utils;
+using System;
+
 namespace Cultivation_Way
 {
     public class MoreMapModes
     {
+        static HashSetTileZone current;
+        static HashSetTileZone toClean;
+        static SpriteRenderer sprRnd;
         internal void add()
         {
             PlayerConfig.dict.Add("map_reki_zones", new PlayerOptionData("map_reki_zones") { boolVal = false });
@@ -19,15 +25,18 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(ZoneCalculator), "update", typeof(float))]
         public static void update_Prefix(float pElapsed, ZoneCalculator __instance)
         {
+            if (sprRnd == null)
+            {
+                sprRnd = (SpriteRenderer)Reflection.GetField(typeof(ZoneCalculator), __instance, "sprRnd");
+            }
             if (MapBox.instance.showElementZones())
             {
-                SpriteRenderer sprRnd = (SpriteRenderer)Reflection.GetField(typeof(ZoneCalculator), __instance, "sprRnd");
                 sprRnd.enabled = true;
-                __instance.CallMethod("redrawZones");
-                __instance.CallMethod("checkAutoDisable");
+                ((Action<ZoneCalculator>)__instance.GetFastMethod("redrawZones"))(__instance);
+                ((Action<ZoneCalculator>)__instance.GetFastMethod("checkAutoDisable"))(__instance);
                 if (sprRnd.enabled)
                 {
-                    __instance.CallMethod("UpdateDirty", pElapsed);
+                    ((Action<ZoneCalculator,float>)__instance.GetFastMethod("UpdateDirty"))(__instance,pElapsed);
                 }
             }
 
@@ -37,25 +46,35 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(ZoneCalculator), "redrawZones")]
         public static void redrawZones_Postfix(ZoneCalculator __instance)
         {
-            if (((SpriteRenderer)Reflection.GetField(typeof(ZoneCalculator), __instance, "sprRnd")).enabled)
+            if (sprRnd == null)
+            {
+                sprRnd = (SpriteRenderer)Reflection.GetField(typeof(ZoneCalculator), __instance, "sprRnd");
+            }
+            if (sprRnd.enabled)
             {
                 switch (Main.instance.addMapMode)
                 {
                     case "map_reki_zones":
+                        if (current==null||toClean == null)
+                        {
+                            current = (HashSetTileZone)Reflection.GetField(typeof(ZoneCalculator), __instance, "_currentDrawnZones");
+                            toClean = (HashSetTileZone)Reflection.GetField(typeof(ZoneCalculator), __instance, "_toCleanUp");
+                        }
+                        Color32[] pixels = __instance.GetValue<Color32[]>("pixels");
                         for (int i = 0; i < ExtendedWorldData.instance.chunks.Count; i++)
                         {
                             MapChunk chunk = ExtendedWorldData.instance.chunks[i];
-                            Color32 color = Utils.OthersHelper.GetColor32ByElement(ExtendedWorldData.instance.chunkToElement[chunk.id]);
-                            __instance.colorModeElement(chunk.zone, color);
+                            Color32 color = OthersHelper.GetColor32ByElement(ExtendedWorldData.instance.chunkToElement[chunk.id]);
+                            __instance.colorModeElement(chunk.zone, color,current,toClean,pixels);
                         }
                         Reflection.SetField(__instance, "_dirty", true);
-                        if (((HashSetTileZone)Reflection.GetField(typeof(ZoneCalculator), __instance, "_toCleanUp")).Any<TileZone>())
+                        if (toClean.Any())
                         {
-                            __instance.CallMethod("clearDrawnZones");
+                            ((Action<ZoneCalculator>)__instance.GetFastMethod("clearDrawnZones"))(__instance);
                         }
                         if ((bool)Reflection.GetField(typeof(ZoneCalculator), __instance, "_dirty"))
                         {
-                            __instance.CallMethod("updatePixels");
+                            ((Action<ZoneCalculator>)__instance.GetFastMethod("updatePixels"))(__instance);
                         }
                         break;
                 }
@@ -76,13 +95,12 @@ namespace Cultivation_Way
         //}
     }
 
-    static class ZonesCalculatorExtension
+    internal static class ZonesCalculatorExtension
     {
-        public static void colorModeElement(this ZoneCalculator zoneCalculator, TileZone pZone, Color32 color)
+        public static void colorModeElement(this ZoneCalculator _, TileZone pZone, Color32 color,HashSetTileZone current,HashSetTileZone toClean,Color32[] pixels)
         {
-            ((HashSetTileZone)Reflection.GetField(typeof(ZoneCalculator), zoneCalculator, "_currentDrawnZones")).Add(pZone);
-            ((HashSetTileZone)Reflection.GetField(typeof(ZoneCalculator), zoneCalculator, "_toCleanUp")).Remove(pZone);
-            Color32[] pixels = Reflection.GetField(typeof(ZoneCalculator), zoneCalculator, "pixels") as Color32[];
+            current.Add(pZone);
+            toClean.Remove(pZone);
             for (int i = 0; i < pZone.tiles.Count; i++)
             {
                 WorldTile worldTile = pZone.tiles[i];

@@ -1,7 +1,7 @@
 
 from distutils.file_util import copy_file
 import os
-path='D:/Steam/steamapps/common/worldbox/Mods/Cultivation-Way/GameResources/actors'
+path='D:/Steam/steamapps/common/worldbox/Mods/Cultivation-Way/GameResources/actors/races/Wu'
 dir=os.listdir(path)
 k=0
 for i in dir:

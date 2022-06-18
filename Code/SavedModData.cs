@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Cultivation_Way
 {
-    class SavedModData
+    internal class SavedModData
     {
         public int saveVersion;
 
@@ -48,9 +48,9 @@ namespace Cultivation_Way
             {
                 Main instance = Main.instance;
                 specialBodyLimit = instance.SpecialBodyLimit;
-                creatureLimit = instance.creatureLimit;
-                familys = instance.familys.Values.ToList();
-                chunkToElement = instance.chunkToElement;
+                creatureLimit = ExtendedWorldData.instance.creatureLimit;
+                familys = ExtendedWorldData.instance.familys.Values.ToList();
+                chunkToElement = ExtendedWorldData.instance.chunkToElement;
                 specialBodies = AddAssetManager.specialBodyLibrary.list;
             }, "Prepare Mod Data(3/3): Assign new data", true);
         }
@@ -82,7 +82,7 @@ namespace Cultivation_Way
 
         public byte[] toZip()
         {
-            return Zip.Compress(this.toJson());
+            return Zip.Compress(toJson());
         }
         private void prepare()
         {
@@ -94,17 +94,17 @@ namespace Cultivation_Way
                 }
                 foreach (ExtendedActor actor in MapBox.instance.units.getSimpleList())
                 {
-                    if(actor.easyData.alive==false || actor.stats.skipSave)
+                    if (actor.easyData.alive == false || actor.stats.skipSave)
                     {
                         continue;
                     }
                     actor.extendedData.status.element = actor.extendedCurStats.element.baseElementContainer;
                     actor.extendedData.status.compositionsID = new string[actor.compositions.Count];
-                    for(int i=0;i<actor.compositions.Count;i++)
+                    for (int i = 0; i < actor.compositions.Count; i++)
                     {
                         if (actor.compositions[i].objectType == MapObjectType.Building)
                         {
-                            actor.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building),(Building)(actor.compositions[i]),"data") as BuildingData).objectID;
+                            actor.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building), (Building)(actor.compositions[i]), "data") as BuildingData).objectID;
                         }
                         else if (actor.compositions[i].objectType == MapObjectType.Actor)
                         {
@@ -133,10 +133,10 @@ namespace Cultivation_Way
             }, "Prepare Mod Data(2/3): Prepare units and buildings data", false);
             SmoothLoader.add(delegate
             {
-                foreach (string kingdomID in Main.instance.kingdomBindActors.Keys)
+                foreach (string kingdomID in ExtendedWorldData.instance.kingdomBindActors.Keys)
                 {
                     kingdomBindActors[kingdomID] = new List<string>();
-                    foreach (ExtendedActor actor in Main.instance.kingdomBindActors[kingdomID])
+                    foreach (ExtendedActor actor in ExtendedWorldData.instance.kingdomBindActors[kingdomID])
                     {
                         kingdomBindActors[kingdomID].Add(actor.easyData.actorID);
                     }

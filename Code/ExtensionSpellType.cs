@@ -3,7 +3,7 @@
     /// <summary>
     /// 用于表示法术信息，而非类别
     /// </summary>
-    class ExtensionSpellType
+    internal class ExtensionSpellType
     {
         public bool attacking = true;
         public bool attacked = false;

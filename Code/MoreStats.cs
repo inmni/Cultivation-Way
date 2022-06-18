@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cultivation_Way
 {
-    class MoreStats
+    internal class MoreStats
     {
         #region BaseStats中已有属性
         //public float accuracy;		命中率
@@ -62,6 +62,10 @@ namespace Cultivation_Way
         /// </summary>
         public int magic;
         /// <summary>
+        /// 护盾
+        /// </summary>
+        public int shied;
+        /// <summary>
         /// 吸血
         /// </summary>
         public float vampire;
@@ -105,15 +109,15 @@ namespace Cultivation_Way
         {
             baseStats.CallMethod("addStats", another.baseStats);
 
-            this.spells.AddRange(another.spells);//待修改，减少重复？目前是存在重复的
-            this.spellRange += another.spellRange;
-            this.magic += another.magic;
-            this.vampire += another.vampire;
-            this.antiInjury += another.antiInjury;
-            this.spellRelief += another.spellRelief;
-            this.talent += another.talent;
-            this.soul += another.soul;
-            this.maxAge += another.maxAge;
+            spells.AddRange(another.spells);//待修改，减少重复？目前是存在重复的
+            spellRange += another.spellRange;
+            magic += another.magic;
+            vampire += another.vampire;
+            antiInjury += another.antiInjury;
+            spellRelief += another.spellRelief;
+            talent += another.talent;
+            soul += another.soul;
+            maxAge += another.maxAge;
             return this;
         }
         /// <summary>
@@ -122,14 +126,14 @@ namespace Cultivation_Way
         /// <param name="another"></param>
         public void minusAnotherStats(MoreStats another)
         {
-            this.spellRange -= another.spellRange;
-            this.magic -= another.magic;
-            this.vampire -= another.vampire;
-            this.antiInjury -= another.antiInjury;
-            this.spellRelief -= another.spellRelief;
-            this.talent -= another.talent;
-            this.soul -= another.soul;
-            this.maxAge -= another.maxAge;
+            spellRange -= another.spellRange;
+            magic -= another.magic;
+            vampire -= another.vampire;
+            antiInjury -= another.antiInjury;
+            spellRelief -= another.spellRelief;
+            talent -= another.talent;
+            soul -= another.soul;
+            maxAge -= another.maxAge;
             baseStats.mod_attackSpeed -= another.baseStats.mod_attackSpeed;
             baseStats.mod_damage -= another.baseStats.mod_damage;
             baseStats.mod_health -= another.baseStats.mod_health;
@@ -146,10 +150,10 @@ namespace Cultivation_Way
         /// <param name="magic"></param>
         public void setBasicStats(int health, int damage, int speed, int armor, int magic = 0)
         {
-            this.baseStats.health = health;
-            this.baseStats.damage = damage;
-            this.baseStats.speed = speed;
-            this.baseStats.armor = armor;
+            baseStats.health = health;
+            baseStats.damage = damage;
+            baseStats.speed = speed;
+            baseStats.armor = armor;
             this.magic = magic;
         }
         /// <summary>
@@ -158,7 +162,7 @@ namespace Cultivation_Way
         /// <returns></returns>
         public BaseStats GetBaseStats()
         {
-            return this.baseStats;
+            return baseStats;
         }
         /// <summary>
         /// 设置特殊属性
@@ -174,27 +178,27 @@ namespace Cultivation_Way
         }
         public void addSpell(ExtensionSpell spell)
         {
-            for(int i = 0; i < this.spells.Count; i++)
+            for (int i = 0; i < spells.Count; i++)
             {
-                if (this.spells[i].spellAssetID == spell.spellAssetID)
+                if (spells[i].spellAssetID == spell.spellAssetID)
                 {
-                    this.spells[i].might = this.spells[i].might>spell.might?this.spells[i].might:spell.might;
+                    spells[i].might = spells[i].might > spell.might ? spells[i].might : spell.might;
                     return;
                 }
             }
-            this.spells.Add(new ExtensionSpell(spell));
+            spells.Add(new ExtensionSpell(spell));
         }
         public ExtensionSpell addSpell(string spellID)
         {
-            for (int i = 0; i < this.spells.Count; i++)
+            for (int i = 0; i < spells.Count; i++)
             {
-                if (this.spells[i].spellAssetID == spellID)
+                if (spells[i].spellAssetID == spellID)
                 {
-                    return this.spells[i];
+                    return spells[i];
                 }
             }
             ExtensionSpell spell = new ExtensionSpell(spellID);
-            this.spells.Add(spell);
+            spells.Add(spell);
             return spell;
         }
         /// <summary>

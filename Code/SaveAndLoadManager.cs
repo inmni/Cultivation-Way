@@ -2,17 +2,17 @@
 using CultivationWay;
 using HarmonyLib;
 using Newtonsoft.Json;
+using ReflectionUtility;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
-using ReflectionUtility;
 
 namespace Cultivation_Way
 {
-    class SaveAndLoadManager
+    internal class SaveAndLoadManager
     {
         internal const string name_main_save = "cultivation.wb";
         private static SavedModData savedModData;
@@ -67,7 +67,7 @@ namespace Cultivation_Way
             SaveAndLoadManager.pFolder = pFolder;
             SaveAndLoadManager.pCompress = pCompress;
             MapBox.instance.transitionScreen.CallMethod("startTransition", new LoadingScreen.TransitionAction(writeIn));
-            
+
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(SaveManager), "loadWorld", typeof(string), typeof(bool))]
@@ -127,8 +127,8 @@ namespace Cultivation_Way
             return codes;
         }
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(SaveManager),"loadActors")]
-        public static bool loadActors_Prefix(SaveManager __instance,int startIndex =0,int pAmount = 0)
+        [HarmonyPatch(typeof(SaveManager), "loadActors")]
+        public static bool loadActors_Prefix(SaveManager __instance, int startIndex = 0, int pAmount = 0)
         {
             ExtendedWorldData.instance.tempMoreData = new Dictionary<string, MoreData>();
             foreach (string id in savedModData.tempMoreData.Keys)
@@ -168,11 +168,11 @@ namespace Cultivation_Way
                             actorData.status.gender = ActorGender.Female;
                         }
                     }
-                    
+
                     if ((!(actorData.status.statsID == "livingPlants") && !(actorData.status.statsID == "livingHouse")) || !string.IsNullOrEmpty(actorData.status.special_graphics))
                     {
                         actor = (ExtendedActor)MapBox.instance.spawnAndLoadUnit(actorData.status.statsID, actorData, tile);
-                        
+
                         if (!(actor == null) && savedMap.saveVersion < 6)
                         {
                             foreach (string pTrait in actor.stats.traits)
@@ -195,7 +195,7 @@ namespace Cultivation_Way
             return false;
         }
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(SaveManager),"loadBuildings")]
+        [HarmonyPatch(typeof(SaveManager), "loadBuildings")]
         public static bool loadBuildings_Prefix()
         {
             for (int i = 0; i < savedMap.buildings.Count; i++)
@@ -208,8 +208,8 @@ namespace Cultivation_Way
                 BuildingAsset b = AssetManager.buildings.get(buildingData.templateID);
                 if (b != null)
                 {
-                    ExtendedBuilding building = (ExtendedBuilding)MapBox.instance.CallMethod("loadBuilding",buildingData);
-                    
+                    ExtendedBuilding building = (ExtendedBuilding)MapBox.instance.CallMethod("loadBuilding", buildingData);
+
                     if (building == null)
                     {
                         continue;
@@ -237,19 +237,19 @@ namespace Cultivation_Way
         public static SavedMap loadModData(SavedMap pData)
         {
             Main instance = Main.instance;
-            instance.tempMoreData.Clear(); 
-            instance.familys.Clear();
+            ExtendedWorldData.instance.tempMoreData.Clear();
+            ExtendedWorldData.instance.familys.Clear();
             AddAssetManager.specialBodyLibrary.clear();
             instance.resetCreatureLimit();
             foreach (string key in Utils.WorldLawHelper.originLaws.Keys)
             {
-                pData.worldLaws.dict[key]=Utils.WorldLawHelper.originLaws[key];
+                pData.worldLaws.dict[key] = Utils.WorldLawHelper.originLaws[key];
             }
             //此处两个temp为存储不存在项目
             List<string> tempTrait = new List<string>();
             List<string> tempTech = new List<string>();
             #region 处理生物bug
-            for(int i = 0; i < pData.actors.Count; i++)
+            for (int i = 0; i < pData.actors.Count; i++)
             {
                 ActorData actor = pData.actors[i];
                 List<string> newTraits = new List<string>();
@@ -273,7 +273,7 @@ namespace Cultivation_Way
             }
             #endregion
             #region 城市处理
-            for(int i=0;i<pData.cities.Count;i++)
+            for (int i = 0; i < pData.cities.Count; i++)
             {
                 CityData cityData = pData.cities[i];
                 List<CityStorageSlot> tempResources = new List<CityStorageSlot>();
@@ -288,7 +288,7 @@ namespace Cultivation_Way
             }
             #endregion
             #region 文化科技处理
-            for(int i=0;i<pData.cultures.Count;i++)
+            for (int i = 0; i < pData.cultures.Count; i++)
             {
                 Culture culture = pData.cultures[i];
                 List<string> newTech = new List<string>();
@@ -307,11 +307,11 @@ namespace Cultivation_Way
             }
             #endregion
             #region 国家处理
-            instance.kingdomBindActors.Clear();
-                foreach (Kingdom kingdom in pData.kingdoms)
-                {
-                    instance.kingdomBindActors[kingdom.id] = new List<Actor>();
-                }
+            ExtendedWorldData.instance.kingdomBindActors.Clear();
+            foreach (Kingdom kingdom in pData.kingdoms)
+            {
+                ExtendedWorldData.instance.kingdomBindActors[kingdom.id] = new List<ExtendedActor>();
+            }
             #endregion
             if (savedModData == null)
             {
@@ -326,12 +326,12 @@ namespace Cultivation_Way
             {
                 savedModData.creatureLimit = new Dictionary<string, int>();
             }
-            if (savedModData.creatureLimit.Count >= instance.creatureLimit.Count)
+            if (savedModData.creatureLimit.Count >= ExtendedWorldData.instance.creatureLimit.Count)
             {
-                instance.creatureLimit = savedModData.creatureLimit;
+                ExtendedWorldData.instance.creatureLimit = savedModData.creatureLimit;
             }
             instance.SpecialBodyLimit = savedModData.specialBodyLimit;
-            
+
             #region 加载家族
             foreach (Family family in savedModData.familys)
             {
@@ -339,42 +339,42 @@ namespace Cultivation_Way
                 {
                     MonoBehaviour.print(family.id + "家族为空");
                 }
-                instance.familys.Add(family.id, family);
+                ExtendedWorldData.instance.familys.Add(family.id, family);
             }
             foreach (string missing in ChineseNameAsset.familyNameTotal)
             {
-                if (instance.familys.ContainsKey(missing))
+                if (ExtendedWorldData.instance.familys.ContainsKey(missing))
                 {
                     continue;
                 }
-                instance.familys.Add(missing, new Family(missing));
+                ExtendedWorldData.instance.familys.Add(missing, new Family(missing));
             }
             #endregion
             #region 加载国家与人物绑定关系
-                if (savedModData.kingdomBindActors != null)
+            if (savedModData.kingdomBindActors != null)
+            {
+                foreach (Kingdom kingdom in pData.kingdoms)
                 {
-                    foreach (Kingdom kingdom in pData.kingdoms)
-                    {
                     if (!savedModData.kingdomBindActors.ContainsKey(kingdom.id))
                     {
                         continue;
                     }
-                        int limit = savedModData.kingdomBindActors[kingdom.id].Count;
-                        List<string> idList = savedModData.kingdomBindActors[kingdom.id];
-                        foreach (ExtendedActor actor in kingdom.units)
+                    int limit = savedModData.kingdomBindActors[kingdom.id].Count;
+                    List<string> idList = savedModData.kingdomBindActors[kingdom.id];
+                    foreach (ExtendedActor actor in kingdom.units)
+                    {
+                        if (idList.Contains(actor.easyData.actorID))
                         {
-                            if (idList.Contains(actor.easyData.actorID))
+                            ExtendedWorldData.instance.kingdomBindActors[kingdom.id].Add(actor);
+                            limit--;
+                            if (limit == 0)
                             {
-                                instance.kingdomBindActors[kingdom.id].Add(actor);
-                                limit--;
-                                if (limit == 0)
-                                {
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
                 }
+            }
             #endregion
             foreach (SpecialBody specialBody in savedModData.specialBodies)
             {
@@ -384,7 +384,7 @@ namespace Cultivation_Way
             {
                 AddAssetManager.specialBodyLibrary.reset();
             }
-            instance.chunkToElement = savedModData.chunkToElement;
+            ExtendedWorldData.instance.chunkToElement = savedModData.chunkToElement;
             return pData;
         }
     }

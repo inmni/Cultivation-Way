@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    class ChineseElementLibrary : AssetLibrary<ChineseElementAsset>
+    internal class ChineseElementLibrary : AssetLibrary<ChineseElementAsset>
     {
         public override void init()
         {
@@ -8,7 +8,7 @@
 
             #region 单属性 五行
             //金
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "Gold",
                 name = "金",
@@ -18,7 +18,7 @@
                 rarity = 3
             });
             //木
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "Wood",
                 name = "木",
@@ -28,7 +28,7 @@
                 rarity = 3
             });
             //水
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "Water",
                 name = "水",
@@ -38,7 +38,7 @@
                 rarity = 3
             });
             //火
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "Fire",
                 name = "火",
@@ -48,7 +48,7 @@
                 rarity = 3
             });
             //土
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "Ground",
                 name = "土",
@@ -60,70 +60,70 @@
             #endregion
 
             #region 双属性
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "GoWo",
                 name = "金木",
                 content = new int[5] { 50, 50, 0, 0, 0 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "GoWa",
                 name = "金水",
                 content = new int[5] { 50, 0, 50, 0, 0 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "GoF",
                 name = "金火",
                 content = new int[5] { 50, 0, 0, 50, 0 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "GoGr",
                 name = "金土",
                 content = new int[5] { 50, 0, 0, 0, 50 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "WoWa",
                 name = "木水",
                 content = new int[5] { 0, 50, 50, 0, 0 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "WoF",
                 name = "木火",
                 content = new int[5] { 0, 50, 0, 50, 0 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "WoGr",
                 name = "木土",
                 content = new int[5] { 0, 50, 0, 0, 50 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "WaF",
                 name = "水火",
                 content = new int[5] { 0, 0, 50, 50, 0 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "WaWr",
                 name = "水土",
                 content = new int[5] { 0, 0, 50, 0, 50 },
                 rarity = 2
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "FGr",
                 name = "火土",
@@ -141,7 +141,7 @@
             #endregion
             #region 五属性
             //混沌
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "AllElement",
                 name = "混沌",
@@ -150,7 +150,7 @@
                 promoteElementId = new string[] { },//无
                 rarity = 10
             });
-            this.add(new ChineseElementAsset
+            add(new ChineseElementAsset
             {
                 id = "All",
                 name = "杂",
@@ -165,9 +165,9 @@
 
         public void reset()
         {
-            this.dict.Clear();
-            this.list.Clear();
-            this.init();
+            dict.Clear();
+            list.Clear();
+            init();
         }
     }
 }

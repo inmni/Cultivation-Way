@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Cultivation_Way
 {
-    class MoreDrops
+    internal class MoreDrops
     {
         internal void init()
         {

@@ -1,10 +1,9 @@
-﻿using CultivationWay;
-using NCMS.Utils;
+﻿using NCMS.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 namespace Cultivation_Way
 {
-    class WindowAboutThis
+    internal class WindowAboutThis
     {
         internal static void init()
         {

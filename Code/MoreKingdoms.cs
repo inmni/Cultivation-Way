@@ -1,22 +1,21 @@
-﻿
-using CultivationWay;
-using HarmonyLib;
+﻿using HarmonyLib;
 using ReflectionUtility;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using Cultivation_Way.Utils;
 namespace Cultivation_Way
 {
-    class MoreKingdoms
+    internal class MoreKingdoms
     {
         internal void init()
         {
             AssetManager.kingdoms.add(new KingdomAsset
             {
-                id="empty",
-                civ=true
+                id = "empty",
+                civ = true
             });
             AssetManager.kingdoms.add(new KingdomAsset
             {
@@ -35,7 +34,7 @@ namespace Cultivation_Way
             addKingdom1.addEnemyTag("undead");
             addKingdom1.addEnemyTag("bandits");
             AssetManager.kingdoms.get("good").addFriendlyTag("Tian");
-            this.newHiddenKingdom(addKingdom1);
+            newHiddenKingdom(addKingdom1);
             //临时用的国家
             KingdomAsset addKingdom2 = AssetManager.kingdoms.clone("nomads_Tian", "nomads_empty");
             addKingdom2.addTag("civ");
@@ -45,7 +44,7 @@ namespace Cultivation_Way
             addKingdom2.addFriendlyTag("good");
             addKingdom2.addEnemyTag("undead");
             addKingdom2.addEnemyTag("bandits");
-            this.newHiddenKingdom(addKingdom2);
+            newHiddenKingdom(addKingdom2);
             #endregion
             #region 冥族
             KingdomAsset undead = AssetManager.kingdoms.get("undead");
@@ -68,7 +67,7 @@ namespace Cultivation_Way
             addKingdom3.addFriendlyTag("neutral");
             addKingdom3.addFriendlyTag("good");
             addKingdom3.addEnemyTag("bandits");
-            this.newHiddenKingdom(addKingdom3);
+            newHiddenKingdom(addKingdom3);
             //临时用的国家
             KingdomAsset addKingdom4 = AssetManager.kingdoms.clone("nomads_Ming", "nomads_empty");
             addKingdom4.addTag("civ");
@@ -78,7 +77,7 @@ namespace Cultivation_Way
             addKingdom4.addFriendlyTag("neutral");
             addKingdom4.addFriendlyTag("good");
             addKingdom4.addEnemyTag("bandits");
-            this.newHiddenKingdom(addKingdom4);
+            newHiddenKingdom(addKingdom4);
             #endregion
             #region 妖族
             //主要国家
@@ -92,7 +91,7 @@ namespace Cultivation_Way
             addKingdom5.addFriendlyTag("good");
             addKingdom5.addEnemyTag("bandits");
             AssetManager.kingdoms.get("snakes").addFriendlyTag("civ");
-            this.newHiddenKingdom(addKingdom5);
+            newHiddenKingdom(addKingdom5);
             //临时用的国家
             KingdomAsset addKingdom6 = AssetManager.kingdoms.clone("nomads_Yao", "nomads_empty");
             addKingdom6.addTag("civ");
@@ -103,7 +102,7 @@ namespace Cultivation_Way
             addKingdom6.addFriendlyTag("neutral");
             addKingdom6.addFriendlyTag("good");
             addKingdom6.addEnemyTag("bandits");
-            this.newHiddenKingdom(addKingdom6);
+            newHiddenKingdom(addKingdom6);
             #endregion
             #region 东方人族
             //主要国家
@@ -114,7 +113,7 @@ namespace Cultivation_Way
             addKingdom7.addFriendlyTag("neutral");
             addKingdom7.addFriendlyTag("good");
             addKingdom7.addEnemyTag("bandits");
-            this.newHiddenKingdom(addKingdom7);
+            newHiddenKingdom(addKingdom7);
             //临时用的国家
             KingdomAsset addKingdom8 = AssetManager.kingdoms.clone("nomads_EasternHuman", "nomads_empty");
             addKingdom8.addTag("civ");
@@ -123,7 +122,27 @@ namespace Cultivation_Way
             addKingdom8.addFriendlyTag("neutral");
             addKingdom8.addFriendlyTag("good");
             addKingdom8.addEnemyTag("bandits");
-            this.newHiddenKingdom(addKingdom8);
+            newHiddenKingdom(addKingdom8);
+            #endregion
+            #region 东方人族
+            //主要国家
+            KingdomAsset addKingdom9 = AssetManager.kingdoms.clone("Wu", "empty");
+            addKingdom9.addTag("civ");
+            addKingdom9.addTag("Wu");
+            addKingdom9.addFriendlyTag("Wu");
+            addKingdom9.addFriendlyTag("neutral");
+            addKingdom9.addFriendlyTag("good");
+            addKingdom9.addEnemyTag("bandits");
+            newHiddenKingdom(addKingdom9);
+            //临时用的国家
+            KingdomAsset addKingdom10 = AssetManager.kingdoms.clone("nomads_Wu", "nomads_empty");
+            addKingdom10.addTag("civ");
+            addKingdom10.addTag("Wu");
+            addKingdom10.addFriendlyTag("Wu");
+            addKingdom10.addFriendlyTag("neutral");
+            addKingdom10.addFriendlyTag("good");
+            addKingdom10.addEnemyTag("bandits");
+            newHiddenKingdom(addKingdom10);
             #endregion
             #region BOSS
             KingdomAsset addKingdom0 = AssetManager.kingdoms.clone("boss", "Ming");
@@ -138,7 +157,7 @@ namespace Cultivation_Way
             addKingdom0.mad = true;
             addKingdom0.nature = false;
             addKingdom0.attack_each_other = true;
-            this.newHiddenKingdom(addKingdom0);
+            newHiddenKingdom(addKingdom0);
             #endregion
 
 
@@ -222,7 +241,7 @@ namespace Cultivation_Way
             {
                 return true;
             }
-            
+            ((Action<Actor, UnitProfession>)pActor.GetFastMethod("setProfession",typeof(Actor)))(pActor, UnitProfession.Warrior);
             pActor.CallMethod("setProfession", UnitProfession.Warrior);
             __instance.status.warriorCurrent++;
             //强制征兵，不做冷却限制，如果该单位没有装备栏
@@ -233,7 +252,7 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(ai.behaviours.CityBehProduceUnit), "produceNewCitizen")]
         public static bool produceNewCitizen_Prefix(ai.behaviours.CityBehProduceUnit __instance, bool __result, Building pBuilding, City pCity)
         {
-            ExtendedActor randomParent = (ExtendedActor)pCity.getRandomParent(null);
+            ExtendedActor randomParent = pCity.getRandomParent(null);
             if (randomParent == null)
             {
                 __result = false;
@@ -244,10 +263,10 @@ namespace Cultivation_Way
                 __result = false;
                 return false;
             }
-            ExtendedActor randomParent2 = (ExtendedActor)pCity.getRandomParent(randomParent);
+            ExtendedActor randomParent2 = pCity.getRandomParent(randomParent);
             randomParent.easyData.children++;
             pCity.status.housingFree--;
-            CityData cityData = Reflection.GetField(typeof(City), pCity, "data") as CityData;
+            CityData cityData = pCity.GetValue<CityData>("data");
             if (randomParent.kingdom != null)
             {
                 randomParent.kingdom.born++;
@@ -365,7 +384,7 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(KingdomManager), "makeNewCivKingdom")]
         public static void makeNewCivKingdom_Postfix(Kingdom __result)
         {
-            Main.instance.kingdomBindActors[__result.id] = new List<Actor>();
+            ExtendedWorldData.instance.kingdomBindActors[__result.id] = new List<ExtendedActor>();
         }
         //国家灭亡事件
         [HarmonyPostfix]
@@ -385,7 +404,7 @@ namespace Cultivation_Way
                 i--;
                 actor.killHimself(true, AttackType.Other, true, true);
             }
-            Main.instance.kingdomBindActors.Remove(pKingdom.id);
+            ExtendedWorldData.instance.kingdomBindActors.Remove(pKingdom.id);
         }
         //妖族建立城市修改
         [HarmonyTranspiler]
@@ -436,15 +455,15 @@ namespace Cultivation_Way
             FieldInfo stats = AccessTools.Field(typeof(Building), "stats");
             FieldInfo buildingType = AccessTools.Field(typeof(BuildingAsset), "buildingType");
             int offset = 0;
-            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldloc_S,4));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldloc_S, 4));
             offset++;
             codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldarg_1));
             offset++;
             codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldarg_1));
             offset++;
-            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld,beh_building_target));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld, beh_building_target));
             offset++;
-            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld,stats));
+            codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld, stats));
             offset++;
             codes.Insert(30 + offset, new CodeInstruction(OpCodes.Ldfld, buildingType));
             offset++;

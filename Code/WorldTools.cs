@@ -5,7 +5,7 @@ using ReflectionUtility;
 
 namespace Cultivation_Way
 {
-    static class WorldTools
+    internal static class WorldTools
     {
         public static bool showElementZones(this MapBox world)
         {
@@ -22,7 +22,7 @@ namespace Cultivation_Way
             worldLogMessage.kingdom = pKingdom;
             worldLogMessage.add();
         }
-        public static void logSomething(string text,string icon,WorldTile tile = null)
+        public static void logSomething(string text, string icon, WorldTile tile = null)
         {
             WorldLogMessage worldLogMessage = new WorldLogMessage("baseLog");
             Localization.setLocalization("baseLog", text);

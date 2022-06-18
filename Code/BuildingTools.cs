@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ReflectionUtility;
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    static class BuildingTools
+    internal static class BuildingTools
     {
         public static BuildingData getBuildingData(this Building building)
         {

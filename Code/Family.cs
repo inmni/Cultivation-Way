@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    class Family
+    internal class Family
     {
         /// <summary>
         /// 家族名

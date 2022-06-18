@@ -2,7 +2,7 @@
 
 namespace Cultivation_Way
 {
-    class ChineseNameAsset : Asset
+    internal class ChineseNameAsset : Asset
     {
         /// <summary>
         /// 采用模板法命名
@@ -10,7 +10,7 @@ namespace Cultivation_Way
         /// 模板元素前缀加上R.6F表示60%产生
         /// </summary>
         public string[] templates = { "addition_start", "part", "addition_end" };
-        
+
         /// <summary>
         /// 前缀，用作智慧种族姓氏
         /// </summary>
@@ -92,7 +92,7 @@ namespace Cultivation_Way
         };
 
         public static string[] rankName = new string[10] { "凡", "黄", "玄", "地", "天", "荒", "洪", "宙", "宇", "圣" };//品阶，仅限一字
-        public static string[] rankName1 = new string[6] { "(凡阶)", "(黄阶)","(玄阶)", "(地阶)", "(天阶)", "(帝阶)" };
+        public static string[] rankName1 = new string[6] { "(凡阶)", "(黄阶)", "(玄阶)", "(地阶)", "(天阶)", "(帝阶)" };
         public ChineseNameAsset()
         {
         }

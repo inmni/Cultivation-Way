@@ -2,7 +2,7 @@
 
 namespace Cultivation_Way
 {
-    class EasternDragonAssetContainer
+    internal class EasternDragonAssetContainer
     {
 
         public EasternDragonState id;

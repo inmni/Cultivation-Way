@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cultivation_Way.Code
+﻿namespace Cultivation_Way.Code
 {
-    class Useless
+    internal class Useless
     {
-        
-
-
-
-
-
-        void Circum_node()
+        private void Circum_node()
         {
             //if (false)
             //{

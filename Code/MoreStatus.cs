@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace Cultivation_Way
+﻿namespace Cultivation_Way
 {
-    class MoreStatus
+    internal class MoreStatus
     {
         /// <summary>
         /// 修炼体系
@@ -25,15 +23,19 @@ namespace Cultivation_Way
         /// </summary>
         public int magic = 0;
         /// <summary>
+        /// 剩余护盾
+        /// </summary>
+        public int leftShied = 0;
+        /// <summary>
         /// 是否可以修炼
         /// </summary>
-        public bool canCultivate = true;
+        public bool canCultivate = false;
         /// <summary>
         /// 灵根
         /// </summary>
         public ChineseElement chineseElement = new ChineseElement();
         /// <summary>
-        /// buff效果
+        /// 额外加成
         /// </summary>
         public MoreStats bonusStats = new MoreStats();
         /// <summary>
@@ -50,7 +52,7 @@ namespace Cultivation_Way
         /// 元素
         /// </summary>
         public int[] element = { 0, 0, 0, 0, 0 };
-        
+
 
     }
 }

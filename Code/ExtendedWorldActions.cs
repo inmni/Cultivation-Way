@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Cultivation_Way
 {
-    class ExtensionSpellActionLibrary
+    internal class ExtendedWorldActions
     {
         //StackSpellEffects
         //样例
@@ -32,7 +32,7 @@ namespace Cultivation_Way
             return true;
         }
         //基础术法
-        public static bool baseSpell(ExtensionSpell spell,BaseSimObject pUser= null,BaseSimObject pTarget = null)
+        public static bool baseSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -144,7 +144,7 @@ namespace Cultivation_Way
             BaseSpellEffectController baseEffectController3 = Main.instance.spellEffects.get(spell.spellAssetID);
             BaseSpellEffectController baseEffectController4 = Main.instance.spellEffects.get(spell.spellAssetID);
 
-            BaseSpellEffect baseEffect1 = baseEffectController1 != null? baseEffectController1.spawnAt(end, new Vector3(-0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, 135)) : null;
+            BaseSpellEffect baseEffect1 = baseEffectController1 != null ? baseEffectController1.spawnAt(end, new Vector3(-0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, 135)) : null;
             BaseSpellEffect baseEffect2 = baseEffectController2 != null ? baseEffectController2.spawnAt(end, new Vector3(0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, -135)) : null;
             BaseSpellEffect baseEffect3 = baseEffectController3 != null ? baseEffectController3.spawnAt(end, new Vector3(0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, 45)) : null;
             BaseSpellEffect baseEffect4 = baseEffectController4 != null ? baseEffectController4.spawnAt(end, new Vector3(-0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, -45)) : null;
@@ -205,7 +205,7 @@ namespace Cultivation_Way
                     summoned.easyData.level = 1;
                 }
                 summoned.easyData.firstName = user.easyData.firstName + "召唤物";
-                summoned.easyData.health = user.GetCurStats().health / 3;
+                summoned.easyData.health = user.easyCurStats.health / 3;
                 summoned.setStatsDirty();
             }
             return true;
@@ -222,7 +222,7 @@ namespace Cultivation_Way
             //设置生成位置和动画位置
             WorldTile tile1 = user.currentTile;
             Vector2 pos = new Vector2(tile1.posV3.x + 3f, tile1.posV3.y + 12f);
-            
+
             ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
             Reflection.SetField(summoned, "hitboxZ", 10f);
             Utils.ResourcesHelper.playSpell(spell.spellAssetID, pos, pos, 15f);
@@ -243,7 +243,7 @@ namespace Cultivation_Way
                 summoned.easyData.level = 1;
             }
             summoned.easyData.firstName = user.easyData.firstName + "召唤物";
-            summoned.easyData.health = user.GetCurStats().health;
+            summoned.easyData.health = user.easyCurStats.health;
             summoned.setStatsDirty();
             return true;
         }
@@ -348,7 +348,7 @@ namespace Cultivation_Way
                 return false;
             }
             string godID = "";
-            foreach(string key in Main.instance.godList.Keys)
+            foreach (string key in ExtendedWorldData.instance.godList.Keys)
             {
                 if (ExtendedWorldData.instance.creatureLimit[key] > 0)
                 {
@@ -361,18 +361,19 @@ namespace Cultivation_Way
                 return false;
             }
             ExtendedWorldData.instance.creatureLimit[godID]--;
+
             ExtendedActor god = (ExtendedActor)MapBox.instance.createNewUnit(godID, pTile);
             ActorTools.copyActor(user, god);
             god.kingdom = pUser.kingdom;
             god.city = pUser.city;
-            
-            if (Main.instance.kingdomBindActors.ContainsKey(god.kingdom.id))
+            ExtendedKingdomStats.setStatus(god.kingdom.id, godID, 1f);
+            if (ExtendedWorldData.instance.kingdomBindActors.ContainsKey(god.kingdom.id))
             {
-                Main.instance.kingdomBindActors[god.kingdom.id].Add(god);
+                ExtendedWorldData.instance.kingdomBindActors[god.kingdom.id].Add(god);
             }
             god.easyData.health = int.MaxValue >> 2;
             god.easyData.level = user.easyData.level;
-            god.easyData.firstName = Main.instance.godList[godID];
+            god.easyData.firstName = ExtendedWorldData.instance.godList[godID];
             return true;
         }
         public static bool aWaterPoleDamage(BaseSimObject pUser, WorldTile pTile = null)
@@ -387,7 +388,7 @@ namespace Cultivation_Way
             }
             List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 3f);
             ExtendedActor user = (ExtendedActor)pUser;
-            float damage = user.GetCurStats().damage * 5f;
+            float damage = user.easyCurStats.damage * 5f;
             foreach (ExtendedActor target in targets)
             {
                 if (target.easyData.alive)
@@ -397,7 +398,7 @@ namespace Cultivation_Way
             }
             return true;
         }
-        public static bool aFireworkDamage(BaseSimObject pUser,WorldTile pTile = null)
+        public static bool aFireworkDamage(BaseSimObject pUser, WorldTile pTile = null)
         {
             if (pUser == null)
             {
@@ -405,9 +406,9 @@ namespace Cultivation_Way
             }
             List<WorldTile> tiles = OthersHelper.getTilesInRange(pTile, 20f);
             bool hasFound = false;
-            foreach(WorldTile tile in tiles)
+            foreach (WorldTile tile in tiles)
             {
-                foreach(Actor actor in tile.units)
+                foreach (Actor actor in tile.units)
                 {
                     if (actor.stats.id == "Nian")
                     {
@@ -433,6 +434,15 @@ namespace Cultivation_Way
             }
             pTile = pUser.currentTile;
             Utils.ResourcesHelper.playSpell("happySpringFestival", pTile.pos, pTile.pos, 20f);
+            return true;
+        }
+        public static bool dizz(BaseSimObject pTarget, WorldTile pTile = null)
+        {
+            if (pTarget == null)
+            {
+                return false;
+            }
+
             return true;
         }
         #endregion

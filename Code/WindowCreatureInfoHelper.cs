@@ -1,7 +1,7 @@
-﻿using CultivationWay;
-using HarmonyLib;
+﻿using HarmonyLib;
 using NCMS.Utils;
 using ReflectionUtility;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class WindowCreatureInfoHelper
+    internal class WindowCreatureInfoHelper
     {
         internal WindowCreatureInfo instance;
 
@@ -82,13 +82,13 @@ namespace Cultivation_Way
             loadCultivationBookButton(selectedUnit, num, count, data.level);
             num++;
 
-            Localization.setLocalization("trait_element", AddAssetManager.chineseElementLibrary.get(selectedUnit.extendedCurStats.element.id) + "灵根");
+            Localization.setLocalization("trait_element", AddAssetManager.chineseElementLibrary.get(selectedUnit.extendedCurStats.element.id).name + "灵根");
             Localization.setLocalization("trait_cultivationBook", ExtendedWorldData.instance.familys[selectedUnit.extendedData.status.familyID].cultivationBook.bookName);
             if (data.traits != null)
             {
                 for (int i = 0; i < data.traits.Count; i++)
                 {
-                    this.loadNormalTraitButton(data.traits[i], num, count);
+                    loadNormalTraitButton(data.traits[i], num, count);
                     num++;
                 }
             }
@@ -114,7 +114,7 @@ namespace Cultivation_Way
         {
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
 
-    
+
             Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("race"));
             Race race = AssetManager.raceLibrary.dict[raceID];
             if (!AssetManager.raceLibrary.dict[raceID].civilization)
@@ -125,8 +125,16 @@ namespace Cultivation_Way
             {
                 Localization.setLocalization("trait_race", LocalizedTextManager.getText(AssetManager.raceLibrary.dict[raceID].nameLocale));
             }
-            Sprite sprite = Resources.Load<Sprite>(race.path_icon);
-            traitButton.GetComponent<Image>().sprite = sprite;
+            Sprite sprite;
+            try
+            {
+                sprite = Resources.Load<Sprite>(race.path_icon);
+            }
+            catch(Exception)
+            {
+                sprite = Resources.Load<Sprite>("ui/Icons/iconOther");
+            }
+            traitButton.transform.Find("icon").GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
             float num = 10f;
@@ -147,7 +155,7 @@ namespace Cultivation_Way
             //功法贴图固定
             //灵根贴图固定
             //其他待定
-            
+
             MoreStats moreStats = actor.extendedCurStats;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
@@ -165,7 +173,7 @@ namespace Cultivation_Way
             Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("realm"));
 
             Sprite sprite = Resources.Load<Sprite>("ui/Icons/" + actor.extendedData.status.cultisystem + "_" + 1);
-            traitButton.GetComponent<Image>().sprite = sprite;
+            traitButton.transform.Find("icon").GetComponent<Image>().sprite = sprite;
             Localization.setLocalization("trait_realm", actor.getRealmName());
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
@@ -186,20 +194,20 @@ namespace Cultivation_Way
             ExtendedActor extendedActor = (ExtendedActor)actor;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
-                ExtensionSpell[] spells = ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
-                for(int i=0;i<spells.Length;i++)
+            ExtensionSpell[] spells = ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
+            for (int i = 0; i < spells.Length; i++)
+            {
+                if (spells[i] == null)
                 {
-                    if (spells[i] == null)
-                    {
-                        continue;
-                    }
-                    description.Append("\n" + spells[i].GetSpellAsset().name);
+                    continue;
                 }
-            Localization.setLocalization("trait_cultivationBook_info", "法术\n"+description.ToString());
+                description.Append("\n" + spells[i].GetSpellAsset().name);
+            }
+            Localization.setLocalization("trait_cultivationBook_info", "法术\n" + description.ToString());
 
             Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("cultivationBook"));
             Sprite sprite = Resources.Load<Sprite>("ui/Icons/iconCultivationBook");
-            traitButton.GetComponent<Image>().sprite = sprite;
+            traitButton.transform.Find("icon").GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
             float num = 10f;
@@ -223,7 +231,7 @@ namespace Cultivation_Way
 
             Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("element"));
             Sprite sprite = Resources.Load<Sprite>("ui/Icons/iconTalent");
-            traitButton.GetComponent<Image>().sprite = sprite;
+            traitButton.transform.Find("icon").GetComponent<Image>().sprite = sprite;
 
             RectTransform component = traitButton.GetComponent<RectTransform>();
             float num = 10f;
@@ -280,7 +288,7 @@ namespace Cultivation_Way
             {
                 for (int i = 0; i < temp_equipment.Count; i++)
                 {
-                    this.loadEquipmentButton(temp_equipment[i], num, count);
+                    loadEquipmentButton(temp_equipment[i], num, count);
                     num++;
                 }
             }

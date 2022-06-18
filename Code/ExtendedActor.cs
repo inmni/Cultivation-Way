@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using ReflectionUtility;
+﻿using System.Collections.Generic;
 namespace Cultivation_Way
 {
-    class ExtendedActor : Actor
+    internal class ExtendedActor : Actor
     {
         public MoreStats extendedCurStats = new MoreStats();
         public MoreData extendedData = new MoreData();

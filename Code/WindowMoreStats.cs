@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Cultivation_Way
 {
-    class WindowMoreStats
+    internal class WindowMoreStats
     {
         private const int lineLength = 50;
 

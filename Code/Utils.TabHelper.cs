@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Cultivation_Way.Utils
 {
-    class TabHelper
+    internal class TabHelper
     {
         private static PowersTab powersTab = GetPowersTab("Tab_Cultivation_Way");
         private static int Buttons = 0;

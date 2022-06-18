@@ -3,7 +3,7 @@ using CultivationWay;
 
 namespace Cultivation_Way
 {
-    class AddAssetManager
+    internal class AddAssetManager
     {
         internal static ChineseNameLibrary chineseNameGenerator;
 
@@ -19,6 +19,16 @@ namespace Cultivation_Way
         {
             //顺序尽量不要调整
             ChineseNameGenerator.init();
+            chineseNameGenerator = new ChineseNameLibrary();
+            chineseElementLibrary = new ChineseElementLibrary();
+            cultisystemLibrary = new CultisystemLibrary();
+            extensionSpellLibrary = new ExtensionSpellLibrary();
+            specialBodyLibrary = new SpecialBodyLibrary();
+            add(chineseNameGenerator, "chineseNameGenerator");
+            add(chineseElementLibrary, "element");
+            add(cultisystemLibrary, "cultisystem");
+            add(extensionSpellLibrary, "extensionSpell");
+            add(specialBodyLibrary, "specialBody");
             Main.instance.moreItems.init();
             Main.instance.moreTraits.init();
             Main.instance.moreActors.init();
@@ -30,16 +40,8 @@ namespace Cultivation_Way
             Main.instance.moreProjectiles.init();
             Main.instance.moreCityTasks.init();
             Main.instance.moreTopTileTypes.init();
-            chineseNameGenerator = new ChineseNameLibrary();
-            chineseElementLibrary = new ChineseElementLibrary();
-            cultisystemLibrary = new CultisystemLibrary();
-            extensionSpellLibrary = new ExtensionSpellLibrary();
-            specialBodyLibrary = new SpecialBodyLibrary();
-            add(chineseNameGenerator, "chineseNameGenerator");
-            add(chineseElementLibrary, "element");
-            add(cultisystemLibrary, "cultisystem");
-            add(extensionSpellLibrary, "extensionSpell");
-            add(specialBodyLibrary, "specialBody");
+            Main.instance.moreStatusEffects.init();
+
             Main.instance.moreCultureTechs.init();//顺序不可调换
 
         }

@@ -7,7 +7,7 @@ namespace Cultivation_Way
     /// <summary>
     /// Copied from game
     /// </summary>
-    class StackSpellEffects : MonoBehaviour
+    internal class StackSpellEffects : MonoBehaviour
     {
         internal SpriteAnimation spriteAnimation;
 
@@ -41,40 +41,40 @@ namespace Cultivation_Way
 
         internal void Awake()
         {
-            this.world = MapBox.instance;
-            this.dictionary = new Dictionary<string, BaseSpellEffectController>();
-            this.list = new List<BaseSpellEffectController>();
-            this.m_gameObject = new GameObject("stackSpellEffects");
-            this.prefabController = this.m_gameObject.AddComponent<BaseSpellEffectController>();
-            this.loadEffect("example", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("lightning", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("lightningPunishment", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("explosion", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("swordsArray", true, 0.1f, "EffectsTop", 10);
-            this.loadEffect("default_lightning", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("default_fire", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("JiaoDragon_laser", true, 0.1f, "EffectsTop", 10);
-            this.loadEffect("goldBar", true, 0.1f, "EffectsTop", 10);
-            this.loadEffect("goldBarDown", true, 0.1f, "EffectsTop", 10);
-            this.loadEffect("happySpringFestival", true, 0.1f, "EffectsTop", 5);
-            this.loadEffect("firework", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("LXST", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("XTDT", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("HWMT", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("FT", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("summon", true, 0.1f, "EffectsTop", 100);
-            this.loadEffect("summonTian", true, 0.1f, "EffectsTop", 100);
+            world = MapBox.instance;
+            dictionary = new Dictionary<string, BaseSpellEffectController>();
+            list = new List<BaseSpellEffectController>();
+            m_gameObject = new GameObject("stackSpellEffects");
+            prefabController = m_gameObject.AddComponent<BaseSpellEffectController>();
+            loadEffect("example", true, 0.1f, "EffectsTop", 100);
+            loadEffect("lightning", true, 0.1f, "EffectsTop", 100);
+            loadEffect("lightningPunishment", true, 0.1f, "EffectsTop", 100);
+            loadEffect("explosion", true, 0.1f, "EffectsTop", 100);
+            loadEffect("swordsArray", true, 0.1f, "EffectsTop", 10);
+            loadEffect("default_lightning", true, 0.1f, "EffectsTop", 100);
+            loadEffect("default_fire", true, 0.1f, "EffectsTop", 100);
+            loadEffect("JiaoDragon_laser", true, 0.1f, "EffectsTop", 10);
+            loadEffect("goldBar", true, 0.1f, "EffectsTop", 10);
+            loadEffect("goldBarDown", true, 0.1f, "EffectsTop", 10);
+            loadEffect("happySpringFestival", true, 0.1f, "EffectsTop", 5);
+            loadEffect("firework", true, 0.1f, "EffectsTop", 100);
+            loadEffect("LXST", true, 0.1f, "EffectsTop", 100);
+            loadEffect("XTDT", true, 0.1f, "EffectsTop", 100);
+            loadEffect("HWMT", true, 0.1f, "EffectsTop", 100);
+            loadEffect("FT", true, 0.1f, "EffectsTop", 100);
+            loadEffect("summon", true, 0.1f, "EffectsTop", 100);
+            loadEffect("summonTian", true, 0.1f, "EffectsTop", 100);
             //this.add(prefabLightning, "lightning", 100);
         }
         internal void Update()
         {
-            for (int i = 0; i < this.list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                this.list[i].update(this.world.getCurElapsed());
+                list[i].update(world.getCurElapsed());
             }
-            if (this.timeOutFireworks > 0f)
+            if (timeOutFireworks > 0f)
             {
-                this.timeOutFireworks -= Time.deltaTime;
+                timeOutFireworks -= Time.deltaTime;
             }
         }
         private void loadEffect(string pName, bool pUseBasicPrefab = true, float pTimeBetweenFrames = 0.1f, string pSortingLayerName = "EffectsTop", int pLimit = 60)
@@ -98,7 +98,7 @@ namespace Cultivation_Way
                 component.frames = Utils.ResourcesHelper.loadAllSprite("effects/" + pName, 0.55f, 0.2f);
                 ((SpriteRenderer)Reflection.GetField(typeof(SpriteAnimation), component, "spriteRenderer")).sortingLayerName = pSortingLayerName;
             }
-            BaseSpellEffectController baseEffectController = this.add(gameObject, pName, pLimit);
+            BaseSpellEffectController baseEffectController = add(gameObject, pName, pLimit);
 
             baseEffectController.addNewObject(gameObject.AddComponent<BaseSpellEffect>());
             baseEffectController.transform.SetParent(base.transform);
@@ -106,25 +106,25 @@ namespace Cultivation_Way
         }
         private BaseSpellEffectController add(GameObject pPrefab, string pID, int pLimit = 0)
         {
-            BaseSpellEffectController baseEffectController = UnityEngine.Object.Instantiate<BaseSpellEffectController>(this.prefabController);
+            BaseSpellEffectController baseEffectController = UnityEngine.Object.Instantiate<BaseSpellEffectController>(prefabController);
             baseEffectController.create();
             baseEffectController.transform.parent = base.transform;
             baseEffectController.transform.name = pID;
             baseEffectController.prefab = pPrefab.transform;
             baseEffectController.objectLimit = pLimit;
-            this.dictionary.Add(pID, baseEffectController);
-            this.list.Add(baseEffectController);
+            dictionary.Add(pID, baseEffectController);
+            list.Add(baseEffectController);
             return baseEffectController;
         }
         internal BaseSpellEffectController get(string pID)
         {
-            return this.dictionary[pID];
+            return dictionary[pID];
         }
         internal void clear()
         {
-            for (int i = 0; i < this.list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                this.list[i].clear();
+                list[i].clear();
             }
         }
     }

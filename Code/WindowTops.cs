@@ -39,7 +39,7 @@ namespace Cultivation_Way
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+        private static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
@@ -111,11 +111,11 @@ namespace Cultivation_Way
                 }
                 else if (data1.level == data2.level)
                 {
-                    if(!combatTmp.TryGetValue(a1.GetInstanceID(),out combat1))
+                    if (!combatTmp.TryGetValue(a1.GetInstanceID(), out combat1))
                     {
                         combatTmp[a1.GetInstanceID()] = combat1 = a1.getCombat();
                     }
-                    if(!combatTmp.TryGetValue(a2.GetInstanceID(),out combat2))
+                    if (!combatTmp.TryGetValue(a2.GetInstanceID(), out combat2))
                     {
                         combatTmp[a2.GetInstanceID()] = combat2 = a2.getCombat();
                     }
@@ -129,7 +129,7 @@ namespace Cultivation_Way
                         {
                             return 1;
                         }
-                        else if(data1.kills==data2.kills)
+                        else if (data1.kills == data2.kills)
                         {
                             return data1.GetHashCode() > data2.GetHashCode() ? 1 : -1;
                         }
@@ -249,11 +249,11 @@ namespace Cultivation_Way
                 {
                     e1 = element1.getImPurity() * bodyRank2;
                     e2 = element2.getImPurity() * bodyRank1;
-                    if ( e1< e2)
+                    if (e1 < e2)
                     {
                         return -1;
                     }
-                    else if(e1== e2)
+                    else if (e1 == e2)
                     {
                         return a1.GetHashCode() > a2.GetHashCode() ? -1 : 1;
                     }
@@ -295,7 +295,7 @@ namespace Cultivation_Way
         private void getActors()
         {
             actors.Clear();
-            actors = new List<ExtendedActor>(MapBox.instance.units.Count+50);
+            actors = new List<ExtendedActor>(MapBox.instance.units.Count + 50);
             foreach (ExtendedActor actor in MapBox.instance.units)
             {
                 if (actor.stats.id.StartsWith("summon") || !actor.easyData.alive)
@@ -323,7 +323,7 @@ namespace Cultivation_Way
             gameObject.transform.SetParent(rectTransform1.transform);
             Image image = gameObject.AddComponent<Image>();
             image.sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/windowInnerSlicedCut.png");
-            gameObject.transform.localPosition = new Vector3(35f, -((float)elements.Count * this.offset - 20f));
+            gameObject.transform.localPosition = new Vector3(35f, -((float)elements.Count * offset - 20f));
             gameObject.transform.localScale = new Vector3(1.9f, 0.25f, 0f);
             RectTransform component = gameObject.GetComponent<RectTransform>();
             component.pivot = new Vector2(0f, 1f);
@@ -367,7 +367,7 @@ namespace Cultivation_Way
                 ((SpriteAnimation)Reflection.GetField(typeof(Actor), actor, "spriteAnimation")).setFrameIndex(0);
             }
             actor.forceAnimation();
-                actor.CallMethod("checkSpriteConstructor");
+            actor.CallMethod("checkSpriteConstructor");
             Image image = actorAvator.AddComponent<Image>();
             image.sprite = ((SpriteRenderer)Reflection.GetField(typeof(Actor), actor, "spriteRenderer")).sprite;
             actorAvator.transform.localScale = new Vector3(actor.stats.inspectAvatarScale * 0.029f, actor.stats.inspectAvatarScale * 0.256f, actor.stats.inspectAvatarScale);
@@ -436,9 +436,9 @@ namespace Cultivation_Way
 
             gameObject.transform.localPosition = new Vector3(60f, -70f);
         }
-        private void setHealth(Actor actor, GameObject parent)
+        private void setHealth(ExtendedActor actor, GameObject parent)
         {
-            int maxHealth = actor.GetCurStats().health;
+            int maxHealth = actor.easyCurStats.health;
             int fontsize = 18;
             if (maxHealth > 1000)
             {
@@ -469,7 +469,7 @@ namespace Cultivation_Way
 
             gameObject.transform.localPosition = new Vector3(20f, -74f);
         }
-        private void setDamage(Actor actor, GameObject parent)
+        private void setDamage(ExtendedActor actor, GameObject parent)
         {
 
             GameObject gameObject = new GameObject("actorHealth");
@@ -487,7 +487,7 @@ namespace Cultivation_Way
             text.alignment = TextAnchor.UpperLeft;
             text.color = Color.yellow;
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
-            text.text = actor.GetCurStats().damage.ToString();
+            text.text = actor.easyCurStats.damage.ToString();
             RectTransform component = gameObject2.GetComponent<RectTransform>();
             component.pivot = new Vector2(0f, 1f);
             component.sizeDelta = new Vector2(100f, 100f);

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cultivation_Way
 {
-    class ChineseNameGenerator
+    internal class ChineseNameGenerator
     {
         public static ChineseNameGenerator instance;
         public static bool isBeingUsed = true;
@@ -13,18 +13,10 @@ namespace Cultivation_Way
         {
             instance = new ChineseNameGenerator();
         }
+        
         public static string getName(string pAssetID)
         {
-            ChineseNameAsset chineseNameAsset;
-            if (AddAssetManager.chineseNameGenerator.dict.ContainsKey(pAssetID))
-            {
-                chineseNameAsset = AddAssetManager.chineseNameGenerator.get(pAssetID);
-            }
-            else
-            {
-                chineseNameAsset = AddAssetManager.chineseNameGenerator.get("default_name");
-            }
-            return instance.getNameFromTemplate(chineseNameAsset);
+            return instance.getNameFromTemplate(AddAssetManager.chineseNameGenerator.get(pAssetID));
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(NameGenerator), "getName")]
@@ -34,16 +26,7 @@ namespace Cultivation_Way
             {
                 return true;
             }
-            ChineseNameAsset chineseNameAsset;
-            if (AddAssetManager.chineseNameGenerator.dict.ContainsKey(pAssetID))
-            {
-                chineseNameAsset = AddAssetManager.chineseNameGenerator.get(pAssetID);
-            }
-            else
-            {
-                chineseNameAsset = AddAssetManager.chineseNameGenerator.get("default_name");
-            }
-            __result = instance.getNameFromTemplate(chineseNameAsset);
+            __result = instance.getNameFromTemplate(AddAssetManager.chineseNameGenerator.get(pAssetID));
 
             return false;
         }
@@ -76,7 +59,7 @@ namespace Cultivation_Way
             __instance.list_tech_ids = new List<string>();
             __instance.id = MapBox.instance.mapStats.getNextId("culture");
 
-            ChineseNameAsset chineseNameAsset = ((ChineseNameLibrary)AssetManager.instance.dict["chineseNameGenerator"]).get(pRace.name_template_culture);
+            ChineseNameAsset chineseNameAsset = AddAssetManager.chineseNameGenerator.get(pRace.name_template_culture);
 
             __instance.name = instance.getNameFromTemplate(chineseNameAsset);
             if (pCity != null)
@@ -91,18 +74,13 @@ namespace Cultivation_Way
             Reflection.CallMethod(__instance, "prepare");
             return false;
         }
-        public static string getCreatureName(string pAsset, string familyName, bool prefix = true)
+        public static string getCreatureName(string pAssetID, string familyName, bool prefix = true)
         {
             if (!isBeingUsed)
             {
-                return NameGenerator.getName(pAsset);
+                return NameGenerator.getName(pAssetID);
             }
-            if (!AddAssetManager.chineseNameGenerator.dict.ContainsKey(pAsset))
-            {
-                pAsset ="default_name";
-            }
-            ChineseNameAsset asset = AddAssetManager.chineseNameGenerator.get(pAsset);
-            //prefix表示姓氏是否为前缀
+            ChineseNameAsset asset = AddAssetManager.chineseNameGenerator.get(pAssetID);
             string origin = instance.getNameFromTemplate(asset, false);
             if (prefix)
             {
@@ -118,11 +96,11 @@ namespace Cultivation_Way
             }
             return origin;
         }
-        public string getNameFromTemplate(ChineseNameAsset pAsset,bool useFixedName = true)
+        public string getNameFromTemplate(ChineseNameAsset pAsset, bool useFixedName = true)
         {
             StringBuilder nameBuilder = new StringBuilder();
             //如果该命名可使用固定名
-            if (useFixedName&&!pAsset.onlyByTemplate && pAsset.fixedList!=null&&pAsset.fixedList.Count>0&&Toolbox.randomChance(pAsset.fixedNameChance))
+            if (useFixedName && !pAsset.onlyByTemplate && pAsset.fixedList != null && pAsset.fixedList.Count > 0 && Toolbox.randomChance(pAsset.fixedNameChance))
             {
                 return pAsset.fixedList.GetRandom();
             }
