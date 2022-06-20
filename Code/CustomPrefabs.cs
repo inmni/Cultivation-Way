@@ -16,6 +16,10 @@ namespace Cultivation_Way
             transformActorPrefabs();
             transformBuildingPrefabs();
             generateActorPrefabs();
+            foreach(GameObject g in extendPrefabDict.Values)
+            {
+                g.transform.SetParent(MapBox.instance.transform);
+            }
             Main.instance.transformUnits = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformUnits") as Transform;
             Main.instance.transformCreatures = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformCreatures") as Transform;
         }

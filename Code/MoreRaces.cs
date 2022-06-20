@@ -79,7 +79,7 @@ namespace Cultivation_Way
             addPreferredWeapon("knife1", 1);
             addPreferredWeapon("knife2", 1);
             addPreferredWeapon("minigun1", 6);
-            addPreferredWeapon("gun1", 6);
+            addPreferredWeapon("great_gun1", 6);
             addPreferredWeapon("lightning1", 10);
             #endregion
 

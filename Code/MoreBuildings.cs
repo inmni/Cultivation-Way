@@ -284,17 +284,32 @@ namespace Cultivation_Way
             p.tower_projectile_amount = 1;
             p.tower_projectile_offset = 7f;
             BuildingAsset hall_EH = AssetManager.buildings.get("hall_EasternHuman");
-            hall_EH.fundament = new BuildingFundament(5, 5, 6, 0);
+            hall_EH.fundament = new BuildingFundament(5, 5, 8, 0);
             BuildingAsset hall1_EH = AssetManager.buildings.get("1hall_EasternHuman");
-            hall1_EH.fundament = new BuildingFundament(6, 6, 9, 0);
+            hall1_EH.fundament = new BuildingFundament(5, 5, 10, 0);
             BuildingAsset hall2_EH = AssetManager.buildings.get("2hall_EasternHuman");
-            hall2_EH.fundament = new BuildingFundament(7, 7, 12, 0);
+            hall2_EH.fundament = new BuildingFundament(7, 7, 14, 0);
+            BuildingAsset house_EH = AssetManager.buildings.get("house_EasternHuman");
+            house_EH.fundament = new BuildingFundament(2, 2, 5, 0);
+            BuildingAsset house1_EH = AssetManager.buildings.get("1house_EasternHuman");
+            house1_EH.fundament = new BuildingFundament(3, 3, 5, 0);
+            BuildingAsset house2_EH = AssetManager.buildings.get("2house_EasternHuman");
+            house2_EH.fundament = new BuildingFundament(3, 3, 5, 0);
+            BuildingAsset house3_EH = AssetManager.buildings.get("3house_EasternHuman");
+            house3_EH.fundament = new BuildingFundament(5, 5, 7, 0);
             BuildingAsset house4_EH = AssetManager.buildings.get("4house_EasternHuman");
-            house4_EH.fundament = new BuildingFundament(5, 5, 7, 0);
+            house4_EH.fundament = new BuildingFundament(6, 6, 10, 0);
             BuildingAsset house5_EH = AssetManager.buildings.get("5house_EasternHuman");
-            house5_EH.fundament = new BuildingFundament(5, 5, 7, 0);
+            house5_EH.fundament = new BuildingFundament(6, 6, 10, 0);
+            get("windmill_EasternHuman").fundament.set(4, 4, 8, 0);
+            get("1windmill_EasternHuman").fundament.set(4, 4, 8, 0);
+            get("temple_EasternHuman").fundament.set(2, 3, 9, 0);
+            get("barracks_EasternHuman").fundament.set(3, 3, 8, 0);
         }
-
+        private BuildingAsset get(string pID)
+        {
+            return AssetManager.buildings.get(pID);
+        }
         #region harmony
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Building), "startDestroyBuilding")]

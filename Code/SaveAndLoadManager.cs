@@ -51,15 +51,15 @@ namespace Cultivation_Way
                 }
             }, "Write mod data", true);
         }
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(SaveManager), "saveMapData")]
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(SaveManager), "saveMapData")]
         public static bool saveModData_pre()
         {
             SmoothLoader.prepare();
             return true;
         }
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(SaveManager), "saveMapData")]
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(SaveManager), "saveMapData")]
         public static void saveModData(string pFolder, bool pCompress = true)
         {
             //Thread t = new Thread(() => writeIn(pFolder, pCompress));
@@ -69,8 +69,8 @@ namespace Cultivation_Way
             MapBox.instance.transitionScreen.CallMethod("startTransition", new LoadingScreen.TransitionAction(writeIn));
 
         }
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(SaveManager), "loadWorld", typeof(string), typeof(bool))]
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(SaveManager), "loadWorld", typeof(string), typeof(bool))]
         public static bool prepareLoad(string pPath)
         {
             savedModData = getDataFromPath(pPath);
@@ -112,8 +112,8 @@ namespace Cultivation_Way
             return pFolder;
         }
         //将数据加载到游戏
-        [HarmonyTranspiler]
-        [HarmonyPatch(typeof(SaveManager), "loadData", typeof(SavedMap))]
+        //[HarmonyTranspiler]
+        //[HarmonyPatch(typeof(SaveManager), "loadData", typeof(SavedMap))]
         public static IEnumerable<CodeInstruction> loadData_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
@@ -126,8 +126,8 @@ namespace Cultivation_Way
             codes.Insert(offset, new CodeInstruction(OpCodes.Starg, 1));
             return codes;
         }
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(SaveManager), "loadActors")]
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(SaveManager), "loadActors")]
         public static bool loadActors_Prefix(SaveManager __instance, int startIndex = 0, int pAmount = 0)
         {
             ExtendedWorldData.instance.tempMoreData = new Dictionary<string, MoreData>();
@@ -194,8 +194,8 @@ namespace Cultivation_Way
             }
             return false;
         }
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(SaveManager), "loadBuildings")]
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(SaveManager), "loadBuildings")]
         public static bool loadBuildings_Prefix()
         {
             for (int i = 0; i < savedMap.buildings.Count; i++)

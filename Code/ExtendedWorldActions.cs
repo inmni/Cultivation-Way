@@ -16,7 +16,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, pTarget.currentPosition, pTarget.currentPosition, 1f);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, 0.01f);
             float oriDamage = OthersHelper.getSpellDamage(spell, pUser, pTarget);
             //再进行伤害处理
             if (pTarget.objectType == MapObjectType.Actor)
@@ -58,8 +58,7 @@ namespace Cultivation_Way
             {
                 MapBox.instance.startShake();
             }
-            Vector2 target = new Vector2(pTarget.currentPosition.x + 0.55f, pTarget.currentPosition.y - 7f);
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, 3f);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, 0.03f);
             return true;
         }
         public static bool lightning1Spell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
@@ -68,8 +67,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y + 2.2f);
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, ((ExtendedActor)pUser).easyData.level / 20f);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, ((ExtendedActor)pUser).easyData.level/2000f);
             float oriDamage = OthersHelper.getSpellDamage(spell, pUser, pTarget);
             //再进行伤害处理
             if (pTarget.objectType == MapObjectType.Actor)
@@ -91,8 +89,7 @@ namespace Cultivation_Way
                 return false;
             }
             OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 2f, 0f, spell);
-            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y - 1.5f);
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, target, target, 1f);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, 0.01f);
             return true;
         }
         //剑阵
@@ -103,8 +100,7 @@ namespace Cultivation_Way
                 return false;
             }
             OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 4f, 0f, spell);
-            Vector2 target = new Vector2(pTarget.currentPosition.x, pTarget.currentPosition.y - 5f);
-            ResourcesHelper.playSpell(spell.spellAssetID, target, target, 2f);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, 0.02f);
             return true;
         }
         //激光，目前只用于蛟龙
@@ -124,9 +120,9 @@ namespace Cultivation_Way
             {
                 xScale *= Mathf.Abs(angle - 90) * Mathf.PI / 180f;
             }
-
-            BaseSpellEffectController baseEffectController = Main.instance.spellEffects.get(spell.spellAssetID);
-            BaseSpellEffect baseEffect = ((baseEffectController != null) ? baseEffectController.spawnAt(new Vector3(end.x, end.y + 2.8f), new Vector3(xScale * 0.02f, 0.2f, 0), new Vector3(0f, end.y - start.y, angle)) : null);
+            NewSpriteAnimation anim = NewEffectManager.spawnOn(spell.spellAssetID, new Vector3(end.x, end.y + 2.8f), new Vector3(xScale * 0.02f, 0.2f, 0));
+            anim.m_gameobject.transform.localEulerAngles = new Vector3(0f, end.y - start.y, angle);//待修改
+            
 
             return true;
         }
@@ -139,15 +135,15 @@ namespace Cultivation_Way
             OthersHelper.hitEnemiesInRange(pUser, pTarget.currentTile, 10f, 0f, spell);
             Vector3 start = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y - 0.5f);
             Vector3 end = new Vector3(pTarget.currentTile.posV3.x, pTarget.currentTile.posV3.y - 0.5f);
-            BaseSpellEffectController baseEffectController1 = Main.instance.spellEffects.get(spell.spellAssetID);
-            BaseSpellEffectController baseEffectController2 = Main.instance.spellEffects.get(spell.spellAssetID);
-            BaseSpellEffectController baseEffectController3 = Main.instance.spellEffects.get(spell.spellAssetID);
-            BaseSpellEffectController baseEffectController4 = Main.instance.spellEffects.get(spell.spellAssetID);
-
-            BaseSpellEffect baseEffect1 = baseEffectController1 != null ? baseEffectController1.spawnAt(end, new Vector3(-0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, 135)) : null;
-            BaseSpellEffect baseEffect2 = baseEffectController2 != null ? baseEffectController2.spawnAt(end, new Vector3(0.06f, -0.06f, 0), new Vector3(0f, end.y - start.y, -135)) : null;
-            BaseSpellEffect baseEffect3 = baseEffectController3 != null ? baseEffectController3.spawnAt(end, new Vector3(0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, 45)) : null;
-            BaseSpellEffect baseEffect4 = baseEffectController4 != null ? baseEffectController4.spawnAt(end, new Vector3(-0.06f, 0.06f, 0), new Vector3(0f, end.y - start.y, -45)) : null;
+            float deltaY = pTarget.currentPosition.y - pUser.currentPosition.y;
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, new Vector3(-0.06f, -0.06f, 0))
+                .m_gameobject.transform.localEulerAngles = new Vector3(0f, deltaY, 135);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, new Vector3(0.06f, -0.06f, 0))
+               .m_gameobject.transform.localEulerAngles = new Vector3(0f, deltaY, -135);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, new Vector3(0.06f, 0.06f, 0))
+               .m_gameobject.transform.localEulerAngles = new Vector3(0f, deltaY, 45);
+            NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, new Vector3(-0.06f, 0.06f, 0))
+               .m_gameobject.transform.localEulerAngles = new Vector3(0f, deltaY, -45);
 
             return true;
         }
@@ -158,16 +154,15 @@ namespace Cultivation_Way
                 return false;
             }
             float rad = 15f;
-            float t = 1.5f;
             OthersHelper.hitEnemiesInRange(pUser, pUser.currentTile, rad, 0f, spell);
             Vector3 end1 = new Vector3(pUser.currentTile.posV3.x + 7.2f, pUser.currentTile.posV3.y);
             Vector3 end2 = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y + 6f);
             Vector3 end3 = new Vector3(pUser.currentTile.posV3.x - 7.2f, pUser.currentTile.posV3.y);
             Vector3 end4 = new Vector3(pUser.currentTile.posV3.x, pUser.currentTile.posV3.y - 6f);
-            ResourcesHelper.playSpell(spell.spellAssetID, end1, end1, t);
-            ResourcesHelper.playSpell(spell.spellAssetID, end1, end2, t);
-            ResourcesHelper.playSpell(spell.spellAssetID, end1, end3, t);
-            ResourcesHelper.playSpell(spell.spellAssetID, end1, end4, t);
+            NewEffectManager.spawnOn(spell.spellAssetID, end1, 0.015f);
+            NewEffectManager.spawnOn(spell.spellAssetID, end2, 0.015f);
+            NewEffectManager.spawnOn(spell.spellAssetID, end3, 0.015f);
+            NewEffectManager.spawnOn(spell.spellAssetID, end4, 0.015f);
             return true;
         }
         //骷髅召唤
@@ -184,7 +179,7 @@ namespace Cultivation_Way
             for (int i = 0; i < num; i++)
             {
                 WorldTile tile = pUser.currentTile.neighboursAll.GetRandom();
-                Utils.ResourcesHelper.playSpell(spell.spellAssetID, tile.posV3, tile.posV3, 1f);
+                NewEffectManager.spawnOn(spell.spellAssetID, tile.posV3, 0.01f);
                 ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile);
 
                 ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
@@ -225,8 +220,7 @@ namespace Cultivation_Way
 
             ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
             Reflection.SetField(summoned, "hitboxZ", 10f);
-            Utils.ResourcesHelper.playSpell(spell.spellAssetID, pos, pos, 15f);
-
+            NewEffectManager.spawnOn(spell.spellAssetID, pos, 0.15f);
             ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
             summoned.easyData.profession = UnitProfession.Warrior;
             summoned.kingdom = pUser.kingdom;
@@ -259,7 +253,7 @@ namespace Cultivation_Way
             WorldTile tile1 = pUser.currentTile;
             Vector2 pos = new Vector2(tile1.posV3.x, tile1.posV3.y);
             ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile1);
-            ResourcesHelper.playSpell("explosion", pos, pos, 15f);
+            NewEffectManager.spawnOn("explosion", pos, 0.01f);
             summoned.kingdom = pUser.kingdom;
             if (user.city != null)
             {
@@ -294,8 +288,11 @@ namespace Cultivation_Way
             SpecialBody body = user.GetSpecialBody();
             if (body.rank > 1)
             {
-                BaseSpellEffectController baseEffectController = Main.instance.spellEffects.get(Utils.OthersHelper.getOriginBodyID(body));
-                BaseSpellEffect baseEffect = baseEffectController != null ? baseEffectController.spawnAt(start, 0.1f, true, (Actor)pUser, time, 0, 2f) : null;
+                NewSpriteAnimation anim = NewEffectManager.spawnOn(Utils.OthersHelper.getOriginBodyID(body), pUser, 0.02f);
+                new WorldTimer(time, new System.Action(() =>
+                 {
+                     anim.stop();
+                 }));
             }
 
             MoreStatus moredata = ((ExtendedActor)pUser).extendedData.status;
@@ -329,7 +326,7 @@ namespace Cultivation_Way
                 pTile = pUser.currentTile;
             }
             Vector2 pos = new Vector2(pTile.posV3.x, pTile.posV3.y - 5f);
-            Utils.ResourcesHelper.playSpell("lightningPunishment", pos, pos, 8f);
+            NewEffectManager.spawnOn("lightningPunishment", pos, 0.08f);
             List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 6f);
             foreach (ExtendedActor target in targets)
             {
@@ -376,11 +373,11 @@ namespace Cultivation_Way
             god.easyData.firstName = ExtendedWorldData.instance.godList[godID];
             return true;
         }
-        public static bool aWaterPoleDamage(BaseSimObject pUser, WorldTile pTile = null)
+        public static bool aSimpleRangeDamage(BaseSimObject pUser, WorldTile pTile = null)
         {
             if (pUser == null)
             {
-                return false;
+                return true;
             }
             if (pTile == null)
             {
@@ -388,7 +385,7 @@ namespace Cultivation_Way
             }
             List<Actor> targets = OthersHelper.getEnemyObjectInRange(pUser, pTile, 3f);
             ExtendedActor user = (ExtendedActor)pUser;
-            float damage = user.easyCurStats.damage * 5f;
+            float damage = user.easyCurStats.damage;
             foreach (ExtendedActor target in targets)
             {
                 if (target.easyData.alive)
@@ -423,7 +420,7 @@ namespace Cultivation_Way
                     break;
                 }
             }
-            Utils.ResourcesHelper.playSpell("firework", pUser.currentTile.pos, pTile.pos, 20f);
+            NewEffectManager.spawnOn("firework", pTile.posV3, 0.2f);
             return true;
         }
         public static bool aNianDie(BaseSimObject pUser, WorldTile pTile = null)
@@ -433,7 +430,7 @@ namespace Cultivation_Way
                 return false;
             }
             pTile = pUser.currentTile;
-            Utils.ResourcesHelper.playSpell("happySpringFestival", pTile.pos, pTile.pos, 20f);
+            NewEffectManager.spawnOn("happySpringFestival", pTile.posV3, 0.2f);
             return true;
         }
         public static bool dizz(BaseSimObject pTarget, WorldTile pTile = null)

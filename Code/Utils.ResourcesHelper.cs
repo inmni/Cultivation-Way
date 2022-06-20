@@ -59,19 +59,5 @@ namespace Cultivation_Way.Utils
             string result = File.ReadAllText($"{Main.mainPath}/EmbededResources/" + path);
             return result;
         }
-
-        public static BaseSpellEffect playSpell(string spellID, Vector2 start, Vector2 end, float size)
-        {
-            //播放法术动画
-            BaseSpellEffectController spellEffectController = Main.instance.spellEffects.get(spellID);
-            BaseSpellEffect spellEffect = ((spellEffectController != null) ? spellEffectController.spawnAt(end, size / 50f) : null);
-            if (spellEffect == null)
-            {
-                return null;
-            }
-            //Sfx.play("lightning", true, -1f, -1f);
-            spellEffect.spriteRenderer.flipX = Toolbox.randomBool();
-            return spellEffect;
-        }
     }
 }

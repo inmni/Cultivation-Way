@@ -15,15 +15,11 @@ namespace Cultivation_Way
                 id = "example",
                 name = "简单术法",
                 rarity = 10,
-                bannedRace = new List<string>(),
                 bannedCultisystem = new List<string>() { "bodying" },
                 might = 1f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 50, 20, 10, 10, 10 }),
                 spellAction = new SpellAction(ExtendedWorldActions.exampleSpell)
             });
-            addSpell(t.id, t.rarity);
             add(new ExtensionSpellAsset
             {
                 id = "lightning",
@@ -31,15 +27,11 @@ namespace Cultivation_Way
                 rarity = 9,
                 coolDown = 10,
                 baseCost = 50,
-                bannedRace = new List<string>(),
                 bannedCultisystem = new List<string>() { "bodying" },
                 might = 10f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 50, 20, 10, 10, 10 }),
                 spellAction = new SpellAction(ExtendedWorldActions.lightningSpell)
             });
-            addSpell(t.id, t.rarity);
             add(new ExtensionSpellAsset
             {
                 id = "default_lightning",
@@ -47,15 +39,11 @@ namespace Cultivation_Way
                 rarity = 1,
                 coolDown = 1,
                 baseCost = 5,
-                bannedRace = new List<string>(),
                 bannedCultisystem = new List<string>() { "bodying" },
                 might = 5f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 50, 20, 10, 10, 10 }),
                 spellAction = new SpellAction(ExtendedWorldActions.lightning1Spell)
             });
-            addSpell(t.id, t.rarity);
             add(new ExtensionSpellAsset
             {
                 id = "default_fire",
@@ -63,15 +51,11 @@ namespace Cultivation_Way
                 rarity = 1,
                 coolDown = 2,
                 baseCost = 5,
-                bannedRace = new List<string>(),
                 bannedCultisystem = new List<string>() { "bodying" },
                 might = 5f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 0, 0, 0, 100, 0 }),
                 spellAction = new SpellAction(ExtendedWorldActions.defaultFire)
             });
-            addSpell(t.id, t.rarity);
             add(new ExtensionSpellAsset
             {
                 id = "swordsArray",
@@ -79,15 +63,11 @@ namespace Cultivation_Way
                 rarity = 7,
                 coolDown = 11,
                 baseCost = 20,
-                bannedRace = new List<string>(),
                 bannedCultisystem = new List<string>() { "bodying" },
                 might = 10f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 100, 0, 0, 0, 0 }),
                 spellAction = new SpellAction(ExtendedWorldActions.swordsArray)
             });
-            addSpell(t.id, t.rarity);
             add(new ExtensionSpellAsset
             {
                 id = "base",
@@ -96,14 +76,11 @@ namespace Cultivation_Way
                 coolDown = 1,
                 baseCost = 1,
                 bannedCultisystem = new List<string>() { "bodying" },
-                bannedRace = new List<string>(),
                 might = 1f,
-                type = new ExtensionSpellType() { requiredLevel = 5 },
-                direction = DirectionType.toTarget,
+                requiredLevel = 5,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.baseSpell)
             });
-            addSpell(t.id, t.rarity);
             #endregion
             #region 召唤
 
@@ -116,15 +93,10 @@ namespace Cultivation_Way
                 rarity = 1,
                 coolDown = 50,
                 baseCost = 0,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 1f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.none,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.Shengtixianhua)
             });
-            addSpell(t.id, t.rarity);
             #endregion
             #region 特殊法术
             add(new ExtensionSpellAsset
@@ -134,11 +106,7 @@ namespace Cultivation_Way
                 rarity = 10,
                 coolDown = 1,
                 baseCost = 0,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 10f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.laserSpell)
             });
@@ -149,11 +117,7 @@ namespace Cultivation_Way
                 rarity = 10,
                 coolDown = 5,
                 baseCost = 10,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 5f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.barSpell)
             });
@@ -164,11 +128,7 @@ namespace Cultivation_Way
                 rarity = 10,
                 coolDown = 1,
                 baseCost = 10,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 5f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.barDownSpell)
             });
@@ -181,11 +141,7 @@ namespace Cultivation_Way
                 rarity = 10,
                 coolDown = 100,
                 baseCost = 150,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 1.2f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.toTarget,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.summonTianSpell)
             });
@@ -196,11 +152,8 @@ namespace Cultivation_Way
                 rarity = 10,
                 coolDown = 1,
                 baseCost = 0,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 1.0f,
-                type = new ExtensionSpellType() { attacking = false, levelUp = true, requiredLevel = 101 },
-                direction = DirectionType.toTarget,
+                requiredLevel = 101 ,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.summonTianSpell1)
             });
@@ -211,22 +164,35 @@ namespace Cultivation_Way
                 rarity = 10,
                 coolDown = 6,
                 baseCost = 20,
-                bannedRace = new List<string>(),
-                bannedCultisystem = new List<string>(),
                 might = 1f,
-                type = new ExtensionSpellType(),
-                direction = DirectionType.none,
                 chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
                 spellAction = new SpellAction(ExtendedWorldActions.summonSpell)
             });
             #endregion
         }
-        private void addSpell(string id, int num)
+        public override ExtensionSpellAsset add(ExtensionSpellAsset pAsset)
         {
-            for (int i = 0; i < 10 - num; i++)
+            if (pAsset.bannedCultisystem == null)
             {
-                spellList.Add(id);
+                pAsset.bannedCultisystem = new List<string>();
             }
+            if (pAsset.bannedRace == null)
+            {
+                pAsset.bannedRace = new List<string>();
+            }
+            for (int i = 0; i < 10 - pAsset.rarity; i++)
+            {
+                spellList.Add(pAsset.id);
+            }
+            for (int i = 0; i < AddAssetManager.cultisystemLibrary.list.Count; i++)
+            {
+                pAsset.allowedCultisystem += AddAssetManager.cultisystemLibrary.list[i].flag;
+            }
+            for(int i = 0; i < pAsset.bannedCultisystem.Count; i++)
+            {
+                pAsset.allowedCultisystem -= AddAssetManager.cultisystemLibrary.get(pAsset.bannedCultisystem[i]).flag;
+            }
+            return base.add(pAsset);
         }
     }
 }

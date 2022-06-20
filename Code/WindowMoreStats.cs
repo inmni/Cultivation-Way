@@ -34,17 +34,25 @@ namespace Cultivation_Way
         {
 
             #region 添加进入窗口的按钮
-            PowerButton checkMoreStats = PowerButtons.CreateButton("CheckMoreStats", Resources.Load<Sprite>("ui/icons/iconInspect"),
-            "查看详细信息",
-            "",
-            new Vector2(247.70f, -150f),
-            ButtonType.Click,
-            inspect_unitContent,
-            clickForWindow_MoreStats);
+            GameObject moreStatsGameObject = UnityEngine.Object.Instantiate(GameObject.Find
+                ("/Canvas Container Main/Canvas - Windows/windows/inspect_unit/Background/ButtonContainerTraits"));
+            moreStatsGameObject.transform.SetParent(GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/inspect_unit/Background").transform);
+            moreStatsGameObject.transform.name = "CheckMoreStats";
+            moreStatsGameObject.transform.localScale = Vector3.one;
+            moreStatsGameObject.transform.localPosition = new Vector3(116.85f, -2.4204f,0);
+            Transform moreStatsButton = moreStatsGameObject.transform.Find("Button");
+            moreStatsButton.Find("Icon").gameObject.AddComponent<Image>();
+            moreStatsButton.Find("Icon").GetComponent<Image>().sprite = Resources.Load<Sprite>("ui/icons/iconInspect");
+            PowerButton checkMoreStats = moreStatsButton.GetComponent<PowerButton>();
+            checkMoreStats.type = PowerButtonType.Library;
+            checkMoreStats.open_window_id = string.Empty;
+            moreStatsButton.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
+            moreStatsButton.GetComponent<Button>().onClick.AddListener(delegate { show(); });
+            TipButton tip = moreStatsButton.GetComponent<TipButton>();
+            tip.type = "normal";
+            tip.textOnClick = "tip_moreStats";
+            tip.textOnClickDescription = null;
 
-            checkMoreStats.GetComponent<RectTransform>().sizeDelta = new Vector2(60f, 60f);
-            checkMoreStats.transform.Find("Icon").GetComponent<RectTransform>().sizeDelta = new Vector2(36f, 36f);
-            checkMoreStats.GetComponent<Image>().sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/backButtonRight.png");
             #endregion
 
             window_MoreStats = Windows.CreateNewWindow("window_MoreStats", "详细信息");
@@ -63,11 +71,10 @@ namespace Cultivation_Way
                                              .Find("Content"));
 
         }
-        private static void clickForWindow_MoreStats()
+        private static void show()
         {
 
             setWindowContent();
-
             window_MoreStats.clickShow();
         }
         private static void setWindowContent()

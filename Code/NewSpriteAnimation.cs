@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Cultivation_Way
@@ -12,21 +13,66 @@ namespace Cultivation_Way
         public bool stopTriggered = false;
         public bool loop;
         public bool isOn;
+        public bool move = false;
+        public float moveSpeed;
+        public Vector3 end;
         public AnimPlayType direction;
-        public Sprite[] frames;
-        public Image currFrame;
+        internal Sprite[] frames;
+        internal Action[] frameActions;
+        public SpriteRenderer currFrame;
         public GameObject m_gameobject;
-        public void create()
+        public Action callback;
+        public Action reachAction;
+        public NewEffectController controller;
+        public void create(NewEffectController pController)
         {
-            m_gameobject = UnityEngine.Object.Instantiate<GameObject>(NewEffectManager.prefab);
+            controller = pController;
+            m_gameobject = UnityEngine.Object.Instantiate(controller.prefab);
+            currFrame = m_gameobject.GetComponent<SpriteRenderer>();
+            m_gameobject.transform.SetParent(NewEffectManager.instance.transform);
             direction = AnimPlayType.Forward;
         }
         public void start()
         {
             isOn = true;
+            m_gameobject.SetActive(true);
         }
-        public void stop()
+        public void setMove(Vector3 pEnd,float pSpeed=10f,bool includeElapse=false,Action pReachAction = null)
         {
+            end = pEnd;
+            move = true;
+            if (includeElapse)
+            {
+                moveSpeed = pSpeed;
+            }
+            else
+            {
+                moveSpeed = pSpeed * MapBox.instance.getCurElapsed();
+            }
+            if (pReachAction != null)
+            {
+                reachAction = pReachAction;
+            }
+            return;
+        }
+        public void clearReachAction()
+        {
+            reachAction = null;
+        }
+        private void moveUpdate()
+        {
+            m_gameobject.transform.position = Vector3.MoveTowards(m_gameobject.transform.position, end, moveSpeed);
+        }
+        public void setParent(Transform parent)
+        {
+            m_gameobject.transform.SetParent(parent);
+        }
+        public void stop(bool force = true)
+        {
+            if (!force && callback != null)
+            {
+                callback();
+            }
             isOn = false;
         }
         public void stopAt(int stopIndex)
@@ -34,9 +80,10 @@ namespace Cultivation_Way
             stopFrameIndex = stopIndex;
             stopTriggered = true;
         }
-        public void setFrames(Sprite[] newFrames, bool restart = false)
+        public void setFrames(Sprite[] newFrames,Action[] actions=null, bool restart = false)
         {
             frames = newFrames;
+            frameActions = actions;
             if (restart)
             {
                 currFrameIndex = 0;
@@ -55,8 +102,24 @@ namespace Cultivation_Way
         }
         public void update(float elapse)
         {
-            if (!isOn || (stopTriggered && stopFrameIndex == currFrameIndex)
-                || Config.paused || (nextFrameTime -= elapse) > 0f)
+            if(!isOn || (stopTriggered && stopFrameIndex == currFrameIndex)|| Config.paused)
+            {
+                return;
+            }
+            if (move && (m_gameobject.transform.position - end).sqrMagnitude > 1E-6f)
+            {
+                moveUpdate();
+            }
+            else
+            {
+                move = false; 
+
+                if (reachAction != null)
+                {
+                    reachAction();
+                }
+            }
+            if ((nextFrameTime -= elapse) > 0f)
             {
                 return;
             }
@@ -65,7 +128,7 @@ namespace Cultivation_Way
         }
         public void nextFrame(int forceFrameIndex = -1)
         {
-            if (forceFrameIndex >= 0)
+            if (forceFrameIndex < 0)
             {
                 if (direction == AnimPlayType.Forward)
                 {
@@ -74,7 +137,7 @@ namespace Cultivation_Way
                     {
                         if (!loop)
                         {
-                            stop();
+                            stop(false);
                             return;
                         }
                         currFrameIndex = 0;
@@ -87,7 +150,7 @@ namespace Cultivation_Way
                     {
                         if (!loop)
                         {
-                            stop();
+                            stop(false);
                             return;
                         }
                         currFrameIndex = frames.Length - 1;
@@ -100,17 +163,32 @@ namespace Cultivation_Way
             }
             if (stopTriggered && currFrameIndex == stopFrameIndex)
             {
-                isOn = false;
+                stop(false);
             }
             updateFrame();
+        }
+        public void setFrameAction(int frameIndex,Action action)
+        {
+            if (frameActions==null||frameIndex < 0 || frameIndex >= frames.Length)
+            {
+                return;
+            }
+            Action[] newActions = new Action[frameActions.Length];
+            frameActions.CopyTo(newActions, 0);
+            newActions[frameIndex] = action;
+            frameActions = newActions;
         }
         public void updateFrame()
         {
             currFrame.sprite = frames[currFrameIndex];
+            if (frameActions!=null&&frameActions[currFrameIndex] != null)
+            {
+                frameActions[currFrameIndex]();
+            }
         }
         public void kill()
         {
-
+            UnityEngine.Object.Destroy(m_gameobject);
         }
     }
 }

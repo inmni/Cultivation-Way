@@ -10,5 +10,12 @@
         {
             return ((ExtendedBuilding)building).easyStats.id.Split('_')[1];
         }
+        public static void set(this BuildingFundament fundament,int left,int right,int top,int bottom)
+        {
+            fundament.left = left;
+            fundament.right = right;
+            fundament.top = top;
+            fundament.bottom = bottom;
+        }
     }
 }

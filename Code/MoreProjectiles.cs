@@ -46,13 +46,28 @@ namespace Cultivation_Way
                 world_actions = new WorldAction(ExtendedWorldActions.bLightningSpell),//落地后的行为
                 impactSoundID = "explosion medium",//碰撞声音
             });
-
-            Main.instance.addProjectiles.Add("lightning_orb", new Vector2(0, 7f));//添加，用于加载，后面的Vector2确定发射位置
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "plasma_ball_Tian",
+                speed = 22f,                    
+                texture = "pr_plasma_ball_Tian",
+                trailEffect_enabled = true,
+                trailEffect_scale = 0.1f,
+                trailEffect_timer = 0.1f,
+                trailEffect_texture = "fx_plasma_trail_Tian",
+                look_at_target = true,
+                looped = true,
+                endEffect = "fireballExplosion",          
+                startScale = 0.03f,      
+                targetScale = 0.25f,       
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage),
+            });
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "lightningFire_orb",
                 speed = 15f,
                 parabolic = false,
+                texture = "lightningFire_orb",
                 hitShake = true,
                 startScale = 0.02f,
                 targetScale = 0.02f,
@@ -60,13 +75,13 @@ namespace Cultivation_Way
                 playImpactSound = true,
                 impactSoundID = "explosion medium",
             });
-            Main.instance.addProjectiles.Add("lightningFire_orb", new Vector2(0, 7f));
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "magicArrow",
                 speed = 25f,
                 parabolic = false,
                 hitShake = true,
+                texture = "magicArrow",
                 startScale = 0.02f,
                 targetScale = 0.02f,
                 animation_speed = 0.1f,
@@ -74,13 +89,13 @@ namespace Cultivation_Way
                 look_at_target = true,
                 impactSoundID = "explosion medium",
             });
-            Main.instance.addProjectiles.Add("magicArrow", new Vector2(0, 20f));
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "red_magicArrow",
                 speed = 25f,
                 parabolic = false,
                 hitShake = true,
+                texture = "red_magicArrow",
                 startScale = 0.04f,
                 targetScale = 0.04f,
                 animation_speed = 0.1f,
@@ -89,21 +104,21 @@ namespace Cultivation_Way
                 endEffect = "fireballExplosion",
                 impactSoundID = "explosion medium",
             });
-            Main.instance.addProjectiles.Add("red_magicArrow", Vector2.zero);
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "water_orb",
+                texture = "water_orb",
                 speed = 30f,                    //投掷物移动速度
                 parabolic = false,              //是否开启抛物线
                 hitShake = true,                //受击者是否颤抖
                 startScale = 0.4f,             //发射起始大小
                 targetScale = 0.4f,            //到达目的地大小
-                world_actions = new WorldAction(ExtendedWorldActions.aWaterPoleDamage)
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage)
             });
-            Main.instance.addProjectiles.Add("water_orb", new Vector2(0, 7f));
             AssetManager.projectiles.add(new ProjectileAsset
             {
                 id = "firework",
+                texture = "firework",
                 speed = 20f,                    //投掷物移动速度
                 parabolic = true,              //是否开启抛物线
                 rotate = true,
@@ -112,31 +127,30 @@ namespace Cultivation_Way
                 targetScale = 0.04f,            //到达目的地大小
                 world_actions = new WorldAction(ExtendedWorldActions.aFireworkDamage)
             });
-            Main.instance.addProjectiles.Add("firework", Vector2.zero);
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Projectile), "start")]
-        public static bool start_Prefix(Projectile __instance, ref Vector3 pStart, string pAssetID)
-        {
-            if (!Main.instance.addProjectiles.ContainsKey(pAssetID))
-            {
-                return true;
-            }
-            if (! __instance.GetValue<bool>("created"))
-            {
-                ((Action<Projectile>)__instance.GetFastMethod("create"))(__instance);
-            }
-            ProjectileAsset asset = AssetManager.projectiles.get(pAssetID);
-            Sprite[] _frames = asset.GetValue<Sprite[]>("_frames");
-            if (_frames == null || _frames.Length == 0)
-            {
-                asset.SetValue("_frames", ResourcesHelper.loadAllSprite("projectiles/" + asset.id, 0.8f));
-            }
-            pStart.x += Main.instance.addProjectiles[pAssetID].x;
-            pStart.y += Main.instance.addProjectiles[pAssetID].y;
-            return true;
-        }
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(Projectile), "start")]
+        //public static bool start_Prefix(Projectile __instance, ref Vector3 pStart, string pAssetID)
+        //{
+        //    if (!Main.instance.addProjectiles.ContainsKey(pAssetID))
+        //    {
+        //        return true;
+        //    }
+        //    if (! __instance.GetValue<bool>("created"))
+        //    {
+        //        ((Action<Projectile>)__instance.GetFastMethod("create"))(__instance);
+        //    }
+        //    ProjectileAsset asset = AssetManager.projectiles.get(pAssetID);
+        //    Sprite[] _frames = asset.GetValue<Sprite[]>("_frames");
+        //    if (_frames == null || _frames.Length == 0)
+        //    {
+        //        asset.SetValue("_frames", ResourcesHelper.loadAllSprite("projectiles/" + asset.id, 0.8f));
+        //    }
+        //    pStart.x += Main.instance.addProjectiles[pAssetID].x;
+        //    pStart.y += Main.instance.addProjectiles[pAssetID].y;
+        //    return true;
+        //}
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Projectile), "targetReached")]
         public static bool targetReached_Prefix(Projectile __instance)
@@ -144,15 +158,15 @@ namespace Cultivation_Way
             ProjectileAsset p = __instance.GetValue<ProjectileAsset>("asset");
             if (p.world_actions == null)
             {
-                return false;
+                return true;
             }
             Vector3 pos = __instance.GetValue<Vector3>("vecTarget");
             WorldTile targetTile = MapBox.instance.GetTile((int)pos.x, (int)pos.y);
             if (p.world_actions != null && targetTile != null)
             {
-                return p.world_actions(__instance.GetValue<BaseSimObject>("byWho"), targetTile);
+                p.world_actions(__instance.GetValue<BaseSimObject>("byWho"), targetTile);
             }
-            return false;
+            return true;
         }
     }
 }

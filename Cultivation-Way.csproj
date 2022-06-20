@@ -249,8 +249,6 @@
   <ItemGroup>
     <Compile Include="Code\ActorTools.cs" />
     <Compile Include="Code\AddAssetManager.cs" />
-    <Compile Include="Code\BaseSpellEffect.cs" />
-    <Compile Include="Code\BaseSpellEffectController.cs" />
     <Compile Include="Code\BonusStatsManager.cs" />
     <Compile Include="Code\BuildingTools.cs" />
     <Compile Include="Code\ChineseElement.cs" />
@@ -319,7 +317,6 @@
     <Compile Include="Code\SpecialBody.cs" />
     <Compile Include="Code\SpecialBodyLibrary.cs" />
     <Compile Include="Code\Delegates.cs" />
-    <Compile Include="Code\StackSpellEffects.cs" />
     <Compile Include="Code\Types.cs" />
     <Compile Include="Code\Useless.cs" />
     <Compile Include="Code\Utils.OthersHelper.cs" />
@@ -332,7 +329,6 @@
     <Compile Include="Code\WindowCreatureInfoHelper.cs" />
     <Compile Include="Code\WindowMoreStats.cs" />
     <Compile Include="Code\ExtensionSpell.cs" />
-    <Compile Include="Code\DirectionType.cs" />
     <Compile Include="Code\WindowTops.cs" />
     <Compile Include="Code\MoreWorldLaws.cs" />
     <Compile Include="Code\WorldTools.cs" />

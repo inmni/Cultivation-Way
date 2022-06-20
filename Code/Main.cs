@@ -34,7 +34,7 @@ namespace CultivationWay
 
         public static ResourcesBuffer resourcesBuffer = new ResourcesBuffer();
 
-        public StackSpellEffects spellEffects;
+        public NewEffectManager effectManager;
 
         public CustomPrefabs prefabs = new CustomPrefabs();
 
@@ -99,7 +99,7 @@ namespace CultivationWay
             //开启拦截
             patchHarmony();
             MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
-            spellEffects = transform.gameObject.AddComponent<StackSpellEffects>();
+            effectManager = transform.gameObject.AddComponent<NewEffectManager>();
         }
 
         private void Update()

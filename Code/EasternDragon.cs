@@ -308,7 +308,7 @@ namespace Cultivation_Way
                 {
                     if (actor.extendedData.status.magic > spell.cost && spell.leftCool == 0)
                     {
-                        if (spell.GetSpellAsset().type.attacking)
+                        if (spell.GetSpellAsset().type==ExtensionSpellType.ATTACK)
                         {
                             spellPrepared = spell;
                             break;

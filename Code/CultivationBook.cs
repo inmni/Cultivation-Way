@@ -12,19 +12,21 @@
     internal class CultivationBook
     {
 
-        public string bookName;
+        public string bookName;//名字
+
+        public float[] cultiVelco;//各个境界修炼速度影响因子
 
         public int rank;//品级，10级一阶
 
-        private uint allowedCultiSystem;//允许修炼的修炼体系
+        private uint allowedCultiSystem;//允许修炼的修炼体系（允许多体系
 
         private CultivationBookType bookType;//功法类型
 
-        public ExtensionSpell[] spells;
+        public ExtensionSpell[] spells;//法术（内置法术属性
 
         public MoreStats[] stats;//各个境界加成
 
-        public ChineseElement element;
+        public ChineseElement element;//功法属性
 
         internal CultivationBookType BookType { get => bookType; }
         internal bool allowCultiSystem(uint cultiSystemID)

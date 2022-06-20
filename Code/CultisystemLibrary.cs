@@ -4,14 +4,14 @@
     {
         public override void init()
         {
-            base.init();
+            base.init(); 
             add(new CultisystemAsset
             {
-                id = "normal",
-                name = "仙路",
-                flag = 0 << 1,
-                addExperience = normal,
-                bannedRace = new string[] { "orc" },
+                id = "default",
+                name = "无",
+                flag = 0 << 0,
+                addExperience = nothing,
+                bannedRace = new string[] { },
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
@@ -27,11 +27,11 @@
             }
             add(new CultisystemAsset
             {
-                id = "default",
+                id = "normal",
                 name = "仙路",
                 flag = 0 << 1,
                 addExperience = normal,
-                bannedRace = new string[] { },
+                bannedRace = new string[] { "orc","Wu","Tian" },
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
@@ -51,7 +51,7 @@
                 name = "炼体",
                 flag = 0 << 2,
                 addExperience = normal,
-                bannedRace = new string[] { },
+                bannedRace = new string[] { "Tian","Ming"},
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
@@ -72,7 +72,7 @@
                 name = "武道",
                 flag = 0 << 3,
                 addExperience = normal,
-                bannedRace = new string[] { "orc" },
+                bannedRace = new string[] { "orc","Tian" },
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
@@ -101,7 +101,10 @@
                 }
             }
         }
-
+        private static bool nothing(ExtendedActor pActor,int pValue)
+        {
+            return false;
+        }
         private static bool normal(ExtendedActor pActor, int pValue)
         {
             ActorStatus data;
@@ -136,7 +139,7 @@
                 //法术释放
                 foreach (ExtensionSpell spell in pActor.extendedCurStats.spells)
                 {
-                    if (spell.GetSpellAsset().type.levelUp)
+                    if (spell.GetSpellAsset().type==ExtensionSpellType.LEVELUP)
                     {
                         spell.castSpell(pActor, pActor);
                         break;
@@ -154,14 +157,13 @@
                 return false;
             }
             data = pActor.easyData;
-            if (data.alive && pActor.extendedData.status.canCultivate)
+            if (!data.alive || !pActor.extendedData.status.canCultivate || !pActor.stats.canLevelUp)
             {
                 return false;
             }
             int exp = pActor.getExpToLevelup();
-            if ((data.experience += pValue) < pActor.getExpToLevelup())
+            if ((data.experience += pValue) < exp)
             {
-                data.experience = exp;
                 return false;
             }
             //回蓝，回冷却
@@ -172,7 +174,7 @@
             }
             pActor.setStatsDirty();
             //如果等级达到上限，或者该生物不能升级，则优化灵根
-            if (data.level >= ExtendedWorldData.instance.levelLimit || !pActor.stats.canLevelUp)
+            if (data.level >= ExtendedWorldData.instance.levelLimit)
             {
                 return false;
             }

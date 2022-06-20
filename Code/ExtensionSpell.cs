@@ -60,10 +60,6 @@
             //    return false;
             //}
             //若为概率触发，则开始随机
-            if (spellAsset.type.byChance && Toolbox.randomChance(0.99f))
-            {
-                return false;
-            }
             if (pTarget == null)
             {
                 pTarget = pAttacker;

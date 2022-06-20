@@ -21,14 +21,17 @@ namespace Cultivation_Way
 
         public static void action_exp(WorldTile pTile = null, string pDropID = null)
         {
-            MapBox.instance.CallMethod("getObjectsInChunks", pTile, 3, MapObjectType.Actor);
-            List<BaseSimObject> temp_map_objects = Reflection.GetField(typeof(MapBox), MapBox.instance, "temp_map_objects") as List<BaseSimObject>;
-            int count = temp_map_objects.Count;
+            ExtendedActor actor;
+            int count = pTile.units.Count;
             for (int i = 0; i < count; i++)
             {
-                ExtendedActor actor = (ExtendedActor)temp_map_objects[i];
+                actor = (ExtendedActor)pTile.units[i];
                 actor.extendedData.status.canCultivate = true;
-                actor.CallMethod("addExperience", actor.getExpToLevelup());
+                if (actor.extendedData.status.cultisystem=="default")
+                {
+                    actor.extendedData.status.cultisystem = "normal";
+                }
+                MoreActors.addExperiece_Prefix(actor, actor.getExpToLevelup());
                 actor.startShake(0.3f, 0.1f, true, true);
                 actor.startColorEffect("white");
             }

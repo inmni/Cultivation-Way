@@ -34,17 +34,27 @@ namespace Cultivation_Way
         {
 
             #region 添加进入窗口的按钮
-            PowerButton checkMoreStats = PowerButtons.CreateButton("CheckFamily", Resources.Load<Sprite>("ui/icons/iconInspect"),
-            "查看家族信息",
-            "",
-            new Vector2(247.70f, -90f),
-            ButtonType.Click,
-            inspect_unitContent,
-            clickForWindow_MoreStats);
 
-            checkMoreStats.GetComponent<RectTransform>().sizeDelta = new Vector2(60f, 60f);
-            checkMoreStats.transform.Find("Icon").GetComponent<RectTransform>().sizeDelta = new Vector2(36f, 36f);
-            checkMoreStats.GetComponent<Image>().sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/backButtonRight.png");
+
+
+            GameObject moreStatsGameObject = UnityEngine.Object.Instantiate(GameObject.Find
+                ("/Canvas Container Main/Canvas - Windows/windows/inspect_unit/Background/ButtonContainerTraits"));
+            moreStatsGameObject.transform.SetParent(GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/inspect_unit/Background").transform);
+            moreStatsGameObject.transform.name = "CheckFamily";
+            moreStatsGameObject.transform.localScale = Vector3.one;
+            moreStatsGameObject.transform.localPosition = new Vector3(116.85f, -50f, 0);
+            Transform moreStatsButton = moreStatsGameObject.transform.Find("Button");
+            moreStatsButton.Find("Icon").gameObject.AddComponent<Image>();
+            moreStatsButton.Find("Icon").GetComponent<Image>().sprite = Resources.Load<Sprite>("ui/icons/iconCheckFamily");
+            PowerButton checkMoreStats = moreStatsButton.GetComponent<PowerButton>();
+            checkMoreStats.type = PowerButtonType.Library;
+            checkMoreStats.open_window_id = string.Empty;
+            moreStatsButton.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
+            moreStatsButton.GetComponent<Button>().onClick.AddListener(delegate { clickForWindow_MoreStats(); });
+            TipButton tip = moreStatsButton.GetComponent<TipButton>();
+            tip.type = "normal";
+            tip.textOnClick = "tip_family";
+            tip.textOnClickDescription = null;
             #endregion
 
             window_Family = Windows.CreateNewWindow("window_Family", "家族信息");

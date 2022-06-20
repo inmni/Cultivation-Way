@@ -3,6 +3,7 @@ using HarmonyLib;
 using ReflectionUtility;
 using System;
 using Cultivation_Way.Utils;
+using UnityEngine;
 namespace Cultivation_Way
 {
     internal class MoreGodPowers
@@ -108,6 +109,28 @@ namespace Cultivation_Way
             fairyFox.click_action = new PowerActionWithID((WorldTile pTile, string pPower)
                                 =>
             {
+                Vector3 end = MapBox.instance.GetTile(1, 1).posV3;
+                Vector3 start = pTile.posV3 + end;
+                int count = 0;
+                NewSpriteAnimation e = NewEffectManager.spawnOn("LXST", pTile, Vector3.one);
+                e.setMove(end,30,false, new Action(() => 
+                { 
+                    if (count++ > 100) 
+                    { 
+                        e.stop(true); 
+                        return; 
+                    } 
+                    e.setMove(new Vector3(Toolbox.randomFloat(end.x, start.x), Toolbox.randomFloat(end.y, start.y)), 
+                        Toolbox.randomFloat(e.moveSpeed*0.9f,e.moveSpeed*1.1f), true); 
+                }));
+                e.loop = true;
+                e.frameActions = new Action[e.frames.Length];
+                e.setFrameAction(1, new Action(()=> 
+                { 
+                    MapBox.spawnLightning(
+                        MapBox.instance.GetTile((int)e.m_gameobject.transform.position.x, 
+                        (int)e.m_gameobject.transform.position.y),e.moveSpeed); 
+                }));
                 return (bool)AssetManager.powers.CallMethod("spawnUnit", pTile, pPower);
             });
             AssetManager.powers.add(fairyFox);

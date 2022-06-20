@@ -273,7 +273,6 @@ namespace Cultivation_Way
             Wu.race = "Wu";
             Wu.nameLocale = "Wus";
             Wu.nameTemplate = "Wu_name";
-            Wu.texture_heads = string.Empty;
             Wu.body_separate_part_head = true;
             Wu.heads = 6;
             Wu.useSkinColors = true;
@@ -803,7 +802,7 @@ namespace Cultivation_Way
                     ExtensionSpell spell = pa.extendedCurStats.spells[i];
                     //进行蓝耗和冷却检查
                     if (spell.leftCool == 0 && pa.extendedData.status.magic >= spell.cost
-                        && spell.GetSpellAsset().type.attacking && spell.GetSpellAsset().type.requiredLevel <= dataA.level)
+                        && spell.GetSpellAsset().type==ExtensionSpellType.ATTACK && spell.GetSpellAsset().requiredLevel <= dataA.level)
                     {
                         if (spell.castSpell(pAttacker, pTarget))
                         {
@@ -831,7 +830,7 @@ namespace Cultivation_Way
             float rangeLimit = Mathf.Max(pActor.easyCurStats.range, morestats.spellRange) + pObject.GetValue<BaseStats>("curStats").size;
             foreach (ExtensionSpell spell in morestats.spells)
             {
-                if (pActor.canCastSpell(spell) && spell.GetSpellAsset().type.attacking)
+                if (pActor.canCastSpell(spell) && spell.GetSpellAsset().type==ExtensionSpellType.ATTACK)
                 {
                     if (Toolbox.DistVec3(__instance.currentPosition, pObject.currentPosition) < rangeLimit)
                     {
@@ -863,14 +862,6 @@ namespace Cultivation_Way
         public static bool addExperiece_Prefix(Actor __instance, int pValue)
         {
             ExtendedActor pActor = (ExtendedActor)__instance;
-            if (pActor == null || !pActor.easyData.alive)
-            {
-                return true;
-            }
-            if (!pActor.extendedData.status.canCultivate)
-            {
-                return false;
-            }
             //限制经验加成来源
             StackTrace st = new StackTrace();
             for (int i = 2; i < 5; i++)
@@ -880,9 +871,7 @@ namespace Cultivation_Way
                     return false;
                 }
             }
-
             AddAssetManager.cultisystemLibrary.get(pActor.extendedData.status.cultisystem).addExperience(pActor, pValue);
-
             return false;
         }
         //境界压制

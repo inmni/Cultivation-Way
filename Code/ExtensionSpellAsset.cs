@@ -11,16 +11,18 @@ namespace Cultivation_Way
         public List<string> bannedRace;//禁用种族
 
         public List<string> bannedCultisystem;//禁用体系
+        public uint allowedCultisystem;
 
         public float might;//基础效果，1f为基础攻击力，与基础攻击力相乘
 
-        public int baseCost;//基础蓝耗，暂未实现
+        public int baseCost;//基础蓝耗
 
-        public int coolDown;//冷却时间，可能遗弃
+        public int coolDown;//冷却时间
 
-        public ExtensionSpellType type;//法术类型以及信息
+        public float chance = 0.2f;//释放几率
 
-        public DirectionType direction = DirectionType.none;//动画方向，
+        public ExtensionSpellType type = ExtensionSpellType.NONE;//法术类型以及信息
+        public int requiredLevel = 1;
 
         public ChineseElement chineseElement;//法术元素类型
 
@@ -30,6 +32,10 @@ namespace Cultivation_Way
         {
             bannedRace = new List<string>();
             bannedCultisystem = new List<string>();
+        }
+        internal bool allowCultisystem(uint cultiSystemID)
+        {
+            return (allowedCultisystem & cultiSystemID) > 0;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Cultivation_Way
 {
@@ -49,26 +50,25 @@ namespace Cultivation_Way
             {
                 ChineseElementAsset allElement = elementLibrary.get("AllElement");
                 id = allElement.id;
+                return;
             }
-            Tuple<string, int> maxMembership = new Tuple<string, int>("All", 100000);
-
-
-            foreach (string id in elementLibrary.dict.Keys)
+            id = "All";
+            int maxMembership = 100000;
+            foreach (string k in elementLibrary.dict.Keys)
             {
                 //rarity作为量度，rarity越大，要求的membership越小
                 int membership = 1;
                 for (int i = 0; i < 5; i++)
                 {
-                    membership *= Math.Abs(baseElementContainer[i] - elementLibrary.dict[id].content[i]) + 1;
+                    membership *= Math.Abs(baseElementContainer[i] - elementLibrary.dict[k].content[i]) + 1;
                 }
 
-                if (membership < maxMembership.Item2 && id != "AllElement")
+                if (membership < maxMembership && id != "AllElement")
                 {
-                    maxMembership = new Tuple<string, int>(id, membership);
+                    id = k;
+                    maxMembership =  membership;
                 }
             }
-            ChineseElementAsset element = elementLibrary.get(maxMembership.Item1);
-            id = element.id;
         }
         /// <summary>
         /// 返回不纯净度
@@ -137,10 +137,22 @@ namespace Cultivation_Way
         {
             getRandom();
         }
-
+        public static int getMatchDegree(ChineseElement e1, ChineseElement e2,bool mutiply = false)
+        {
+            if (mutiply) 
+            {
+                return 0;
+            }
+            int res = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                res += Mathf.Abs(e1.baseElementContainer[i] - e2.baseElementContainer[i]);
+            }
+            return res;
+        }
         public static bool isMatch(ChineseElement e1, ChineseElement e2)
         {
-            return true;
+            return getMatchDegree(e1, e2) < 100;
         }
     }
 }

@@ -65,7 +65,10 @@ namespace Cultivation_Way.Utils
             }
             foreach (PlayerOptionData data in originLaws.Values)
             {
-                MapBox.instance.worldLaws.add(data);
+                if (!MapBox.instance.worldLaws.list.Contains(data))
+                {
+                    MapBox.instance.worldLaws.add(data);
+                }
             }
         }
     }
