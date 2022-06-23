@@ -2,6 +2,9 @@
 using ReflectionUtility;
 using System.Collections.Generic;
 using UnityEngine;
+using Cultivation_Way.Utils;
+using System;
+using CultivationWay;
 namespace Cultivation_Way
 {
     internal class MoreBuildings
@@ -417,10 +420,10 @@ namespace Cultivation_Way
                 __result = null;
                 return false;
             }
-            ExtendedBuilding building = Object.Instantiate(CultivationWay.Main.instance.prefabs.ExtendedBuildingPrefab).GetComponent<ExtendedBuilding>();
+            ExtendedBuilding building = UnityEngine.Object.Instantiate(Main.instance.prefabs.ExtendedBuildingPrefab).GetComponent<ExtendedBuilding>();
             building.gameObject.SetActive(true);
-            building.CallMethod("create");
-            building.CallMethod("setBuilding", pTile, buildingAsset, pData);
+            ((Action<ExtendedBuilding>)building.GetFastMethod("create", Types.t_ExtendedBuilding))(building);
+            ((Action<ExtendedBuilding, WorldTile, BuildingAsset,BuildingData>)building.GetFastMethod("setBuilding", Types.t_ExtendedBuilding))(building, pTile, buildingAsset, pData);
 
             if (pData != null)
             {
@@ -429,14 +432,14 @@ namespace Cultivation_Way
             }
             else
             {
-                building.easyData = Reflection.GetField(typeof(Building), building, "data") as BuildingData;
+                building.easyData = building.GetValue<BuildingData>("data", Types.t_ExtendedBuilding);
             }
             building.easyStats = buildingAsset;
-
-            building.transform.parent = Reflection.GetField(typeof(MapBox), MapBox.instance, "transformBuildings") as Transform;
+            building.easyCurStats = building.GetValue<BaseStats>("curStats", Types.t_ExtendedBuilding);
+            building.transform.parent = Main.instance.transformBuildings;
             if (buildingAsset.buildingType == BuildingType.Tree)
             {
-                building.transform.parent = building.transform.parent.Find("Trees");
+                building.transform.parent = Main.instance.transformTrees;
             }
             building.resetShadow();
             MapBox.instance.buildings.Add(building);
@@ -446,7 +449,7 @@ namespace Cultivation_Way
             }
             if (Config.timeScale > 10f)
             {
-                building.CallMethod("finishScaleTween");
+                ((Action<ExtendedBuilding>)building.GetFastMethod("finishScaleTween", Types.t_ExtendedBuilding))(building);
             }
             __result = building;
 

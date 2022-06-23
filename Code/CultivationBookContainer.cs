@@ -2,9 +2,11 @@
 
 namespace Cultivation_Way
 {
-    internal class CultivationBookContainer : ObjectContainer<CultivationBook>
+    internal class CultivationBookContainer
     {
-
+        internal List<CultivationBook> container = new List<CultivationBook>();
+        internal CultivationBookType containerType = CultivationBookType.NONE;
+        internal int maxStoreCount = 30;
         /// <summary>
         /// 获取随机一本匹配类型的功法
         /// </summary>
@@ -27,43 +29,100 @@ namespace Cultivation_Way
         /// <param name="pActor"></param>
         /// <param name="requireType"></param>
         /// <returns></returns>
-        public CultivationBook getBestOne(ExtendedActor pActor, CultivationBookType requireType = CultivationBookType.NONE)
+        public CultivationBook getBestOne(ExtendedActorStatus pStatus, CultivationBookType requireType = CultivationBookType.NONE)
         {
             CultivationBook bestOne = null;
-            float bestMatchDegree = 0f;
+            int count = container.Count;
+            float bestMatchDegree = 10000000f;
             float temp;
-            using (IEnumerator<CultivationBook> enumerator = GetEnumerator())
+
+            for (int i = 0; i < count; i++)
             {
-                while (enumerator.MoveNext())
+                if ((requireType == CultivationBookType.NONE || containerType == CultivationBookType.NONE || container[i].BookType == requireType)
+                        && container[i].allowActor(pStatus))
                 {
-                    if ((requireType == CultivationBookType.NONE || enumerator.Current.BookType == requireType)
-                        && enumerator.Current.allowActor(pActor))
+                    temp = container[i].getMatchDegree(pStatus);
+                    if (temp < bestMatchDegree)
                     {
-                        temp = enumerator.Current.getMatchDegree(pActor);
-                        if (temp > bestMatchDegree)
-                        {
-                            bestMatchDegree = temp;
-                            bestOne = enumerator.Current;
-                        }
+                        bestMatchDegree = temp;
+                        bestOne = container[i];
                     }
                 }
             }
             return bestOne;
         }
+        public int storeNewOne(CultivationBook book)
+        {
+            if (containerType == CultivationBookType.NONE || book.BookType == containerType)
+            {
+                int count = container.Count;
+                if (count >= maxStoreCount)
+                {
+                    List<CultivationBook> possibleBooks = new List<CultivationBook>();
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (book.rank > container[i].rank)
+                        {
+                            possibleBooks.Add(container[i]);
+                        }
+                    }
+                    int minDistance=999999;
+                    int temp;
+                    CultivationBook toReplace=null;
+                    foreach(CultivationBook book1 in possibleBooks)
+                    {
+                        temp = ChineseElement.getMatchDegree(book.element, book1.element,true);
+                        if (temp < minDistance)
+                        {
+                            minDistance = temp;
+                            toReplace = book1;
+                        }
+                    }
+                    int res = -1;
+                    if (toReplace != null)
+                    {
+                        res = container.IndexOf(toReplace);
+                        container[res].setContent(book);
+                    }
+                    return res;
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    if (book.isSimilar(container[i]))
+                    {
+                        if (book.rank > container[i].rank)
+                        {
+                            container[i].setContent(book);
+                            return i;
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                    }
 
+                }
+                container.Add(book);
+                return container.Count-1;
+            }
+            return -1;
+        }
         private void getPossibleBooks(ExtendedActor pActor, CultivationBookType requireType, List<CultivationBook> possibleBooks)
         {
-            using (IEnumerator<CultivationBook> enumerator = GetEnumerator())
+            int count = container.Count;
+            for (int i = 0; i < count; i++)
             {
-                while (enumerator.MoveNext())
+                if ((requireType == CultivationBookType.NONE || containerType == CultivationBookType.NONE || container[i].BookType == requireType)
+                    && container[i].allowActor(pActor))
                 {
-                    if ((requireType == CultivationBookType.NONE || enumerator.Current.BookType == requireType)
-                        && enumerator.Current.allowActor(pActor))
-                    {
-                        possibleBooks.Add(enumerator.Current);
-                    }
+                    possibleBooks.Add(container[i]);
                 }
             }
+        }
+        
+        public CultivationBookContainer(CultivationBookType containerType = CultivationBookType.NONE)
+        {
+            this.containerType = containerType;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Cultivation_Way
 
         private SpriteAnimation spriteAnimation;
 
-        private ExtensionSpell spellPrepared;
+        private ExtendedSpell spellPrepared;
         private bool _justGotHit;
 
         private void Start()

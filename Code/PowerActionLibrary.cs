@@ -62,7 +62,6 @@ namespace Cultivation_Way
             }
             ExtendedActor Sheng = (ExtendedActor)MapBox.instance.spawnNewUnit(godPower.actorStatsId, pTile, "", godPower.actorSpawnHeight);
             Sheng.easyData.level = 50;
-            Sheng.extendedData.status.magic = int.MaxValue >> 2;
             Sheng.easyData.health = int.MaxValue >> 2;
 
             Sheng.CallMethod("setProfession", UnitProfession.Unit);
@@ -100,7 +99,7 @@ namespace Cultivation_Way
                     cloud.sprRenderer.color = cloud.colorRain;
                     Reflection.SetField<string>(cloud, "dropID", "rain");
                 }
-                BaseEffect lightning = ((BaseEffectController)MapBox.instance.stackEffects.CallMethod("get", "lightning")).spawnAtRandomScale(pTile, size, size);
+                ((BaseEffectController)MapBox.instance.stackEffects.CallMethod("get", "lightning")).spawnAtRandomScale(pTile, size, size);
             }
             float damage = Toolbox.randomFloat(actor.easyData.health >> 4, actor.easyData.health >> 2) * rank;
             int num = 0;

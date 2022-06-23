@@ -148,7 +148,7 @@
                 content = new int[5] { 20, 20, 20, 20, 20 },
                 oppositeElementId = new string[] { "*" },//星号表示所有，指在实现时
                 promoteElementId = new string[] { },//无
-                rarity = 10
+                rarity = 20
             });
             add(new ChineseElementAsset
             {

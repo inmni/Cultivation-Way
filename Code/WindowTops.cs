@@ -73,6 +73,13 @@ namespace Cultivation_Way
                                                             new Vector3(-120f, 35f), ButtonType.Click, windowTop.transform,
                                                             setTalent);
             button1.GetComponent<Image>().sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/backButtonLeft.png");
+
+            PowerButton button2 = PowerButtons.CreateButton("familyRank", Resources.Load<Sprite>("ui/Icons/iconCheckFamily"),
+                                                            "家族榜",
+                                                            "",
+                                                            new Vector3(-120f, -10f), ButtonType.Click, windowTop.transform,
+                                                            setTalent);
+            button1.GetComponent<Image>().sprite = Utils.ResourcesHelper.loadSprite($"{Main.mainPath}/EmbededResources/backButtonLeft.png");
             //foreach(string scrollWindow in NCMS.Utils.Windows.AllWindows.Keys)
             //         {
             //	print(scrollWindow);
@@ -235,8 +242,8 @@ namespace Cultivation_Way
             instance.clear();
             actors.Sort((a1, a2) =>
             {
-                ChineseElement element1 = a1.extendedCurStats.element;
-                ChineseElement element2 = a2.extendedCurStats.element;
+                ChineseElement element1 = a1.extendedData.status.chineseElement;
+                ChineseElement element2 = a2.extendedData.status.chineseElement;
                 int bodyRank1 = a1.GetSpecialBody().rank;
                 int bodyRank2 = a2.GetSpecialBody().rank;
                 float e1 = element1.GetAsset().rarity * bodyRank1;
@@ -282,6 +289,58 @@ namespace Cultivation_Way
                     break;
                 }
             }
+        }
+        public static void setFamily()
+        {
+            instance.clear();
+            List<string> families = new List<string>();
+            Dictionary<string, List<ExtendedActor>> dict = new Dictionary<string, List<ExtendedActor>>();
+            foreach(string key in ExtendedWorldData.instance.familys.Keys)
+            {
+                families.Add(key);
+                dict[key] = new List<ExtendedActor>();
+            }
+            foreach(ExtendedActor actor in MapBox.instance.units.getSimpleList())
+            {
+                if (actor.easyData.alive)
+                {
+                    dict[actor.extendedData.status.familyID].Add(actor);
+                }
+            }
+            families.Sort((f1, f2) =>
+            {
+                if (dict[f1].Count > dict[f2].Count)
+                {
+                    return -1;
+                }
+                else if(dict[f1].Count == dict[f2].Count)
+                {
+                    int rank1=0;
+                    int rank2=0;
+                    foreach(CultivationBook book in ExtendedWorldData.instance.familys[f1].lofts[1].container)
+                    {
+                        rank1 += book.rank;
+                    }
+                    foreach (CultivationBook book in ExtendedWorldData.instance.familys[f2].lofts[1].container)
+                    {
+                        rank2 += book.rank;
+                    }
+                    if (rank1 > rank2)
+                    {
+                        return -1;
+                    }
+                    else if (rank1 == rank2)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return 1;
+                    }
+                }
+                return 1;
+            });
+
         }
         private void clear()
         {

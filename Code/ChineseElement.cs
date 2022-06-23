@@ -48,25 +48,27 @@ namespace Cultivation_Way
             ChineseElementLibrary elementLibrary = AddAssetManager.chineseElementLibrary;
             if (isAll)
             {
-                ChineseElementAsset allElement = elementLibrary.get("AllElement");
-                id = allElement.id;
+                id = "AllElement";
                 return;
             }
             id = "All";
-            int maxMembership = 100000;
-            foreach (string k in elementLibrary.dict.Keys)
+            int maxDistance = 0;
+            int corrRarity = 1;
+            int distance;
+            for (int j = 0; j < elementLibrary.list.Count; j++)
             {
                 //rarity作为量度，rarity越大，要求的membership越小
-                int membership = 1;
+                distance=0;
                 for (int i = 0; i < 5; i++)
                 {
-                    membership *= Math.Abs(baseElementContainer[i] - elementLibrary.dict[k].content[i]) + 1;
+                    distance += baseElementContainer[i] * elementLibrary.list[j].content[i];
                 }
-
-                if (membership < maxMembership && id != "AllElement")
+                if ((distance == maxDistance && elementLibrary.list[j].rarity>corrRarity)
+                    ||(distance/ elementLibrary.list[j].rarity> maxDistance/corrRarity))
                 {
-                    id = k;
-                    maxMembership =  membership;
+                    id = elementLibrary.list[j].id;
+                    maxDistance = distance;
+                    corrRarity = elementLibrary.list[j].rarity;
                 }
             }
         }
@@ -113,6 +115,26 @@ namespace Cultivation_Way
             }
         }
         /// <summary>
+        /// 偏移
+        /// </summary>
+        /// <param name="content"></param>
+        public void deflectTo(int[] content,float scale = 0.3f)
+        {
+            for(int i = 0; i < 5; i++)
+            {
+                baseElementContainer[i] -= (int)((baseElementContainer[i]-content[i])*scale);
+            }
+            normalize();
+        }
+        public void setContent(int[] content)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                baseElementContainer[i] = content[i];
+            }
+
+        }
+        /// <summary>
         /// 获取对应的Asset
         /// </summary>
         /// <returns></returns>
@@ -126,7 +148,12 @@ namespace Cultivation_Way
         /// <param name="content"></param>
         public ChineseElement(int[] content)
         {
-            baseElementContainer = content;
+            int length = content.Length;
+            baseElementContainer = new int[length];
+            for(int i = 0; i < length; i++)
+            {
+                baseElementContainer[i] = content[i];
+            }
             normalize();
             setType();
         }
@@ -139,20 +166,41 @@ namespace Cultivation_Way
         }
         public static int getMatchDegree(ChineseElement e1, ChineseElement e2,bool mutiply = false)
         {
+            int res = 0;
             if (mutiply) 
             {
-                return 0;
+                for (int i = 0; i < 5; i++)
+                {
+                    res += (e1.baseElementContainer[i] - e2.baseElementContainer[i])* (e1.baseElementContainer[i] - e2.baseElementContainer[i]);
+                }
+                return res;
             }
-            int res = 0;
             for (int i = 0; i < 5; i++)
             {
                 res += Mathf.Abs(e1.baseElementContainer[i] - e2.baseElementContainer[i]);
             }
             return res;
         }
+        public static int getMatchDegree(int[] e1, int[] e2, bool mutiply = false)
+        {
+            int res = 0;
+            if (mutiply)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    res += (e1[i] - e2[i]) * (e1[i] - e2[i]);
+                }
+                return res;
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                res += Mathf.Abs(e1[i] - e2[i]);
+            }
+            return res;
+        }
         public static bool isMatch(ChineseElement e1, ChineseElement e2)
         {
-            return getMatchDegree(e1, e2) < 100;
+            return getMatchDegree(e1, e2,true) <=8000 ;
         }
     }
 }

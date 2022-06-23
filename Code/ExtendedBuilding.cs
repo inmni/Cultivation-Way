@@ -4,9 +4,10 @@ namespace Cultivation_Way
 {
     internal class ExtendedBuilding : Building
     {
-        internal MoreStats extendedCurStats = new MoreStats();
-        internal MoreData extendedData = new MoreData();
+        public MoreStats extendedCurStats = new MoreStats();
+        public MoreData extendedData = new MoreData();
         public BuildingData easyData;
+        public BaseStats easyCurStats;
         public BuildingAsset easyStats;
         public List<BaseSimObject> compositions = new List<BaseSimObject>();
     }

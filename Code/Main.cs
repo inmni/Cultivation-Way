@@ -38,12 +38,14 @@ namespace CultivationWay
 
         public CustomPrefabs prefabs = new CustomPrefabs();
 
-        public ExtendedWorldData worldData = new ExtendedWorldData();
+        public ExtendedWorldData worldData=new ExtendedWorldData();
 
         public List<BonusStatsManager> bonusStatsManagers = new List<BonusStatsManager>();
 
         internal Transform transformUnits;
         internal Transform transformCreatures;
+        internal Transform transformBuildings;
+        internal Transform transformTrees;
         internal GameStatsData gameStatsData;
         internal ZoneCalculator zoneCalculator;
         public string addMapMode = "";
@@ -74,6 +76,7 @@ namespace CultivationWay
         public List<string> addItems = new List<string>();
         public List<string> addRaces = new List<string>();
         public Dictionary<string, Vector2> addProjectiles = new Dictionary<string, Vector2>();
+        private float startTime;
         #endregion
         #region 初始化n件套
         private bool initiated = false;
@@ -82,23 +85,24 @@ namespace CultivationWay
         {
             instance = this;
             MonoBehaviour.print("[修真之路Cultivation Way]:开始加载");
+            startTime = Time.time;
         }
 
         private void Start()
         {
             //创建按钮栏
             MorePowers.createPowerTab();
-            print("[修真之路Cultivation Way]:创建按钮栏成功");
+            //print("[修真之路Cultivation Way]:创建按钮栏成功");
             //添加Asset
             AddAssetManager.addAsset();
-            print("[修真之路Cultivation Way]:添加Asset成功");
+            //print("[修真之路Cultivation Way]:添加Asset成功");
             //加载按钮
             MorePowers.createButtons();
-            print("[修真之路Cultivation Way]:加载按钮成功");
+            //print("[修真之路Cultivation Way]:加载按钮成功");
             setLanguage_Postfix(Reflection.GetField(typeof(LocalizedTextManager), LocalizedTextManager.instance, "language") as string);
             //开启拦截
             patchHarmony();
-            MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
+            //MonoBehaviour.print("[修真之路Cultivation Way]:启用拦截成功");
             effectManager = transform.gameObject.AddComponent<NewEffectManager>();
         }
 
@@ -120,14 +124,15 @@ namespace CultivationWay
                 MoreRaces.kingdomColorsDataInit();//国家颜色数据
                 initChunkElement();//区块元素
                 moreMapModes.add();//地图显示模式
-                createOrResetFamily();//家族初始化
+                //createOrResetFamily();//家族初始化
                 ExtendedActorStats.init();//添加种族特色
                 ExtendedBuildingStats.init();
                 prefabs.init();//预制体初始化
                 instance.gameStatsData = Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data") as GameStatsData;
                 instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
                 //PrefabUtility.SaveAsPrefabAsset((GameObject)Resources.Load("actors/p_unit", typeof(GameObject)), "p_unit.prefab");
-
+                DefaultSetting.init();
+                MonoBehaviour.print($"[修真之路Cultivation Way]:加载用时{Time.time-startTime}");
                 #endregion
             }
             if (ExtendedWorldData.instance.chunkToElement.Count != Config.ZONE_AMOUNT_X * Config.ZONE_AMOUNT_Y << 6)
@@ -415,7 +420,7 @@ namespace CultivationWay
                         ExtendedActor User = (ExtendedActor)kingdom.getMaxLevelActor();
                         if (User.stats.id == "unit_Tian")
                         {
-                            foreach (ExtensionSpell spell in User.extendedCurStats.spells)
+                            foreach (ExtendedSpell spell in User.extendedData.status.spells)
                             {
                                 if (spell.spellAssetID == "summonTian")
                                 {
@@ -436,7 +441,7 @@ namespace CultivationWay
                             ExtendedActor User = (ExtendedActor)kingdom.king;
                             if (User.stats.id == "unit_Tian")
                             {
-                                foreach (ExtensionSpell spell in User.extendedCurStats.spells)
+                                foreach (ExtendedSpell spell in User.extendedData.status.spells)
                                 {
                                     if (spell.spellAssetID == "summonTian1")
                                     {

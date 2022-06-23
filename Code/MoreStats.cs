@@ -50,17 +50,9 @@ namespace Cultivation_Way
         #endregion
         public BaseStats baseStats;
         /// <summary>
-        /// 法术
-        /// </summary>
-        public List<ExtensionSpell> spells;
-        /// <summary>
         /// 施法距离
         /// </summary>
         public float spellRange;
-        /// <summary>
-        /// 蓝量
-        /// </summary>
-        public int magic;
         /// <summary>
         /// 护盾
         /// </summary>
@@ -109,9 +101,7 @@ namespace Cultivation_Way
         {
             baseStats.CallMethod("addStats", another.baseStats);
 
-            spells.AddRange(another.spells);//待修改，减少重复？目前是存在重复的
             spellRange += another.spellRange;
-            magic += another.magic;
             vampire += another.vampire;
             antiInjury += another.antiInjury;
             spellRelief += another.spellRelief;
@@ -127,7 +117,6 @@ namespace Cultivation_Way
         public void minusAnotherStats(MoreStats another)
         {
             spellRange -= another.spellRange;
-            magic -= another.magic;
             vampire -= another.vampire;
             antiInjury -= another.antiInjury;
             spellRelief -= another.spellRelief;
@@ -148,13 +137,12 @@ namespace Cultivation_Way
         /// <param name="speed"></param>
         /// <param name="armor"></param>
         /// <param name="magic"></param>
-        public void setBasicStats(int health, int damage, int speed, int armor, int magic = 0)
+        public void setBasicStats(int health, int damage, int speed, int armor)
         {
             baseStats.health = health;
             baseStats.damage = damage;
             baseStats.speed = speed;
             baseStats.armor = armor;
-            this.magic = magic;
         }
         /// <summary>
         /// 返回BaseStats
@@ -176,31 +164,6 @@ namespace Cultivation_Way
             this.soul = soul;
             this.talent = talent;
         }
-        public void addSpell(ExtensionSpell spell)
-        {
-            for (int i = 0; i < spells.Count; i++)
-            {
-                if (spells[i].spellAssetID == spell.spellAssetID)
-                {
-                    spells[i].might = spells[i].might > spell.might ? spells[i].might : spell.might;
-                    return;
-                }
-            }
-            spells.Add(new ExtensionSpell(spell));
-        }
-        public ExtensionSpell addSpell(string spellID)
-        {
-            for (int i = 0; i < spells.Count; i++)
-            {
-                if (spells[i].spellAssetID == spellID)
-                {
-                    return spells[i];
-                }
-            }
-            ExtensionSpell spell = new ExtensionSpell(spellID);
-            spells.Add(spell);
-            return spell;
-        }
         /// <summary>
         /// 清空
         /// </summary>
@@ -208,7 +171,6 @@ namespace Cultivation_Way
         {
             baseStats = new BaseStats();
             spellRange = 1f;
-            magic = 5;
             vampire = 0f;
             antiInjury = 0f;
             spellRelief = 0f;
@@ -229,17 +191,19 @@ namespace Cultivation_Way
             result.antiInjury = moreStats.antiInjury * num;
             //result.spellRange = moreStats.spellRange * num;
             result.spellRelief = moreStats.spellRelief * num;
-            result.magic = (int)(moreStats.magic * num);
             result.soul = (int)(moreStats.soul * num);
             result.talent = (int)(moreStats.talent * num);
+            result.baseStats.health = (int)(moreStats.baseStats.health * num);
+            result.baseStats.damage = (int)(moreStats.baseStats.damage * num);
+            result.baseStats.armor = (int)(moreStats.baseStats.armor * num);
+            result.baseStats.speed = moreStats.baseStats.speed * num;
+            result.baseStats.crit = moreStats.baseStats.crit * num;
             return result;
         }
         public MoreStats()
         {
             baseStats = new BaseStats();
-            spells = new List<ExtensionSpell>();
             spellRange = 1f;
-            magic = 5;
             vampire = 0f;
             antiInjury = 0f;
             spellRelief = 0f;

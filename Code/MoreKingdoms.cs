@@ -10,6 +10,8 @@ namespace Cultivation_Way
 {
     internal class MoreKingdoms
     {
+        private static ExtendedActor temp_parent;
+        internal static MoreData temp_data;
         internal void init()
         {
             AssetManager.kingdoms.add(new KingdomAsset
@@ -247,110 +249,26 @@ namespace Cultivation_Way
             //强制征兵，不做冷却限制，如果该单位没有装备栏
             return false;
         }
-        //彻底修改生育
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ai.behaviours.CityBehProduceUnit), "produceNewCitizen")]
-        public static bool produceNewCitizen_Prefix(ai.behaviours.CityBehProduceUnit __instance, bool __result, Building pBuilding, City pCity)
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ai.behaviours.CityBehProduceUnit), "getRandomParent")]
+        public static void getRandomParent_Postfix(Actor __result)
         {
-            ExtendedActor randomParent = pCity.getRandomParent(null);
-            if (randomParent == null)
+            if (__result != null)
             {
-                __result = false;
-                return false;
+                temp_parent = (ExtendedActor)__result;
             }
-            if (randomParent.haveTrait("infected") && Toolbox.randomBool())
-            {
-                __result = false;
-                return false;
-            }
-            ExtendedActor randomParent2 = pCity.getRandomParent(randomParent);
-            randomParent.easyData.children++;
-            pCity.status.housingFree--;
-            CityData cityData = pCity.GetValue<CityData>("data");
-            if (randomParent.kingdom != null)
-            {
-                randomParent.kingdom.born++;
-            }
-            ActorStats stats = randomParent.stats;
-            ActorData actorData = new ActorData();
-
-
-            actorData.cityID = cityData.cityID;
-            actorData.status = new ActorStatus();
-            actorData.status.statsID = stats.id;
-            ActorBase.generateCivUnit(stats, actorData.status, AssetManager.raceLibrary.get(stats.race));
-            actorData.status.generateTraits(stats, AssetManager.raceLibrary.get(stats.race));
-            actorData.status.inheritTraits(randomParent.easyData.traits);
-            actorData.status.hunger = stats.maxHunger / 2;
-            if (randomParent2 != null)
-            {
-                actorData.status.inheritTraits(randomParent2.easyData.traits);
-                randomParent2.easyData.children++;
-            }
-            actorData.status.skin = ai.ActorTool.getBabyColor(randomParent, randomParent2);
-            actorData.status.skin_set = randomParent.easyData.skin_set;
-            Culture babyCulture = (Culture)Reflection.CallStaticMethod(typeof(ai.behaviours.CityBehProduceUnit), "getBabyCulture", randomParent, randomParent2);
-            if (babyCulture != null)
-            {
-                actorData.status.culture = babyCulture.id;
-                actorData.status.level = babyCulture.getBornLevel();
-            }
-            #region 设置出生属性
-            MoreData moreData = new MoreData();
-            actorData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
-            ExtendedWorldData.instance.tempMoreData[actorData.status.actorID] = moreData;
-            moreData.status.element = new ChineseElement().baseElementContainer;
-            //获取修炼体系
-            if (babyCulture != null)
-            {
-                List<string> cultisystem = new List<string>();
-                foreach (string tech in babyCulture.list_tech_ids)
-                {
-                    if (tech.StartsWith("culti_"))
-                    {
-                        cultisystem.Add(tech);
-                    }
-                }
-                if (cultisystem.Count > 0)
-                {
-                    moreData.status.cultisystem = cultisystem.GetRandom().Remove(0, 6);
-                }
-            }
-            //继承体质
-            int bodyRank = randomParent.GetSpecialBody().rank;
-            if (Toolbox.randomChance(1f / (bodyRank * (bodyRank + 1))))
-            {
-                moreData.status.specialBody = randomParent.GetSpecialBody().id;
-            }
-            if (Toolbox.randomChance(0.001f))
-            {
-                moreData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
-            }
-            //继承家族
-            moreData.status.familyID = randomParent.GetFamily().id;
-            if (Toolbox.randomChance(0.05f))
-            {
-                moreData.status.familyID = stats.unit ? AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() : AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
-            }
-            Family family = ExtendedWorldData.instance.familys[moreData.status.familyID];
-            family.num++;
-            //设置名字
-            moreData.status.familyName = randomParent.extendedData.status.familyName;
-            if (Toolbox.randomChance(0.02f))
-            {
-                moreData.status.familyName = stats.unit ? AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() : AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
-            }
-            actorData.status.firstName = stats.unit ? ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, true) : ChineseNameGenerator.getCreatureName(stats.nameTemplate, moreData.status.familyName, false);
-            #endregion
-            cityData.popPoints.Add(actorData);
-            __result = true;
-            return false;
+        }
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(City),"addPopPoint")]
+        public static void addPopPoint_Postfix(ActorData pData)
+        {
+            pData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
+            ExtendedWorldData.instance.tempMoreData[pData.status.actorID] = pData.generateExtendedStatus(temp_parent);
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(City), "spawnPopPoint")]
         public static bool spawnPopPoint(ActorData pData, WorldTile pTile)
         {
-
             if (pData.status.age <= 8)
             {
                 pData.status.statsID = pData.status.statsID.Replace("unit_", "baby_");
@@ -365,17 +283,14 @@ namespace Cultivation_Way
                     pData.status.traits.Add(item);
                 }
             }
+            temp_data  = ExtendedWorldData.instance.tempMoreData[pData.status.actorID];
+            ExtendedWorldData.instance.tempMoreData.Remove(pData.status.actorID);
             ExtendedActor actor = (ExtendedActor)MapBox.instance.spawnAndLoadUnit(pData.status.statsID, pData, pTile);
             actor.setStatsDirty();
             if (actor.stats.baby)
             {
-                actor.GetComponent<Baby>().timerGrow = (float)actor.stats.timeToGrow;
+                actor.GetComponent<Baby>().timerGrow = actor.stats.timeToGrow;
             }
-
-            actor.extendedData = ExtendedWorldData.instance.tempMoreData[pData.status.actorID];
-            actor.extendedCurStats.element = new ChineseElement(actor.extendedData.status.element);
-
-            ExtendedWorldData.instance.tempMoreData.Remove(pData.status.actorID);
             pData.status.actorID = MapBox.instance.mapStats.getNextId("unit");
             return false;
         }

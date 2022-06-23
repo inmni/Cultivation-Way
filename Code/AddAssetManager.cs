@@ -11,9 +11,10 @@ namespace Cultivation_Way
 
         internal static CultisystemLibrary cultisystemLibrary;
 
-        internal static ExtensionSpellLibrary extensionSpellLibrary;
+        internal static ExtendedSpellLibrary extensionSpellLibrary;
 
         internal static SpecialBodyLibrary specialBodyLibrary;
+
 
         public static void addAsset()
         {
@@ -22,7 +23,7 @@ namespace Cultivation_Way
             chineseNameGenerator = new ChineseNameLibrary();
             chineseElementLibrary = new ChineseElementLibrary();
             cultisystemLibrary = new CultisystemLibrary();
-            extensionSpellLibrary = new ExtensionSpellLibrary();
+            extensionSpellLibrary = new ExtendedSpellLibrary();
             specialBodyLibrary = new SpecialBodyLibrary();
             add(chineseNameGenerator, "chineseNameGenerator");
             add(chineseElementLibrary, "element");

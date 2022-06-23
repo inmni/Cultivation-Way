@@ -10,7 +10,7 @@ namespace Cultivation_Way
     {
         //StackSpellEffects
         //样例
-        public static bool exampleSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool exampleSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -32,7 +32,7 @@ namespace Cultivation_Way
             return true;
         }
         //基础术法
-        public static bool baseSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool baseSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -47,7 +47,7 @@ namespace Cultivation_Way
             return true;
         }
         //雷法
-        public static bool lightningSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool lightningSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -61,7 +61,7 @@ namespace Cultivation_Way
             NewEffectManager.spawnOn(spell.spellAssetID, pTarget.currentPosition, 0.03f);
             return true;
         }
-        public static bool lightning1Spell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool lightning1Spell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -82,7 +82,7 @@ namespace Cultivation_Way
             return true;
         }
         //基础火
-        public static bool defaultFire(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool defaultFire(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -93,7 +93,7 @@ namespace Cultivation_Way
             return true;
         }
         //剑阵
-        public static bool swordsArray(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool swordsArray(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -104,7 +104,7 @@ namespace Cultivation_Way
             return true;
         }
         //激光，目前只用于蛟龙
-        public static bool laserSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool laserSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -126,7 +126,7 @@ namespace Cultivation_Way
 
             return true;
         }
-        public static bool barSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool barSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -147,7 +147,7 @@ namespace Cultivation_Way
 
             return true;
         }
-        public static bool barDownSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool barDownSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == pTarget || pUser == null || pTarget == null)
             {
@@ -166,7 +166,7 @@ namespace Cultivation_Way
             return true;
         }
         //骷髅召唤
-        public static bool summonSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool summonSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             ExtendedActor user = (ExtendedActor)pUser;
             if (pUser == null || user.stats.race.Contains("summon"))
@@ -206,7 +206,7 @@ namespace Cultivation_Way
             return true;
         }
         //单独召唤
-        public static bool summonTianSpell(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool summonTianSpell(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             ExtendedActor user = (ExtendedActor)pUser;
             if (pUser == null || user.stats.race.Contains("summon"))
@@ -241,7 +241,7 @@ namespace Cultivation_Way
             summoned.setStatsDirty();
             return true;
         }
-        public static bool summonTianSpell1(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool summonTianSpell1(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             ExtendedActor user = (ExtendedActor)pUser;
             if (pUser == null || user.stats.race.Contains("summon") || ExtendedWorldData.instance.creatureLimit[spell.spellAssetID] <= 0)
@@ -276,7 +276,7 @@ namespace Cultivation_Way
             return true;
         }
         //法相天地
-        public static bool Shengtixianhua(ExtensionSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool Shengtixianhua(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             ExtendedActor user = (ExtendedActor)pUser;
             if (pUser == null || user.easyData.health < user.easyCurStats.health * 3 / 4)
@@ -295,9 +295,8 @@ namespace Cultivation_Way
                  }));
             }
 
-            MoreStatus moredata = ((ExtendedActor)pUser).extendedData.status;
+            ExtendedActorStatus moredata = ((ExtendedActor)pUser).extendedData.status;
             MoreStats bonusStats = new MoreStats();
-            bonusStats.magic = 0;
             bonusStats.baseStats.mod_damage += body.mod_damage;
             bonusStats.baseStats.mod_attackSpeed += body.mod_attack_speed;
             bonusStats.baseStats.mod_speed += body.mod_speed;
@@ -310,8 +309,68 @@ namespace Cultivation_Way
 
             return true;
         }
-
-
+        //发射类
+        public static bool projectileLike(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || pUser == pTarget || pTarget == null
+                ||!pUser.base_data.alive||!pTarget.base_data.alive)
+            {
+                return false;
+            }
+            ExtendedActor user = (ExtendedActor)pUser;
+            Projectile p = Utils.OthersHelper.startProjectile(spell.spellAssetID, pUser, pTarget);
+            Reflection.SetField(p, "byWho", user);
+            p.setStats(user.easyCurStats);
+            p.targetObject = pTarget;
+            return true;
+        }
+        #region 十二祖巫
+        public static bool RuShou(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null||!pUser.base_data.alive)
+            {
+                return false;
+            }
+            //添加防护罩
+            return true;
+        }
+        public static bool XuanMing1(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || !pUser.base_data.alive)
+            {
+                return false;
+            }
+            //召唤雨云
+            return true;
+        }
+        public static bool HouTu1(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || !pUser.base_data.alive)
+            {
+                return false;
+            }
+            //地刺
+            return true;
+        }
+        public static bool HouTu2(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || !pUser.base_data.alive)
+            {
+                return false;
+            }
+            //召唤亡灵
+            return true;
+        }
+        public static bool ZhuJiuYin(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || !pUser.base_data.alive)
+            {
+                return false;
+            }
+            //时间暂停
+            return true;
+        }
+        #endregion
 
         #region 通过游戏原版的委托进行的非交互法术
         public static bool bLightningSpell(BaseSimObject pUser, WorldTile pTile = null)
@@ -344,7 +403,7 @@ namespace Cultivation_Way
             {
                 return false;
             }
-            string godID = "";
+            string godID = string.Empty;
             foreach (string key in ExtendedWorldData.instance.godList.Keys)
             {
                 if (ExtendedWorldData.instance.creatureLimit[key] > 0)
@@ -370,7 +429,6 @@ namespace Cultivation_Way
             }
             god.easyData.health = int.MaxValue >> 2;
             god.easyData.level = user.easyData.level;
-            god.easyData.firstName = ExtendedWorldData.instance.godList[godID];
             return true;
         }
         public static bool aSimpleRangeDamage(BaseSimObject pUser, WorldTile pTile = null)

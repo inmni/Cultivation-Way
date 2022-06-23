@@ -41,7 +41,6 @@ namespace Cultivation_Way
             moreStatsGameObject.transform.localScale = Vector3.one;
             moreStatsGameObject.transform.localPosition = new Vector3(116.85f, -2.4204f,0);
             Transform moreStatsButton = moreStatsGameObject.transform.Find("Button");
-            moreStatsButton.Find("Icon").gameObject.AddComponent<Image>();
             moreStatsButton.Find("Icon").GetComponent<Image>().sprite = Resources.Load<Sprite>("ui/icons/iconInspect");
             PowerButton checkMoreStats = moreStatsButton.GetComponent<PowerButton>();
             checkMoreStats.type = PowerButtonType.Library;
@@ -119,14 +118,10 @@ namespace Cultivation_Way
             //}
             //Debug.Log(properties.Length);
             ExtendedActor actor = (ExtendedActor)Config.selectedUnit;
-            ActorStatus data = actor.easyData;
             SpecialBody specialBody = actor.GetSpecialBody();
-            MoreStatus moredata = actor.extendedData.status;
-            MoreStats stats = actor.extendedCurStats;
+            ExtendedActorStatus moredata = actor.extendedData.status;
             item.Add("family");
             value.Add(moredata.familyID + "氏");
-            item.Add("cultivationBook");
-            value.Add(ExtendedWorldData.instance.familys[moredata.familyID].cultivationBook.bookName);
             item.Add("specialBody");
             value.Add(specialBody.name);
             item.Add("origin");
@@ -134,24 +129,22 @@ namespace Cultivation_Way
             item.Add("madeBy");
             value.Add(specialBody.madeBy);
             item.Add("elementType");
-            value.Add(AddAssetManager.chineseElementLibrary.get(stats.element.id).name + "灵根");
+            value.Add(AddAssetManager.chineseElementLibrary.get(moredata.chineseElement.id).name + "灵根");
             item.Add("elementGold");
-            value.Add(stats.element.baseElementContainer[0] + "%");
+            value.Add(moredata.chineseElement.baseElementContainer[0] + "%");
             item.Add("elementWood");
-            value.Add(stats.element.baseElementContainer[1] + "%");
+            value.Add(moredata.chineseElement.baseElementContainer[1] + "%");
             item.Add("elementWater");
-            value.Add(stats.element.baseElementContainer[2] + "%");
+            value.Add(moredata.chineseElement.baseElementContainer[2] + "%");
             item.Add("elementFire");
-            value.Add(stats.element.baseElementContainer[3] + "%");
+            value.Add(moredata.chineseElement.baseElementContainer[3] + "%");
             item.Add("elementGround");
-            value.Add(stats.element.baseElementContainer[4] + "%");
+            value.Add(moredata.chineseElement.baseElementContainer[4] + "%");
             item.Add("cultisystem");
             value.Add(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).name);
             item.Add("realm");
             value.Add(actor.getRealmName());
 
-            item.Add("magic");
-            value.Add(moredata.magic + "/" + stats.magic);
             return toFormat(item, value);
         }
         private static string toFormat(List<string> item, List<string> value)

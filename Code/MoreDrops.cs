@@ -6,6 +6,7 @@ namespace Cultivation_Way
 {
     internal class MoreDrops
     {
+        private static List<BaseSimObject> temp_map_objects = null;
         internal void init()
         {
             AssetManager.drops.add(new DropAsset
@@ -21,11 +22,13 @@ namespace Cultivation_Way
 
         public static void action_exp(WorldTile pTile = null, string pDropID = null)
         {
-            ExtendedActor actor;
-            int count = pTile.units.Count;
-            for (int i = 0; i < count; i++)
+            MapBox.instance.CallMethod("getObjectsInChunks", pTile, 3, MapObjectType.Actor);
+            if (temp_map_objects == null)
             {
-                actor = (ExtendedActor)pTile.units[i];
+                temp_map_objects = (List<BaseSimObject>)Reflection.GetField(typeof(MapBox), MapBox.instance, "temp_map_objects");
+            }
+            foreach (ExtendedActor actor in temp_map_objects)
+            {
                 actor.extendedData.status.canCultivate = true;
                 if (actor.extendedData.status.cultisystem=="default")
                 {

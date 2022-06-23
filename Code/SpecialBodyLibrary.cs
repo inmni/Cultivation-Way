@@ -53,6 +53,14 @@ namespace Cultivation_Way
                 rank = 1,
             });
         }
+        public override SpecialBody add(SpecialBody pAsset)
+        {
+            if (pAsset.inheritChance == 0f)
+            {
+                pAsset.inheritChance = 1 / pAsset.rank;
+            }
+            return base.add(pAsset);
+        }
         internal void reset()
         {
             dict.Clear();

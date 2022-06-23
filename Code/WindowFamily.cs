@@ -19,6 +19,8 @@ namespace Cultivation_Way
         private static Text contentText;
 
         private static GameObject familyContent;
+
+        private static List<ExtendedActor> units = new List<ExtendedActor>();
         internal static void init()//此处init仅作为入口
         {
             Reflection.CallStaticMethod(typeof(ScrollWindow), "checkWindowExist", "inspect_unit");
@@ -44,7 +46,6 @@ namespace Cultivation_Way
             moreStatsGameObject.transform.localScale = Vector3.one;
             moreStatsGameObject.transform.localPosition = new Vector3(116.85f, -50f, 0);
             Transform moreStatsButton = moreStatsGameObject.transform.Find("Button");
-            moreStatsButton.Find("Icon").gameObject.AddComponent<Image>();
             moreStatsButton.Find("Icon").GetComponent<Image>().sprite = Resources.Load<Sprite>("ui/icons/iconCheckFamily");
             PowerButton checkMoreStats = moreStatsButton.GetComponent<PowerButton>();
             checkMoreStats.type = PowerButtonType.Library;
@@ -59,7 +60,6 @@ namespace Cultivation_Way
 
             window_Family = Windows.CreateNewWindow("window_Family", "家族信息");
             window_Family.transform.Find("Background").Find("Scroll View").gameObject.SetActive(true);
-
             familyContent = GameObject.Find("/Canvas Container Main/Canvas - Windows/windows/window_Family/Background/Scroll View/Viewport/Content");
 
             contentComponent = window_Family.transform
@@ -76,7 +76,6 @@ namespace Cultivation_Way
         private static void clickForWindow_MoreStats()
         {
             setWindowContent();
-
             window_Family.clickShow();
         }
         private static void setWindowContent()
@@ -112,18 +111,20 @@ namespace Cultivation_Way
 
             List<string> item = new List<string>();
             List<string> value = new List<string>();
-            MoreStatus moredata = ((ExtendedActor)Config.selectedUnit).extendedData.status;
-            Family family = ExtendedWorldData.instance.familys[moredata.familyID];
+            Family family = ((ExtendedActor)Config.selectedUnit).GetFamily();
             item.Add("family");
             value.Add(family.id + "氏");
-            item.Add("cultivationBook");
-            value.Add(family.cultivationBook.bookName);
-            item.Add("历史最强者");
-            value.Add(family.honorary);
-            item.Add("最强者等级");
-            value.Add(family.maxLevel.ToString());
+            units.Clear();
+            foreach(ExtendedActor actor in MapBox.instance.units)
+            {
+                if (!actor.easyData.alive||actor.extendedData.status.familyID!=family.id)
+                {
+                    continue;
+                }
+                units.Add(actor);
+            }
             item.Add("人数");
-            value.Add(family.num.ToString());
+            value.Add(units.Count.ToString());
             return toFormat(item, value);
         }
         private static string toFormat(List<string> item, List<string> value)
@@ -132,7 +133,7 @@ namespace Cultivation_Way
             int length = item.Count;
             for (int i = 0; i < length; i++)
             {
-                int tmpLength = 0;
+                int tmpLength;
                 string text = item[i];
                 if (LocalizedTextManager.stringExists(text))
                 {

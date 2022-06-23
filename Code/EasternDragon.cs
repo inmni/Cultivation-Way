@@ -25,7 +25,7 @@ namespace Cultivation_Way
 
         private Actor actorToAttack;
 
-        private ExtensionSpell spellPrepared;//预备施法
+        private ExtendedSpell spellPrepared;//预备施法
 
         private bool _died;
 
@@ -304,11 +304,11 @@ namespace Cultivation_Way
                         actorToAttack = targets.GetRandom();
                     }
                 }
-                foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
+                foreach (ExtendedSpell spell in actor.extendedData.status.spells)
                 {
-                    if (actor.extendedData.status.magic > spell.cost && spell.leftCool == 0)
+                    if (actor.easyData.experience > spell.cost)
                     {
-                        if (spell.GetSpellAsset().type==ExtensionSpellType.ATTACK)
+                        if (spell.GetSpellAsset().type==ExtendedSpellType.ATTACK)
                         {
                             spellPrepared = spell;
                             break;

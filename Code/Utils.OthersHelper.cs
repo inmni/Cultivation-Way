@@ -196,7 +196,7 @@ namespace Cultivation_Way.Utils
             color.a = (byte)(255 - Mathf.Pow((element.getImPurity() - 1), 0.2f) * 193f);
             return color;
         }//通过元素获取一定透明度的颜色，可能存在一定偏差
-        public static float getSpellDamage(ExtensionSpell spell, BaseSimObject pUser, BaseSimObject pTarget)
+        public static float getSpellDamage(ExtendedSpell spell, BaseSimObject pUser, BaseSimObject pTarget)
         {
             ExtendedActor user = (ExtendedActor)pUser;
             if (pTarget.objectType == MapObjectType.Actor)
@@ -234,7 +234,7 @@ namespace Cultivation_Way.Utils
                 return oriDamage * num1;
             }
         }
-        public static void hitEnemiesInRange(BaseSimObject pUser, WorldTile pTargetTile, float range, float damge, ExtensionSpell spell = null)
+        public static void hitEnemiesInRange(BaseSimObject pUser, WorldTile pTargetTile, float range, float damge, ExtendedSpell spell = null)
         {
             List<Actor> enemies = getEnemyObjectInRange(pUser, pTargetTile, range);
 
@@ -443,6 +443,58 @@ namespace Cultivation_Way.Utils
             float pZ = (float)pTarget.CallMethod("getZ");
             float num = Vector2.Distance(pUser.currentPosition, pTarget.currentPosition) + pZ;
             Vector3 end = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, target.x, target.y, num - ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pTarget, "curStats")).size, true);
+            end.y += 0.1f;
+            Vector3 start = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, end.x, end.y - 0.1f, (float)((BaseStats)Reflection.GetField(typeof(BaseSimObject), pUser, "curStats")).size, true);
+            start.x += xOffset;
+            start.y += 0.5f + yOffset;
+
+            return (Projectile)MapBox.instance.stackEffects.CallMethod("startProjectile", start, end, id, pZ);
+        }
+        public static Projectile startProjectile(string id, ExtendedActor pUser, ExtendedBuilding pTarget, float xOffset = 0f, float yOffset = 0f)
+        {
+            Vector3 target = new Vector3(pTarget.currentPosition.x, pTarget.currentPosition.y);
+            float pZ = (float)pTarget.CallMethod("getZ");
+            float num = Vector2.Distance(pUser.currentPosition, pTarget.currentPosition) + pZ;
+            Vector3 end = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, target.x, target.y, num - ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pTarget, "curStats")).size, true);
+            end.y += 0.1f;
+            Vector3 start = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, end.x, end.y - 0.1f, pUser.easyCurStats.size, true);
+            start.x += xOffset;
+            start.y += 0.5f + yOffset;
+
+            return (Projectile)MapBox.instance.stackEffects.CallMethod("startProjectile", start, end, id, pZ);
+        }
+        public static Projectile startProjectile(string id, ExtendedActor pUser, ExtendedActor pTarget, float xOffset = 0f, float yOffset = 0f)
+        {
+            Vector3 target = new Vector3(pTarget.currentPosition.x, pTarget.currentPosition.y);
+            float pZ = (float)pTarget.CallMethod("getZ");
+            float num = Vector2.Distance(pUser.currentPosition, pTarget.currentPosition) + pZ;
+            Vector3 end = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, target.x, target.y, num - pTarget.easyCurStats.size, true);
+            end.y += 0.1f;
+            Vector3 start = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, end.x, end.y - 0.1f, pUser.easyCurStats.size, true);
+            start.x += xOffset;
+            start.y += 0.5f + yOffset;
+
+            return (Projectile)MapBox.instance.stackEffects.CallMethod("startProjectile", start, end, id, pZ);
+        }
+        public static Projectile startProjectile(string id, ExtendedBuilding pUser, ExtendedBuilding pTarget, float xOffset = 0f, float yOffset = 0f)
+        {
+            Vector3 target = new Vector3(pTarget.currentPosition.x, pTarget.currentPosition.y);
+            float pZ = (float)pTarget.CallMethod("getZ");
+            float num = Vector2.Distance(pUser.currentPosition, pTarget.currentPosition) + pZ;
+            Vector3 end = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, target.x, target.y, num - ((BaseStats)Reflection.GetField(typeof(BaseSimObject), pTarget, "curStats")).size, true);
+            end.y += 0.1f;
+            Vector3 start = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, end.x, end.y - 0.1f, (float)((BaseStats)Reflection.GetField(typeof(BaseSimObject), pUser, "curStats")).size, true);
+            start.x += xOffset;
+            start.y += 0.5f + yOffset;
+
+            return (Projectile)MapBox.instance.stackEffects.CallMethod("startProjectile", start, end, id, pZ);
+        }
+        public static Projectile startProjectile(string id, ExtendedBuilding pUser, ExtendedActor pTarget, float xOffset = 0f, float yOffset = 0f)
+        {
+            Vector3 target = new Vector3(pTarget.currentPosition.x, pTarget.currentPosition.y);
+            float pZ = (float)pTarget.CallMethod("getZ");
+            float num = Vector2.Distance(pUser.currentPosition, pTarget.currentPosition) + pZ;
+            Vector3 end = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, target.x, target.y, num - pTarget.easyCurStats.size, true);
             end.y += 0.1f;
             Vector3 start = Toolbox.getNewPoint(pUser.currentPosition.x, pUser.currentPosition.y, end.x, end.y - 0.1f, (float)((BaseStats)Reflection.GetField(typeof(BaseSimObject), pUser, "curStats")).size, true);
             start.x += xOffset;

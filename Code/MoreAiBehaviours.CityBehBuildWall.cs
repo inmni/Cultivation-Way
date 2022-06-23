@@ -45,6 +45,10 @@ namespace Cultivation_Way.MoreAiBehaviours
 
         public override BehResult execute(City pCity)
         {
+            if (!pCity.isCapitalCity())
+            {
+                return BehResult.Continue;
+            }
             cityKey = pCity.GetHashCode();
             if (!conditions.ContainsKey(cityKey))
             {

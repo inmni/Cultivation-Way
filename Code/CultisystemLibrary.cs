@@ -4,24 +4,25 @@
     {
         public override void init()
         {
-            base.init(); 
+            base.init();
+
             add(new CultisystemAsset
             {
                 id = "default",
                 name = "无",
-                flag = 0 << 0,
-                addExperience = nothing,
+                flag = 1 << 0,
+                addExperience = doNothing,
                 bannedRace = new string[] { },
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
-            t.moreStats[0].setBasicStats(0, 0, 0, 0, 0);
+            t.moreStats[0].setBasicStats(0, 0, 0, 0);
             t.moreStats[0].setSpecialStats(0, 0, 0);
             for (int i = 1; i < 20; i++)
             {
                 t.moreStats[i] = new MoreStats();
                 t.moreStats[i].baseStats.knockbackReduction = i * 2;
-                t.moreStats[i].setBasicStats(i * i << 4, (int)(0.9 * (i * i)), i + 1, (int)(0.1 * (i + 19)), i << 1);
+                t.moreStats[i].setBasicStats(i * i << 4, (int)(0.9 * (i * i)), i + 1, (int)(0.1 * (i + 19)));
                 t.moreStats[i].setSpecialStats(30 * i * i, i >> 1, 0);
                 t.moreStats[i].addAnotherStats(t.moreStats[i - 1]);
             }
@@ -29,19 +30,19 @@
             {
                 id = "normal",
                 name = "仙路",
-                flag = 0 << 1,
+                flag = 1 << 1,
                 addExperience = normal,
                 bannedRace = new string[] { "orc","Wu","Tian" },
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
-            t.moreStats[0].setBasicStats(0, 0, 0, 0, 0);
+            t.moreStats[0].setBasicStats(0, 0, 0, 0);
             t.moreStats[0].setSpecialStats(0, 0, 0);
             for (int i = 1; i < 20; i++)
             {
                 t.moreStats[i] = new MoreStats();
                 t.moreStats[i].baseStats.knockbackReduction = i * 2;
-                t.moreStats[i].setBasicStats(i * i << 4, (int)(0.9 * (i * i)), i + 1, (int)(0.1 * (i + 19)), i << 1);
+                t.moreStats[i].setBasicStats(i * i << 4, (int)(0.9 * (i * i)), i + 1, (int)(0.1 * (i + 19)));
                 t.moreStats[i].setSpecialStats(30 * i * i, i >> 1, 0);
                 t.moreStats[i].addAnotherStats(t.moreStats[i - 1]);
             }
@@ -49,13 +50,13 @@
             {
                 id = "bodying",
                 name = "炼体",
-                flag = 0 << 2,
+                flag = 1 << 2,
                 addExperience = normal,
                 bannedRace = new string[] { "Tian","Ming"},
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
-            t.moreStats[0].setBasicStats(0, 0, 0, 0, 0);
+            t.moreStats[0].setBasicStats(0, 0, 0, 0);
             t.moreStats[0].setSpecialStats(0, 0, 0);
             for (int i = 1; i < 20; i++)
             {
@@ -70,13 +71,13 @@
             {
                 id = "bushido",
                 name = "武道",
-                flag = 0 << 3,
+                flag = 1 << 3,
                 addExperience = normal,
                 bannedRace = new string[] { "orc","Tian" },
                 moreStats = new MoreStats[20]
             });
             t.moreStats[0] = new MoreStats();
-            t.moreStats[0].setBasicStats(0, 0, 0, 0, 0);
+            t.moreStats[0].setBasicStats(0, 0, 0, 0);
             t.moreStats[0].setSpecialStats(0, 0, 0);
             for (int i = 1; i < 20; i++)
             {
@@ -101,7 +102,7 @@
                 }
             }
         }
-        private static bool nothing(ExtendedActor pActor,int pValue)
+        private static bool doNothing(ExtendedActor pActor,int pValue)
         {
             return false;
         }
@@ -123,7 +124,6 @@
                     {
                         return false;
                     }
-                    data.health = int.MaxValue >> 4;
                     if (data.level > 10)
                     {
                         if (data.level == 110)
@@ -131,15 +131,16 @@
                             pActor.generateNewBody();
                         }
                     }
-                    if (Toolbox.randomChance(data.level * (pActor.extendedCurStats.talent + 1) / 110f))
+                    if (Toolbox.randomChance(data.level * (pActor.extendedCurStats.talent + 1) / 20f))
                     {
-                        pActor.learnNewSpell();
+                        pActor.tryLearnNewSpell();
                     }
                 }
+                pActor.restoreAllHealth();
                 //法术释放
-                foreach (ExtensionSpell spell in pActor.extendedCurStats.spells)
+                foreach (ExtendedSpell spell in pActor.extendedData.status.spells)
                 {
-                    if (spell.GetSpellAsset().type==ExtensionSpellType.LEVELUP)
+                    if (spell.GetSpellAsset().type==ExtendedSpellType.LEVELUP)
                     {
                         spell.castSpell(pActor, pActor);
                         break;
@@ -167,11 +168,6 @@
                 return false;
             }
             //回蓝，回冷却
-            pActor.extendedData.status.magic = pActor.extendedCurStats.magic;//待调整与元素相关
-            foreach (ExtensionSpell spell in pActor.extendedCurStats.spells)
-            {
-                spell.leftCool -= spell.leftCool > 0 ? 1 : 0;
-            }
             pActor.setStatsDirty();
             //如果等级达到上限，或者该生物不能升级，则优化灵根
             if (data.level >= ExtendedWorldData.instance.levelLimit)

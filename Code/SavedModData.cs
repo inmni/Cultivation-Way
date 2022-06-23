@@ -98,36 +98,10 @@ namespace Cultivation_Way
                     {
                         continue;
                     }
-                    actor.extendedData.status.element = actor.extendedCurStats.element.baseElementContainer;
-                    actor.extendedData.status.compositionsID = new string[actor.compositions.Count];
-                    for (int i = 0; i < actor.compositions.Count; i++)
-                    {
-                        if (actor.compositions[i].objectType == MapObjectType.Building)
-                        {
-                            actor.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building), (Building)(actor.compositions[i]), "data") as BuildingData).objectID;
-                        }
-                        else if (actor.compositions[i].objectType == MapObjectType.Actor)
-                        {
-                            actor.extendedData.status.compositionsID[i] = ((ExtendedActor)(actor.compositions[i])).easyData.actorID;
-                        }
-                    }
                     moreActorData.Add(actor.extendedData);
                 }
                 foreach (ExtendedBuilding building in MapBox.instance.buildings.getSimpleList())
                 {
-                    building.extendedData.status.element = building.extendedCurStats.element.baseElementContainer;
-                    building.extendedData.status.compositionsID = new string[building.compositions.Count];
-                    for (int i = 0; i < building.compositions.Count; i++)
-                    {
-                        if (building.compositions[i].objectType == MapObjectType.Building)
-                        {
-                            building.extendedData.status.compositionsID[i] = (ReflectionUtility.Reflection.GetField(typeof(Building), (Building)(building.compositions[i]), "data") as BuildingData).objectID;
-                        }
-                        else if (building.compositions[i].objectType == MapObjectType.Actor)
-                        {
-                            building.extendedData.status.compositionsID[i] = ((ExtendedActor)(building.compositions[i])).easyData.actorID;
-                        }
-                    }
                     moreBuildingData.Add(building.extendedData);
                 }
             }, "Prepare Mod Data(2/3): Prepare units and buildings data", false);

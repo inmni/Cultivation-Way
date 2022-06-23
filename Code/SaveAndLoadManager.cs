@@ -185,7 +185,6 @@ namespace Cultivation_Way
                 if (actor != null)
                 {
                     actor.extendedData = moreActorData;
-                    actor.extendedCurStats.element = new ChineseElement(moreActorData.status.element);
                 }
                 else
                 {
@@ -221,7 +220,6 @@ namespace Cultivation_Way
                             building.easyData = buildingData;
                             building.easyStats = b;
                             building.extendedData = savedModData.moreBuildingData[i];
-                            building.extendedCurStats.element = new ChineseElement(building.extendedData.status.element);
                         }
                     }
                     //if (building.kingdom == null)

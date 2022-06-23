@@ -6,29 +6,321 @@ namespace Cultivation_Way
 {
     internal static class ActorTools
     {
-        
+        static List<string> temp_stringList = new List<string>(128);
+        static List<int> temp_intList = new List<int>(128);
         /// <summary>
         /// 返回actor的体质
         /// </summary>
         /// <param name="actor"></param>
         /// <returns></returns>
-        public static SpecialBody GetSpecialBody(this Actor actor)
+        public static SpecialBody GetSpecialBody(this ExtendedActor actor)
         {
             SpecialBodyLibrary specialBodyLibrary = AddAssetManager.specialBodyLibrary;
-            return specialBodyLibrary.get(((ExtendedActor)actor).extendedData.status.specialBody);
+            return specialBodyLibrary.get(actor.extendedData.status.specialBody);
         }
-        /// <summary>
-        /// 返回actor的家族
-        /// </summary>
-        /// <param name="actor"></param>
-        /// <returns></returns>
-        public static Family GetFamily(this Actor actor)
+        public static Family GetFamily(this ExtendedActor actor)
         {
-            return ExtendedWorldData.instance.familys[((ExtendedActor)actor).extendedData.status.familyID];
+            Family family;
+
+            if(!ExtendedWorldData.instance.familys.TryGetValue(actor.extendedData.status.familyID, out family))
+            {
+                family = new Family(actor.extendedData.status.familyName);
+                actor.extendedData.status.familyID = family.id;
+                ExtendedWorldData.instance.familys[actor.extendedData.status.familyID] = family;
+            }
+            return family;
         }
-        public static bool canCastSpell(this ExtendedActor actor, ExtensionSpell spell)
+        public static Family GetFamily(this ExtendedActorStatus status)
         {
-            return actor.extendedData.status.magic > spell.cost && spell.leftCool == 0;
+            Family family;
+
+            if (!ExtendedWorldData.instance.familys.TryGetValue(status.familyID, out family))
+            {
+                family = new Family(status.familyName);
+                status.familyID = family.id;
+                ExtendedWorldData.instance.familys[status.familyID] = family;
+            }
+            return family;
+        }
+        public static void restoreAllHealth(this ExtendedActor pActor)
+        {
+            pActor.easyData.health = int.MaxValue >> 4;
+        }
+        public static void generateExtendedData(this ExtendedActor pActor,ExtendedActor inheritFrom=null)
+        {
+            Family family;
+            MoreData res = new MoreData();
+            ActorStats stats = pActor.stats;
+            ExtendedActorStats eStats = Main.instance.extendedActorStatsLibrary[stats.id];
+            pActor.extendedData = res;
+            if (Toolbox.randomChance(eStats.cultivateChance))
+            {
+                res.status.canCultivate = true;
+            }
+            pActor.easyData.level = eStats.initialLevel;
+            if (inheritFrom != null)
+            {
+                //设置修炼体系
+                res.status.cultisystem = inheritFrom.extendedData.status.cultisystem;
+                if (Toolbox.randomChance(0.2f) && pActor.easyData.culture != null)
+                {
+                    Culture culture = MapBox.instance.cultures.get(pActor.easyData.culture);
+                    int count = culture.list_tech_ids.Count;
+                    temp_intList.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (culture.list_tech_ids[i].StartsWith("culti_"))
+                        {
+                            temp_intList.Add(i);
+                        }
+                    }
+                    if (temp_intList.Count == 0)
+                    {
+                        res.status.cultisystem = Main.instance.extendedActorStatsLibrary[pActor.easyData.statsID].defaultCultisystem;
+                    }
+                    else
+                    {
+                        res.status.cultisystem = culture.list_tech_ids[temp_intList.GetRandom()].Remove(0, 6);
+                    }
+                }
+                //继承体质
+                if (Toolbox.randomChance(inheritFrom.GetSpecialBody().inheritChance))
+                {
+                    res.status.specialBody = inheritFrom.extendedData.status.specialBody;
+                }
+                else
+                {
+                    if (Toolbox.randomChance(0.001f))
+                    {
+                        res.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                    }
+                    else
+                    {
+                        res.status.specialBody = "FT";
+                    }
+                }
+                //继承灵根
+                res.status.chineseElement = new ChineseElement(inheritFrom.extendedData.status.chineseElement.baseElementContainer);
+                res.status.chineseElement.deflectTo(ExtendedWorldData.instance.chunkToElement[inheritFrom.currentTile.chunk.id].baseElementContainer);
+                res.status.chineseElement.deflectTo(Main.instance.extendedActorStatsLibrary[pActor.easyData.statsID].preferedElement,
+                                                eStats.preferedElementScale);
+                //选择继承名字和家族
+                if (Toolbox.randomChance(0.05f))
+                {
+                    res.status.familyName = stats.unit ?
+                        AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() :
+                        AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
+                    res.status.familyID = res.status.familyName;
+                }
+                else
+                {
+                    res.status.familyName = inheritFrom.extendedData.status.familyName;
+                    res.status.familyID = inheritFrom.extendedData.status.familyID;
+                }
+
+            }
+            else
+            {
+                //设置修炼体系
+                if (Toolbox.randomChance(0.2f)&& pActor.easyData.culture != null&& pActor.easyData.culture!=string.Empty)
+                {
+                    Culture culture = MapBox.instance.cultures.get(pActor.easyData.culture);
+                    int count = culture.list_tech_ids.Count;
+                    temp_intList.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (culture.list_tech_ids[i].StartsWith("culti_"))
+                        {
+                            temp_intList.Add(i);
+                        }
+                    }
+                    if (temp_intList.Count == 0)
+                    {
+                        res.status.cultisystem = eStats.defaultCultisystem;
+                    }
+                    else
+                    {
+                        res.status.cultisystem = culture.list_tech_ids[temp_intList.GetRandom()].Remove(0,6);
+                    }
+                }
+                else
+                {
+                    res.status.cultisystem = eStats.defaultCultisystem;
+                }
+                //生成体质
+                if (Toolbox.randomChance(0.001f))
+                {
+                    res.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                }
+                else
+                {
+                    res.status.specialBody = "FT";
+                }
+                //生成灵根
+                res.status.chineseElement = new ChineseElement();
+                res.status.chineseElement.deflectTo(eStats.preferedElement,
+                                                eStats.preferedElementScale);
+                //选择生成名字和家族
+                res.status.familyName = stats.unit ?
+                    AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() :
+                    AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
+                res.status.familyID = res.status.familyName;
+            }
+            if (eStats.fixedName != null)
+            {
+                pActor.easyData.firstName = eStats.fixedName;
+            }
+            else
+            {
+                pActor.easyData.firstName = ChineseNameGenerator.getCreatureName(stats.nameTemplate, res.status.familyName, stats.unit);
+            }
+            family = pActor.GetFamily();
+            //获取修炼功法
+            res.status.cultiBook = family.getbook(res.status, CultivationBookType.CULTIVATE);
+            if (res.status.cultiBook == null)
+            {
+                UnityEngine.Debug.Log("[ActorTools]:null cultiBook");
+            }
+        }
+        public static MoreData generateExtendedStatus(this ActorData pData, ExtendedActor inheritFrom = null)
+        {
+            Family family;
+            MoreData res = new MoreData();
+            ActorStats stats = AssetManager.unitStats.get(pData.status.statsID);
+            ExtendedActorStats eStats = Main.instance.extendedActorStatsLibrary[stats.id];
+            if (Toolbox.randomChance(eStats.cultivateChance))
+            {
+                res.status.canCultivate = true;
+            }
+            pData.status.level = eStats.initialLevel;
+            if (inheritFrom != null)
+            {
+                //设置修炼体系
+                res.status.cultisystem = inheritFrom.extendedData.status.cultisystem;
+                if (Toolbox.randomChance(0.2f) && pData.status.culture != null&& pData.status.culture != string.Empty)
+                {
+                    Culture culture = MapBox.instance.cultures.get(pData.status.culture);
+                    int count = culture.list_tech_ids.Count;
+                    temp_intList.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (culture.list_tech_ids[i].StartsWith("culti_"))
+                        {
+                            temp_intList.Add(i);
+                        }
+                    }
+                    if (temp_intList.Count == 0)
+                    {
+                        res.status.cultisystem = Main.instance.extendedActorStatsLibrary[pData.status.statsID].defaultCultisystem;
+                    }
+                    else
+                    {
+                        res.status.cultisystem = culture.list_tech_ids[temp_intList.GetRandom()].Remove(0, 6);
+                    }
+                }
+                //继承体质
+                if (Toolbox.randomChance(inheritFrom.GetSpecialBody().inheritChance))
+                {
+                    res.status.specialBody = inheritFrom.extendedData.status.specialBody;
+                }
+                else
+                {
+                    if (Toolbox.randomChance(0.001f))
+                    {
+                        res.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                    }
+                    else
+                    {
+                        res.status.specialBody = "FT";
+                    }
+                }
+                //继承灵根
+                res.status.chineseElement = new ChineseElement(inheritFrom.extendedData.status.chineseElement.baseElementContainer);
+                res.status.chineseElement.deflectTo(Main.instance.extendedActorStatsLibrary[pData.status.statsID].preferedElement,
+                                                eStats.preferedElementScale);
+                //选择继承名字和家族
+                if (Toolbox.randomChance(0.05f))
+                {
+                    res.status.familyName = stats.unit ?
+                        AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() :
+                        AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
+                    res.status.familyID = res.status.familyName;
+                }
+                else
+                {
+                    res.status.familyName = inheritFrom.extendedData.status.familyName;
+                    res.status.familyID = inheritFrom.extendedData.status.familyID;
+                }
+                
+                
+            }
+            else
+            {
+                //设置修炼体系
+                if (Toolbox.randomChance(0.2f)&& pData.status.culture != null)
+                {
+                    Culture culture = MapBox.instance.cultures.get(pData.status.culture);
+                    int count = culture.list_tech_ids.Count;
+                    temp_intList.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (culture.list_tech_ids[i].StartsWith("culti_"))
+                        {
+                            temp_intList.Add(i);
+                        }
+                    }
+                    if (temp_intList.Count == 0)
+                    {
+                        res.status.cultisystem = Main.instance.extendedActorStatsLibrary[pData.status.statsID].defaultCultisystem;
+                    }
+                    else
+                    {
+                        res.status.cultisystem = culture.list_tech_ids[temp_intList.GetRandom()].Remove(0, 6);
+                    }
+                }
+                else
+                {
+                    res.status.cultisystem = Main.instance.extendedActorStatsLibrary[pData.status.statsID].defaultCultisystem;
+                }
+                //生成体质
+                if (Toolbox.randomChance(0.001f))
+                {
+                    res.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                }
+                else
+                {
+                    res.status.specialBody = "FT";
+                }
+                //生成灵根
+                res.status.chineseElement = new ChineseElement(inheritFrom.extendedData.status.chineseElement.baseElementContainer);
+                res.status.chineseElement.deflectTo(Main.instance.extendedActorStatsLibrary[pData.status.statsID].preferedElement,
+                                                eStats.preferedElementScale);
+                //选择生成名字和家族
+                res.status.familyName = stats.unit ?
+                    AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_startList.GetRandom() :
+                    AddAssetManager.chineseNameGenerator.get(stats.nameTemplate).addition_endList.GetRandom();
+                res.status.familyID = res.status.familyName;
+            }
+            if (eStats.fixedName != null)
+            {
+                pData.status.firstName = eStats.fixedName;
+            }
+            else
+            {
+                pData.status.firstName = ChineseNameGenerator.getCreatureName(stats.nameTemplate, res.status.familyName, stats.unit);
+            }
+            family = res.status.GetFamily();
+            //获取修炼功法
+            res.status.cultiBook = family.getbook(res.status,CultivationBookType.CULTIVATE); 
+            if (res.status.cultiBook == null)
+            {
+                UnityEngine.Debug.Log("[ActorTools]:null cultiBook");
+            }
+            return res;
+        }
+        public static bool canCastSpell(this ExtendedActor actor, ExtendedSpell spell)
+        {
+            return actor.easyData.experience > spell.cost;
         }
         //"haveOppsiteTrait"完全来自游戏内部，拷贝目的是为了减少反射带来额外开销
         public static bool haveOppositeTrait(this ActorStatus data, ActorTrait pTraitMain)
@@ -72,21 +364,20 @@ namespace Cultivation_Way
         /// 生成新的体质
         /// </summary>
         /// <param name="actor"></param>
-        public static void generateNewBody(this Actor actor)
+        public static void generateNewBody(this ExtendedActor pActor)
         {
             SpecialBody newBody = new SpecialBody();
-            ExtendedActor extendedActor = (ExtendedActor)actor;
-            if (((ExtendedActor)actor).extendedData.status.specialBody == null || ((ExtendedActor)actor).extendedData.status.specialBody == string.Empty)
+            if (pActor.extendedData.status.specialBody == null || pActor.extendedData.status.specialBody == string.Empty)
             {
-                ((ExtendedActor)actor).extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
+                pActor.extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
             }
-            newBody.id = extendedActor.easyData.actorID;
-            newBody.madeBy = extendedActor.easyData.firstName;
-            newBody.origin = actor.GetSpecialBody().origin;
+            newBody.id = pActor.easyData.actorID;
+            newBody.madeBy = pActor.easyData.firstName;
+            newBody.origin = pActor.GetSpecialBody().origin;
             newBody.rank = Toolbox.randomInt(1, 7);
-            if (newBody.rank > actor.GetSpecialBody().rank)
+            if (newBody.rank > pActor.GetSpecialBody().rank)
             {
-                ((ExtendedActor)actor).extendedData.status.specialBody = newBody.id;
+                pActor.extendedData.status.specialBody = newBody.id;
             }
             newBody.name = ChineseNameGenerator.getName("specialBody_name" + newBody.rank) + ChineseNameAsset.rankName1[newBody.rank - 1];
             newBody.mod_damage = Toolbox.randomInt(0, 20 * newBody.rank);
@@ -96,17 +387,52 @@ namespace Cultivation_Way
             newBody.spellRelief = Toolbox.randomInt(0, 5 * newBody.rank);
             AddAssetManager.specialBodyLibrary.add(newBody);
         }
-        public static void learnNewSpell(this Actor actor)
+        public static bool canLearnSpell(this ExtendedActor pActor,string spellID)
         {
-            ExtendedActor extendedActor = (ExtendedActor)actor;
-            ExtensionSpell[] spells = ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
-            for (int i = 0; i < spells.Length; i++)
+            ExtendedSpellAsset asset = AddAssetManager.extensionSpellLibrary.get(spellID);
+            
+            return asset.allowCultisystem(AddAssetManager.cultisystemLibrary.get(pActor.extendedData.status.cultisystem).flag)
+                &&!asset.bannedRace.Contains(pActor.stats.race)&&asset.requiredLevel<=pActor.easyData.level
+                &&ChineseElement.getMatchDegree(pActor.extendedData.status.chineseElement,asset.chineseElement,true)<=6400;
+        }
+        public static void tryLearnNewSpell(this ExtendedActor pActor)
+        {
+            if (Toolbox.randomChance(0.01f))
             {
-                if (spells[i] == null)
+                string spellID = AddAssetManager.extensionSpellLibrary.spellList.GetRandom();
+                for (int j = 0; j < pActor.extendedData.status.spells.Count; j++)
                 {
-                    continue;
+                    if (spellID == pActor.extendedData.status.spells[j].spellAssetID)
+                    {
+                        pActor.extendedData.status.spells[j].might *= 1.05f;
+                        return;
+                    }
                 }
-                extendedActor.extendedCurStats.addSpell(spells[i]);
+                //UnityEngine.Debug.Log(pActor.easyData.firstName + "_" + spellID);
+                pActor.extendedData.status.spells.Add(new ExtendedSpell(spellID));
+                return;
+            }
+            bool having = false;
+            for(int i = 0; i < pActor.extendedData.status.cultiBook.spellCount; i++)
+            {
+                for (int j = 0; j < pActor.extendedData.status.spells.Count; j++) {
+                    if (pActor.extendedData.status.cultiBook.spells[i].spellAssetID==pActor.extendedData.status.spells[j].spellAssetID)
+                    {
+                        having = true;
+                        break;
+                    }
+                }
+                if (!having&& pActor.canLearnSpell(pActor.extendedData.status.cultiBook.spells[i].spellAssetID))
+                {
+                    UnityEngine.Debug.Log(pActor.easyData.firstName + "_" + pActor.extendedData.status.cultiBook.spells[i].spellAssetID);
+                    pActor.extendedData.status.spells.Add(new ExtendedSpell(pActor.extendedData.status.cultiBook.spells[i]));
+                    return;
+                }
+                having = false;
+            }
+            if (pActor.extendedData.status.spells.Count != 0)
+            {
+                pActor.extendedData.status.spells[Toolbox.randomInt(0, pActor.extendedData.status.spells.Count)].might *= 1.05f;
             }
         }
         /// <summary>
@@ -263,14 +589,14 @@ namespace Cultivation_Way
         {
             ExtendedActor fromActor = (ExtendedActor)from;
             ExtendedActor toActor = (ExtendedActor)to;
-            toActor.extendedCurStats.element = new ChineseElement(fromActor.extendedCurStats.element.baseElementContainer);
+            toActor.extendedData.status.chineseElement = new ChineseElement(fromActor.extendedData.status.chineseElement.baseElementContainer);
             toActor.extendedData.status.bonusStats = new MoreStats().addAnotherStats(fromActor.extendedData.status.bonusStats);
             toActor.extendedData.status.familyID = fromActor.extendedData.status.familyID;
             toActor.extendedData.status.familyName = fromActor.extendedData.status.familyName;
-            toActor.extendedData.status.magic = fromActor.extendedData.status.magic;
             toActor.extendedData.status.specialBody = fromActor.extendedData.status.specialBody;
             toActor.extendedData.status.cultisystem = fromActor.extendedData.status.cultisystem;
             toActor.extendedData.status.canCultivate = fromActor.extendedData.status.canCultivate;
+            toActor.extendedData.status.cultiBook = fromActor.extendedData.status.cultiBook;
             if (compositionCopied)
             {
                 toActor.extendedData.status.compositionSetting = fromActor.extendedData.status.compositionSetting;
@@ -316,11 +642,11 @@ namespace Cultivation_Way
         {
             ExtendedActor actor1 = (ExtendedActor)actor;
             MoreStats morestats = actor1.extendedCurStats;
-            MoreStatus moredata = actor1.extendedData.status;
+            ExtendedActorStatus moredata = actor1.extendedData.status;
             morestats.clear();
             int realm = actor1.getRealm();
             morestats.addAnotherStats(AddAssetManager.cultisystemLibrary.get(moredata.cultisystem).moreStats[realm - 1]);
-            morestats.addAnotherStats(ExtendedWorldData.instance.familys[moredata.familyID].cultivationBook.stats[realm - 1]);
+            //morestats.addAnotherStats(ExtendedWorldData.instance.familys[moredata.familyID].cultivationBook.stats[realm - 1]);
 
             morestats.addAnotherStats(moredata.bonusStats);
         }
@@ -332,7 +658,7 @@ namespace Cultivation_Way
         public static void dealStatsHelper2(Actor actor)
         {
             ExtendedActor actor1 = (ExtendedActor)actor;
-            MoreStatus moredata = actor1.extendedData.status;
+            ExtendedActorStatus moredata = actor1.extendedData.status;
             int maxArmor = 80 + actor1.easyData.level / 6;
 
             if (moredata.cultisystem == "bodying")
@@ -346,10 +672,6 @@ namespace Cultivation_Way
             if (actor1.easyCurStats.armor > maxArmor)
             {
                 actor1.easyCurStats.armor = maxArmor;
-            }
-            if (moredata.magic > actor1.extendedCurStats.magic)
-            {
-                moredata.magic = actor1.extendedCurStats.magic;
             }
             return;
         }
@@ -368,9 +690,9 @@ namespace Cultivation_Way
         {
             ExtendedActor actor1 = (ExtendedActor)actor;
             float result;
-            float element = actor1.extendedCurStats.element.getImPurity();
-            float spellCount = actor1.extendedCurStats.spells.Count;
-            float specialBody = actor.GetSpecialBody().rank;
+            float element = actor1.extendedData.status.chineseElement.getImPurity();
+            float spellCount = actor1.extendedData.status.spells.Count;
+            float specialBody = actor1.GetSpecialBody().rank;
             float baseStats = (actor1.easyCurStats.health >> 7) * (actor1.easyCurStats.damage >> 5) / (100 - actor1.easyCurStats.armor) * actor1.easyCurStats.attackSpeed;
             result = element * spellCount * specialBody * baseStats / 4;
             return result;

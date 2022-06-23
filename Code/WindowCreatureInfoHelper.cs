@@ -82,8 +82,9 @@ namespace Cultivation_Way
             loadCultivationBookButton(selectedUnit, num, count, data.level);
             num++;
 
-            Localization.setLocalization("trait_element", AddAssetManager.chineseElementLibrary.get(selectedUnit.extendedCurStats.element.id).name + "灵根");
-            Localization.setLocalization("trait_cultivationBook", ExtendedWorldData.instance.familys[selectedUnit.extendedData.status.familyID].cultivationBook.bookName);
+            Localization.setLocalization("trait_element", AddAssetManager.chineseElementLibrary.get(selectedUnit.extendedData.status.chineseElement.id).name + "灵根");
+            Localization.setLocalization("trait_cultivationBook", (selectedUnit.extendedData.status.cultisystem=="default"||!selectedUnit.extendedData.status.canCultivate)?
+                                                                            "无":selectedUnit.extendedData.status.cultiBook.bookName+ selectedUnit.extendedData.status.cultiBook.rank.ToString()) ;
             if (data.traits != null)
             {
                 for (int i = 0; i < data.traits.Count; i++)
@@ -159,11 +160,11 @@ namespace Cultivation_Way
             MoreStats moreStats = actor.extendedCurStats;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
-            if (moreStats.spells.Count != 0)
+            if (actor.extendedData.status.spells.Count != 0)
             {
                 description.Append("法术\n");
 
-                foreach (ExtensionSpell spell in moreStats.spells)
+                foreach (ExtendedSpell spell in actor.extendedData.status.spells)
                 {
                     description.Append("\n" + spell.GetSpellAsset().name);
                 }
@@ -194,16 +195,22 @@ namespace Cultivation_Way
             ExtendedActor extendedActor = (ExtendedActor)actor;
             TraitButton traitButton = UnityEngine.Object.Instantiate<TraitButton>(instance.prefabTrait, instance.traitsParent);
             StringBuilder description = new StringBuilder();
-            ExtensionSpell[] spells = ExtendedWorldData.instance.familys[extendedActor.extendedData.status.familyID].cultivationBook.spells;
-            for (int i = 0; i < spells.Length; i++)
+            List<ExtendedSpell> spells = extendedActor.extendedData.status.spells;
+            for (int i = 0; i < spells.Count; i++)
             {
-                if (spells[i] == null)
-                {
-                    continue;
-                }
-                description.Append("\n" + spells[i].GetSpellAsset().name);
+                description.Append("\n");
+                description.Append(spells[i].GetSpellAsset().name);
+                description.Append("    ");
+                description.Append(spells[i].might);
             }
-            Localization.setLocalization("trait_cultivationBook_info", "法术\n" + description.ToString());
+            if (spells.Count > 0)
+            {
+                Localization.setLocalization("trait_cultivationBook_info", "法术\n" + description.ToString());
+            }
+            else
+            {
+                Localization.setLocalization("trait_cultivationBook_info", string.Empty);
+            }
 
             Reflection.SetField(traitButton, "trait_asset", AssetManager.traits.get("cultivationBook"));
             Sprite sprite = Resources.Load<Sprite>("ui/Icons/iconCultivationBook");

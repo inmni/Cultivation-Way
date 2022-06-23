@@ -91,7 +91,7 @@ namespace Cultivation_Way
 
         };
 
-        public static string[] rankName = new string[10] { "凡", "黄", "玄", "地", "天", "荒", "洪", "宙", "宇", "圣" };//品阶，仅限一字
+        public static string[] rankName = new string[10] { "凡", "黄", "玄", "地", "天", "荒", "洪", "宙", "宇", "帝" };//品阶，仅限一字
         public static string[] rankName1 = new string[6] { "(凡阶)", "(黄阶)", "(玄阶)", "(地阶)", "(天阶)", "(帝阶)" };
         public ChineseNameAsset()
         {

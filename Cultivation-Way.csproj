@@ -276,9 +276,9 @@
     <Compile Include="Code\MoreAiBehaviours.CityBehBuildWall.cs" />
     <Compile Include="Code\MoreAiBehaviours.BehaviourTaskCityLibrary.cs" />
     <Compile Include="Code\ExtendedWorldActions.cs" />
-    <Compile Include="Code\ExtensionSpellAsset.cs" />
-    <Compile Include="Code\ExtensionSpellLibrary.cs" />
-    <Compile Include="Code\ExtensionSpellType.cs" />
+    <Compile Include="Code\ExtendedSpellAsset.cs" />
+    <Compile Include="Code\ExtendedSpellLibrary.cs" />
+    <Compile Include="Code\ExtendedSpellType.cs" />
     <Compile Include="Code\Family.cs" />
     <Compile Include="Code\InspectActor.cs" />
     <Compile Include="Code\KingdomAndCityTools.cs" />
@@ -297,7 +297,7 @@
     <Compile Include="Code\ResourcesBuffer.cs" />
     <Compile Include="Code\SaveAndLoadManager.cs" />
     <Compile Include="Code\Main.cs" />
-    <Compile Include="Code\MoreStatus.cs" />
+    <Compile Include="Code\ExtendedActorStatus.cs" />
     <Compile Include="Code\MoreActors.cs" />
     <Compile Include="Code\MoreBuildings.cs" />
     <Compile Include="Code\MoreCultureTech.cs" />
@@ -328,7 +328,7 @@
     <Compile Include="Code\WindowChunkInfo.cs" />
     <Compile Include="Code\WindowCreatureInfoHelper.cs" />
     <Compile Include="Code\WindowMoreStats.cs" />
-    <Compile Include="Code\ExtensionSpell.cs" />
+    <Compile Include="Code\ExtendedSpell.cs" />
     <Compile Include="Code\WindowTops.cs" />
     <Compile Include="Code\MoreWorldLaws.cs" />
     <Compile Include="Code\WorldTools.cs" />

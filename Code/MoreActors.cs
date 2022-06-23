@@ -324,7 +324,7 @@ namespace Cultivation_Way
             EasternDragonAsset.prefab = "p_easternDragon";
             EasternDragonAsset.actorSize = ActorSize.S17_Dragon;
             EasternDragonAsset.shadowTexture = "unitShadow_23";
-            EasternDragonAsset.texture_path = "EasternDragon";
+            EasternDragonAsset.texture_path = "t_EasternDragon";
             EasternDragonAsset.texture_heads = "";
             //EasternDragonAsset.animation_swim = "";
             //EasternDragonAsset.animation_idle = "";
@@ -395,6 +395,25 @@ namespace Cultivation_Way
             addActor(ZhongKui);
             ExtendedWorldData.instance.creatureLimit.Add(ZhongKui.id, 1);
             ExtendedWorldData.instance.godList.Add(ZhongKui.id, "钟馗");
+            //祖巫
+            ActorStats _ZuWu = AssetManager.unitStats.clone("_ZuWu", "Wu");
+            _ZuWu.baseStats.health = 3000;
+            _ZuWu.baseStats.damage = 200;
+            _ZuWu.procreate = false;
+            _ZuWu.unit = false;
+            addZuWu("DiJiang");
+            addZuWu("GongGong");
+            addZuWu("HouTu");
+            addZuWu("GouMang");
+            addZuWu("QiangLiang");
+            addZuWu("RuShou");
+            addZuWu("SheBiShi");
+            addZuWu("TianWu");
+            addZuWu("XingTian");
+            addZuWu("XiZi");
+            addZuWu("XuanMing");
+            addZuWu("ZhujiuYin");
+            addZuWu("ZhuRong");
             #endregion
 
             #region BOSS
@@ -444,7 +463,7 @@ namespace Cultivation_Way
             NianAsset.race = "Nian";
             NianAsset.kingdom = "boss";
             NianAsset.prefab = "p_specialActor";
-            NianAsset.texture_path = "Nian";
+            NianAsset.texture_path = "t_Nian";
             NianAsset.icon = "iconNian";
             NianAsset.baseStats.range = 23f;
             NianAsset.oceanCreature = false;
@@ -536,6 +555,13 @@ namespace Cultivation_Way
             addActor(pStats);
             protoAndYao.add(id, tranformID);
             return pStats;
+        }
+        private ActorStats addZuWu(string id)
+        {
+            ActorStats stats = AssetManager.unitStats.clone(id, "_ZuWu");
+            stats.texture_path = "t_" + id;
+            ExtendedWorldData.instance.creatureLimit.Add(id, 1);
+            return stats;
         }
         private void addYaoSheng(string id)
         {
@@ -789,25 +815,26 @@ namespace Cultivation_Way
             ExtendedActor pa = (ExtendedActor)pAttacker;
             ActorStatus dataA = pa.easyData;
 
-            if (pa.extendedCurStats.spells.Count != 0)
+            if (pa.extendedData.status.spells.Count != 0)
             {
-                int count = pa.extendedCurStats.spells.Count;
+                int count = pa.extendedData.status.spells.Count;
                 int max = dataA.level >> 5 + 1;
+                int index;
                 for (int i = 0, num = 0; i < count && num < max; i++)
                 {
                     if (!pTarget.base_data.alive)
                     {
                         return true;
                     }
-                    ExtensionSpell spell = pa.extendedCurStats.spells[i];
+                    index = Toolbox.randomInt(i, count);
+                    ExtendedSpell spell = pa.extendedData.status.spells[index];
                     //进行蓝耗和冷却检查
-                    if (spell.leftCool == 0 && pa.extendedData.status.magic >= spell.cost
-                        && spell.GetSpellAsset().type==ExtensionSpellType.ATTACK && spell.GetSpellAsset().requiredLevel <= dataA.level)
+                    if ( pa.easyData.experience >= spell.cost&& spell.GetSpellAsset().type==ExtendedSpellType.ATTACK 
+                        && spell.GetSpellAsset().requiredLevel <= dataA.level)
                     {
                         if (spell.castSpell(pAttacker, pTarget))
                         {
-                            spell.leftCool = spell.cooldown;
-                            pa.extendedData.status.magic -= spell.cost;
+                            pa.easyData.experience -= spell.cost;
                             num++;
                         }
                     }
@@ -826,11 +853,10 @@ namespace Cultivation_Way
                 return;
             }
             ExtendedActor pActor = (ExtendedActor)__instance;
-            MoreStats morestats = pActor.extendedCurStats;
-            float rangeLimit = Mathf.Max(pActor.easyCurStats.range, morestats.spellRange) + pObject.GetValue<BaseStats>("curStats").size;
-            foreach (ExtensionSpell spell in morestats.spells)
+            float rangeLimit = Mathf.Max(pActor.easyCurStats.range, pActor.extendedCurStats.spellRange) + pObject.GetValue<BaseStats>("curStats").size;
+            foreach (ExtendedSpell spell in pActor.extendedData.status.spells)
             {
-                if (pActor.canCastSpell(spell) && spell.GetSpellAsset().type==ExtensionSpellType.ATTACK)
+                if (pActor.canCastSpell(spell) && spell.GetSpellAsset().type==ExtendedSpellType.ATTACK)
                 {
                     if (Toolbox.DistVec3(__instance.currentPosition, pObject.currentPosition) < rangeLimit)
                     {
@@ -990,32 +1016,36 @@ namespace Cultivation_Way
                 __instance.killHimself(false, AttackType.Age, true, true);
                 return false;
             }
-            //回蓝，回冷却
-            actor.extendedData.status.magic += data.level;//待调整与元素相关
-            if (actor.extendedData.status.magic > actor.extendedCurStats.magic + 1)
-            {
-                actor.extendedData.status.magic = actor.extendedCurStats.magic + 1;
-            }
-            foreach (ExtensionSpell spell in actor.extendedCurStats.spells)
-            {
-                spell.leftCool -= spell.leftCool > 0 ? 1 : 0;
-            }
             ChineseElement chunkElement = ExtendedWorldData.instance.chunkToElement[__instance.currentTile.chunk.id];
             ChineseElement actorElement = actor.extendedCurStats.element;
-
-            float exp = 5 + __instance.GetFamily().cultivationBook.rank;
+            float exp = (5+actor.extendedData.status.cultiBook.rank)*actor.extendedData.status.cultiBook.cultiVelco[actor.getRealm()-1];
             float mod = 0f;
+            //待调整为与功法相关
             for (int i = 0; i < 5; i++)
             {
                 int temp = chunkElement.baseElementContainer[i] % 100;
-                mod += (temp * (actorElement.baseElementContainer[i] + 1)) / 1000f;
+                mod += temp * (actorElement.baseElementContainer[i] + 1) / 1000f;
             }
-            exp *= mod * __instance.GetSpecialBody().rank;
+            exp *= mod * actor.GetSpecialBody().rank;
             addExperiece_Prefix(__instance, (int)exp);
-
+            
             if (data.age > 100 && Toolbox.randomChance(0.03f))
             {
                 __instance.addTrait("wise");
+            }
+            exp = data.intelligence > 30 ? 30 : data.intelligence;
+            exp *= (actor.extendedCurStats.talent + 1);
+            if (data.level > actor.extendedData.status.cultiBook.rank||Toolbox.randomChance(exp / 3000f))
+            {
+                CultivationBook newBook = actor.extendedData.status.cultiBook.modify(data.intelligence > 30 ? 30 : data.intelligence,
+                    actor.extendedData.status.chineseElement.baseElementContainer);
+                Family family = actor.GetFamily();
+                int flag = family.storeCultibook(newBook);
+                if (flag != -1)
+                {
+                    actor.extendedData.status.cultiBook = family.lofts[1].container[flag];
+                }
+                actor.tryLearnNewSpell();
             }
             return false;
         }
@@ -1031,7 +1061,7 @@ namespace Cultivation_Way
             MethodInfo part1 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper1");
             MethodInfo part2 = AccessTools.Method(typeof(ActorTools), "dealStatsHelper2");
             MethodInfo addStats = AccessTools.Method(typeof(BaseStats), "addStats", new System.Type[] { typeof(BaseStats) });
-
+            
             FieldInfo CurStats = AccessTools.Field(typeof(ExtendedActor), "curStats");
             FieldInfo extendedCurStats = AccessTools.Field(typeof(ExtendedActor), "extendedCurStats");
             //MethodInfo addStats = typeof(BaseStats).GetMethod("addStats", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -1445,40 +1475,11 @@ namespace Cultivation_Way
         [HarmonyPatch(typeof(ActorBase), "generatePersonality")]
         public static void generatePersonality_Postfix(ActorBase __instance)
         {
-            #region 设置出生属性
-            ActorStatus status = __instance.GetValue<ActorStatus>("data", Types.t_ActorBase);
             ExtendedActor actor = (ExtendedActor)__instance;
+            actor.easyData = __instance.GetValue<ActorStatus>("data", Types.t_ActorBase);
             actor.extendedCurStats.maxAge = __instance.stats.maxAge;
-            //获取修炼体系
-            if (__instance.getCulture() != null)
-            {
-                List<string> cultisystem = new List<string>();
-                Culture culture = __instance.getCulture();
-                foreach (string tech in culture.list_tech_ids)
-                {
-                    if (tech.StartsWith("culti_"))
-                    {
-                        cultisystem.Add(tech);
-                    }
-                }
-                if (cultisystem.Count > 0)
-                {
-                    actor.extendedData.status.cultisystem = cultisystem.GetRandom().Remove(0, 6);
-                }
-            }
-            if (Toolbox.randomChance(0.001f))
-            {
-                actor.extendedData.status.specialBody = AddAssetManager.specialBodyLibrary.list.GetRandom().id;
-            }
-            //设置名字
-            actor.extendedData.status.familyName = __instance.stats.unit ?
-                AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_startList.GetRandom() :
-                AddAssetManager.chineseNameGenerator.get(__instance.stats.nameTemplate).addition_endList.GetRandom();
-            actor.extendedData.status.familyID = actor.extendedData.status.familyName;
-            status.firstName = ChineseNameGenerator.getCreatureName(__instance.stats.nameTemplate, actor.extendedData.status.familyName, __instance.stats.unit);
-            Family family = ExtendedWorldData.instance.familys[actor.extendedData.status.familyID];
-            family.num++;
-            #endregion
+            actor.generateExtendedData();
+            return;
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(MapBox), "createNewUnit")]
@@ -1508,12 +1509,13 @@ namespace Cultivation_Way
             component.transform.name = actorStats.id;
             component.new_creature = true;
             component.easyCurStats = component.GetValue<BaseStats>("curStats",Types.t_ExtendedActor);
-            component.new_creature = pData == null;
             component.setWorld();
             component.loadStats(actorStats);
             if (pData != null)
             {
                 component.easyData = pData.status;
+                component.new_creature = false;
+                component.extendedData = MoreKingdoms.temp_data;
                 component.SetValue("data", pData.status, Types.t_ExtendedActor);
                 component.SetValue("professionAsset", AssetManager.professions.get(pData.status.profession), Types.t_ExtendedActor);
             }
@@ -1524,15 +1526,6 @@ namespace Cultivation_Way
             component.transform.position = pTile.posV3;
             ((Action<ExtendedActor, WorldTile, float>)component.GetFastMethod("spawnOn", Types.t_ExtendedActor))(component,pTile, pZHeight);
             ((Action<ExtendedActor>)component.GetFastMethod("create", Types.t_ExtendedActor))(component);
-            if (pData == null)
-            {
-                component.easyData = component.GetValue<ActorStatus>("data", Types.t_ExtendedActor);
-                if (Toolbox.randomChance(Main.instance.extendedActorStatsLibrary[pStatsID].cultivateChance))
-                {
-                    component.extendedData.status.canCultivate = true;
-                }
-                component.easyData.level = Main.instance.extendedActorStatsLibrary[pStatsID].initialLevel;
-            }
             if (component.stats.kingdom != "")
             {
                 ((Action<ExtendedActor, Kingdom>)component.GetFastMethod("setKingdom", Types.t_ExtendedActor))(component, MapBox.instance.kingdoms.dict_hidden[component.stats.kingdom]);
@@ -1566,17 +1559,7 @@ namespace Cultivation_Way
                 }
             }
 
-            MoreStatus moreData = actor.extendedData.status;
-            if (moreData.familyID != string.Empty)
-            {
-                Family family = ExtendedWorldData.instance.familys[moreData.familyID];
-                family.num--;
-                if (family.num <= 0)
-                {
-                    ExtendedWorldData.instance.familys[moreData.familyID] = new Family(moreData.familyID);
-                }
-                moreData.familyID = string.Empty;
-            }
+            ExtendedActorStatus moreData = actor.extendedData.status;
             if (pActor.kingdom == null)
             {
                 return true;

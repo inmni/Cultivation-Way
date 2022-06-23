@@ -8,26 +8,28 @@ namespace Cultivation_Way
     {
         public string raceID = string.Empty;
 
-        public float cultivateVelo = 1.0f;
+        public string statsID = string.Empty;
 
-        public float cultivateChance = 0.2f;
+        public float cultivateVelo = 1.0f;//修炼速度
 
-        public int initialLevel = 1;
+        public float cultivateChance = 0.2f;//可修炼几率
 
+        public int initialLevel = 1;//初始等级
+        
         public int[] preferedElement;//种族更倾向的元素
+
+        public float preferedElementScale = 0f;//倾向程度
 
         public List<string> raceSpells;//种族自带法术
 
-        public string defaultCultisystem = "default";
+        public string defaultCultisystem = "default";//默认修炼体系
+
+        public string fixedName = null;//预设名
 
 
 
 
-
-
-
-
-
+        private static ExtendedActorStats t;
 
 
         internal static void init()
@@ -36,6 +38,7 @@ namespace Cultivation_Way
             {
                 ExtendedActorStats feature = new ExtendedActorStats();
                 feature.raceID = stats.race;
+                feature.statsID = stats.id;
                 feature.raceSpells = new List<string>();
                 feature.preferedElement = new int[5] { 20, 20, 20, 20, 20 };
                 Main.instance.extendedActorStatsLibrary.Add(stats.id, feature);
@@ -57,27 +60,31 @@ namespace Cultivation_Way
         private static void setIntelligentRaceFeature()
         {
             #region unit
-            ExtendedActorStats humanFeature = Main.instance.extendedActorStatsLibrary["unit_human"];
-
-            ExtendedActorStats elfFeature = Main.instance.extendedActorStatsLibrary["unit_elf"];
-
-            ExtendedActorStats dwarfFeature = Main.instance.extendedActorStatsLibrary["unit_dwarf"];
-
-            ExtendedActorStats orcFeature = Main.instance.extendedActorStatsLibrary["unit_orc"];
-            orcFeature.defaultCultisystem = "bodying";
-            ExtendedActorStats TianFeature = Main.instance.extendedActorStatsLibrary["unit_Tian"];
-            TianFeature.raceSpells.Add("summonTian");
-            TianFeature.raceSpells.Add("summonTian1");
-            TianFeature.cultivateChance = 0f;
-            ExtendedActorStats MingFeature = Main.instance.extendedActorStatsLibrary["unit_Ming"];
-            MingFeature.raceSpells.Add("summon");
-            MingFeature.defaultCultisystem = "normal";
-            ExtendedActorStats YaoFeature = Main.instance.extendedActorStatsLibrary["unit_Yao"];
-
-            ExtendedActorStats EHFeature = Main.instance.extendedActorStatsLibrary["unit_EasternHuman"];
-            EHFeature.defaultCultisystem = "normal";
-            ExtendedActorStats WuFeature = Main.instance.extendedActorStatsLibrary["unit_Wu"];
-            WuFeature.defaultCultisystem = "bodying";
+            t = Main.instance.extendedActorStatsLibrary["unit_human"];
+            t.cultivateChance = 1.0f;
+            t = Main.instance.extendedActorStatsLibrary["unit_elf"];
+            t.cultivateChance = 1.0f;
+            t = Main.instance.extendedActorStatsLibrary["unit_dwarf"];
+            t.cultivateChance = 1.0f;
+            t = Main.instance.extendedActorStatsLibrary["unit_orc"];
+            t.cultivateChance = 1.0f;
+            t.defaultCultisystem = "bodying";
+            t = Main.instance.extendedActorStatsLibrary["unit_Tian"];
+            t.raceSpells.Add("summonTian");
+            t.raceSpells.Add("summonTian1");
+            t.cultivateChance = 0f;
+            t = Main.instance.extendedActorStatsLibrary["unit_Ming"];
+            t.cultivateChance = 1.0f;
+            t.raceSpells.Add("summon");
+            t.defaultCultisystem = "normal";
+            t = Main.instance.extendedActorStatsLibrary["unit_Yao"];
+            t.cultivateChance = 1.0f;
+            t = Main.instance.extendedActorStatsLibrary["unit_EasternHuman"];
+            t.cultivateChance = 1.0f;
+            t.defaultCultisystem = "normal";
+            t = Main.instance.extendedActorStatsLibrary["unit_Wu"];
+            t.cultivateChance = 1.0f;
+            t.defaultCultisystem = "bodying";
             #endregion
 
 
@@ -95,20 +102,80 @@ namespace Cultivation_Way
         }
         private static void setOtherRaceFeature()
         {
-            ExtendedActorStats JiaoDragonFeature = Main.instance.extendedActorStatsLibrary["JiaoDragon"];
-            JiaoDragonFeature.raceSpells.Add("JiaoDragon_laser");
+            t = get("Achelous");
+            t.fixedName = "河伯";
+            t = get("EarthGod");
+            t.fixedName = "土地";
+            t = get("Mammon");
+            t.fixedName = "财神";
+            t = get("Hymen");
+            t.fixedName = "月老";
+            t = get("MountainGod");
+            t.fixedName = "山神";
+            t = get("ZhongKui");
+            t.fixedName = "钟馗";
 
-            ExtendedActorStats EasternDragonFeature = Main.instance.extendedActorStatsLibrary["EasternDragon"];
-            EasternDragonFeature.raceSpells.Add("JiaoDragon_laser");
+            t = get("DiJiang");
+            t.fixedName = "帝江";
+            t = get("GongGong");
+            t.fixedName = "共工";
+            t.preferedElement = new int[] { 0, 0, 100, 0, 0 };
+            t.preferedElementScale = 1.0f;
+            t = get("HouTu");
+            t.fixedName = "后土";
+            t.preferedElement = new int[] { 0, 0, 0, 0, 100 };
+            t.preferedElementScale = 1.0f;
+            t = get("GouMang");
+            t.fixedName = "句芒";
+            t.preferedElement = new int[] { 0, 100, 0, 0, 0 };
+            t.preferedElementScale = 1.0f;
+            t = get("QiangLiang");
+            t.fixedName = "强良";
+            t = get("ZhuJiuYin");
+            t.fixedName = "烛九阴";
+            t = get("RuShou");
+            t.fixedName = "蓐收";
+            t.preferedElement = new int[] { 100, 0, 0, 0, 0 };
+            t.preferedElementScale = 1.0f;
+            t = get("SheBiShi");
+            t.fixedName = "奢比尸";
+            t = get("TianWu");
+            t.fixedName = "天吴";
+            t = get("XingTian");
+            t.fixedName = "刑天";
+            t = get("XiZi");
+            t.fixedName = "翕兹";
+            t = get("XuanMing");
+            t.fixedName = "玄冥";
+            t = get("ZhuRong");
+            t.fixedName = "祝融";
+            t.preferedElement = new int[] { 0, 0, 0, 100, 0 };
+            t.preferedElementScale = 1.0f;
 
-            ExtendedActorStats MengZhuFeature = Main.instance.extendedActorStatsLibrary["MengZhu"];
-            MengZhuFeature.raceSpells.Add("lightning");
-            MengZhuFeature.raceSpells.Add("summonTian");
+            t = Main.instance.extendedActorStatsLibrary["JiaoDragon"];
+            t.raceSpells.Add("JiaoDragon_laser");
 
-            ExtendedActorStats MonkeySheng1 = Main.instance.extendedActorStatsLibrary["MonkeySheng1"];
-            MonkeySheng1.raceSpells.Add("goldBar");
-            MonkeySheng1.raceSpells.Add("goldBarDown");
+            t = Main.instance.extendedActorStatsLibrary["EasternDragon"];
+            t.raceSpells.Add("JiaoDragon_laser");
 
+            t = Main.instance.extendedActorStatsLibrary["MengZhu"];
+            t.raceSpells.Add("lightning");
+            t.raceSpells.Add("summonTian");
+
+            t = Main.instance.extendedActorStatsLibrary["MonkeySheng1"];
+            t.raceSpells.Add("goldBar");
+            t.raceSpells.Add("goldBarDown");
+
+        }
+        public static ExtendedActorStats get(string id)
+        {
+            ExtendedActorStats res;
+            if(!Main.instance.extendedActorStatsLibrary.TryGetValue(id,out res))
+            {
+                Debug.Log("[ExtendedActorStats]:"+id + " not found");
+                return null;
+            }
+            return res;
         }
     }
 }

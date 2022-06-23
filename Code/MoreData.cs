@@ -2,7 +2,7 @@
 {
     internal class MoreData
     {
-        public MoreStatus status = new MoreStatus();
+        public ExtendedActorStatus status = new ExtendedActorStatus();
         public int z;
     }
 }

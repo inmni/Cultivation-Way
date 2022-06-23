@@ -22,6 +22,8 @@ namespace Cultivation_Way
             }
             Main.instance.transformUnits = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformUnits") as Transform;
             Main.instance.transformCreatures = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformCreatures") as Transform;
+            Main.instance.transformBuildings = ReflectionUtility.Reflection.GetField(typeof(MapBox), MapBox.instance, "transformBuildings") as Transform;
+            Main.instance.transformTrees = Main.instance.transformBuildings.Find("Trees");
         }
         private void generateActorPrefabs()
         {
