@@ -27,23 +27,29 @@ namespace Cultivation_Way
                 prefab.SetActive(false);
                 
                 load("example", 0.1f, "EffectsTop", 100);
-                load("lightning", 0.1f, "EffectsTop", 100);
-                load("lightningPunishment", 0.1f, "EffectsTop", 100);
-                load("explosion", 0.1f, "EffectsTop", 100);
-                load("swordsArray", 0.1f, "EffectsTop", 10);
-                load("default_lightning", 0.1f, "EffectsTop", 100);
-                load("default_fire", 0.1f, "EffectsTop", 100);
-                load("JiaoDragon_laser", 0.1f, "EffectsTop", 10);
-                load("goldBar", 0.1f, "EffectsTop", 1);
-                load("goldBarDown", 0.1f, "EffectsTop", 1);
-                load("happySpringFestival", 0.1f, "EffectsTop", 1);
-                load("firework", 0.1f, "EffectsTop", 100);
-                load("LXST", 0.1f, "EffectsTop", 100);
-                load("XTDT", 0.1f, "EffectsTop", 100);
-                load("HWMT", 0.1f, "EffectsTop", 100);
-                load("FT", 0.1f, "EffectsTop", 100);
-                load("summon", 0.1f, "EffectsTop", 100);
-                load("summonTian", 0.1f, "EffectsTop", 100);
+                
+                load("explosion", 0.1f, "EffectsTop", 100, "basicSpell/");
+                load("happySpringFestival", 0.1f, "EffectsTop", 1, "basicSpell/");
+                load("firework", 0.1f, "EffectsTop", 100, "basicSpell/");
+                load("sunkens", 0.1f, "EffectsTop", 100, "basicSpell/");
+                
+                load("summon", 0.1f, "EffectsTop", 100, "singleSpell/");
+                load("summonTian", 0.1f, "EffectsTop", 100, "singleSpell/");
+                load("swordsArray", 0.1f, "EffectsTop", 10, "singleSpell/");
+                load("default_lightning", 0.1f, "EffectsTop", 100, "singleSpell/");
+                load("default_fire", 0.1f, "EffectsTop", 100, "singleSpell/");
+                load("JiaoDragon_laser", 0.1f, "EffectsTop", 10, "singleSpell/");
+                load("goldBar", 0.1f, "EffectsTop", 1, "singleSpell/");
+                load("goldBarDown", 0.1f, "EffectsTop", 1, "singleSpell/");
+                load("lightning", 0.1f, "EffectsTop", 100, "singleSpell/");
+                load("lightningPunishment", 0.1f, "EffectsTop", 100, "singleSpell/");
+
+                load("LXST", 0.1f, "EffectsTop", 100, "specialBody/");
+                load("XTDT", 0.1f, "EffectsTop", 100, "specialBody/");
+                load("HWMT", 0.1f, "EffectsTop", 100, "specialBody/");
+                load("FT", 0.1f, "EffectsTop", 100, "specialBody/");
+
+
                 loadToStackEffects("fx_plasma_trail_Tian", true, 0.1f, "EffectsTop", 100);
                 list = controllers.Values.ToList();
             }
@@ -56,10 +62,10 @@ namespace Cultivation_Way
                 list[i].update(Time.fixedDeltaTime);
             }
         }
-        private NewEffectController load(string id, float frameInterval, string layerOrder, int limit)
+        private NewEffectController load(string id, float frameInterval, string layerOrder, int limit,string extendPath="")
         {
             NewEffectController controller = new NewEffectController();
-            controller.create(Resources.LoadAll<Sprite>("effects/" + id), limit, frameInterval, layerOrder);
+            controller.create(Resources.LoadAll<Sprite>("effects/" + extendPath+id), limit, frameInterval, layerOrder);
             controllers[id] = controller;
             controller.prefab.transform.name = id;
             return controller;

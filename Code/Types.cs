@@ -15,5 +15,6 @@ namespace Cultivation_Way
         internal static Type t_Actor = typeof(Actor);
         internal static Type t_ActorBase = typeof(ActorBase);
         internal static Type t_ExtendedActor = typeof(ExtendedActor);
+        internal static Type t_WorldTile = typeof(WorldTile);
     }
 }

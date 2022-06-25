@@ -21,12 +21,12 @@ namespace Cultivation_Way
 
         public List<Family> familys = new List<Family>();//家族表
 
-        public List<MoreData> moreActorData = new List<MoreData>();
-        public List<MoreData> moreBuildingData = new List<MoreData>();
+        public List<ExtendedActorData> moreActorData = new List<ExtendedActorData>();
+        public List<ExtendedBuildingData> moreBuildingData = new List<ExtendedBuildingData>();
 
         public Dictionary<string, List<string>> kingdomBindActors = new Dictionary<string, List<string>>();//国家与绑定的生物
 
-        public Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//单位与更多数据映射词典
+        public Dictionary<string, ExtendedActorData> tempMoreData = new Dictionary<string, ExtendedActorData>();//单位与更多数据映射词典
 
         public Dictionary<int, ChineseElement> chunkToElement = new Dictionary<int, ChineseElement>();//区块与元素映射词典
 

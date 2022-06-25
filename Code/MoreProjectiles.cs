@@ -127,30 +127,74 @@ namespace Cultivation_Way
                 targetScale = 0.04f,            //到达目的地大小
                 world_actions = new WorldAction(ExtendedWorldActions.aFireworkDamage)
             });
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "swordkee",
+                texture = "swordkee",
+                speed = 30f,       
+                parabolic = false,       
+                hitShake = true,
+                looped=false,
+                look_at_target=true,
+                startScale = 0.4f,            
+                targetScale = 0.4f,            
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage)
+            });
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "water_orb1",
+                texture = "water_orb1",
+                speed = 30f,
+                parabolic = false,
+                look_at_target=true,
+                looped=true,
+                hitShake = true,
+                startScale = 0.4f,
+                targetScale = 0.4f,
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage)
+            }); 
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "wind_blade",
+                texture = "wind_blade",
+                speed = 30f,
+                parabolic = false,
+                hitShake = true,
+                looped=false,
+                look_at_target=true,
+                startScale = 0.4f,
+                targetScale = 0.4f,
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage)
+            });
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "ice_blade",
+                texture = "ice_blade",
+                speed = 30f,
+                parabolic = false,
+                hitShake = true,
+                looped = false,
+                look_at_target = true,
+                startScale = 0.4f,
+                targetScale = 0.4f,
+                hitFreeze=true,
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage)
+            });
+            AssetManager.projectiles.add(new ProjectileAsset
+            {
+                id = "poison_blade",
+                texture = "poison_blade",
+                speed = 30f,
+                parabolic = false,
+                hitShake = true,
+                looped = false,
+                look_at_target = true,
+                startScale = 0.4f,
+                targetScale = 0.4f,
+                world_actions = new WorldAction(ExtendedWorldActions.aSimpleRangeDamage)
+            });
         }
 
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(Projectile), "start")]
-        //public static bool start_Prefix(Projectile __instance, ref Vector3 pStart, string pAssetID)
-        //{
-        //    if (!Main.instance.addProjectiles.ContainsKey(pAssetID))
-        //    {
-        //        return true;
-        //    }
-        //    if (! __instance.GetValue<bool>("created"))
-        //    {
-        //        ((Action<Projectile>)__instance.GetFastMethod("create"))(__instance);
-        //    }
-        //    ProjectileAsset asset = AssetManager.projectiles.get(pAssetID);
-        //    Sprite[] _frames = asset.GetValue<Sprite[]>("_frames");
-        //    if (_frames == null || _frames.Length == 0)
-        //    {
-        //        asset.SetValue("_frames", ResourcesHelper.loadAllSprite("projectiles/" + asset.id, 0.8f));
-        //    }
-        //    pStart.x += Main.instance.addProjectiles[pAssetID].x;
-        //    pStart.y += Main.instance.addProjectiles[pAssetID].y;
-        //    return true;
-        //}
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Projectile), "targetReached")]
         public static bool targetReached_Prefix(Projectile __instance)

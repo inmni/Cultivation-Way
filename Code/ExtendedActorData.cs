@@ -1,6 +1,6 @@
 ﻿namespace Cultivation_Way
 {
-    internal class MoreData
+    internal class ExtendedActorData
     {
         public ExtendedActorStatus status = new ExtendedActorStatus();
         public int z;

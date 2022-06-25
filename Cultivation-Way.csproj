@@ -269,6 +269,8 @@
     <Compile Include="Code\EasternDragonAssetContainer.cs" />
     <Compile Include="Code\EasternDragonState.cs" />
     <Compile Include="Code\ElementBaseType.cs" />
+    <Compile Include="Code\ExtendedBuildingData.cs" />
+    <Compile Include="Code\ExtendedBuildingStats.cs" />
     <Compile Include="Code\ExtendedItemStats.cs" />
     <Compile Include="Code\ExtendedItemTools.cs" />
     <Compile Include="Code\ExtendedKingdomStats.cs" />
@@ -286,7 +288,7 @@
     <Compile Include="Code\MoreMapModes.cs" />
     <Compile Include="Code\ExtendedActor.cs" />
     <Compile Include="Code\ExtendedBuilding.cs" />
-    <Compile Include="Code\MoreData.cs" />
+    <Compile Include="Code\ExtendedActorData.cs" />
     <Compile Include="Code\MoreStatusEffects.cs" />
     <Compile Include="Code\MoreTopTileType.cs" />
     <Compile Include="Code\NewEffectController.cs" />

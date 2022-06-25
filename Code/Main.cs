@@ -75,6 +75,7 @@ namespace CultivationWay
         public List<string> addActors = new List<string>();
         public List<string> addItems = new List<string>();
         public List<string> addRaces = new List<string>();
+        public List<BaseSimObject> temp_map_objects = null;
         public Dictionary<string, Vector2> addProjectiles = new Dictionary<string, Vector2>();
         private float startTime;
         #endregion
@@ -130,6 +131,7 @@ namespace CultivationWay
                 prefabs.init();//预制体初始化
                 instance.gameStatsData = Reflection.GetField(typeof(GameStats), MapBox.instance.gameStats, "data") as GameStatsData;
                 instance.zoneCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "zoneCalculator") as ZoneCalculator;
+                instance.temp_map_objects = Reflection.GetField(typeof(MapBox), MapBox.instance, "temp_map_objects") as List<BaseSimObject>;
                 //PrefabUtility.SaveAsPrefabAsset((GameObject)Resources.Load("actors/p_unit", typeof(GameObject)), "p_unit.prefab");
                 DefaultSetting.init();
                 MonoBehaviour.print($"[修真之路Cultivation Way]:加载用时{Time.time-startTime}");
@@ -191,10 +193,10 @@ namespace CultivationWay
             MonoBehaviour.print("Create and patch all:ChineseNameGenerator");
             Harmony.CreateAndPatchAll(typeof(Main));
             MonoBehaviour.print("Create and patch all:Main");
-            Harmony.CreateAndPatchAll(typeof(MoreActors));
-            MonoBehaviour.print("Create and patch all:MoreActors");
-            Harmony.CreateAndPatchAll(typeof(MoreBuildings));
-            MonoBehaviour.print("Create and patch all:MoreBuildings");
+            Harmony.CreateAndPatchAll(typeof(ExtendedActor));
+            MonoBehaviour.print("Create and patch all:ExtendedActor");
+            Harmony.CreateAndPatchAll(typeof(ExtendedBuilding));
+            MonoBehaviour.print("Create and patch all:ExtendedBuilding");
             Harmony.CreateAndPatchAll(typeof(MoreItems));
             MonoBehaviour.print("Create and patch all:MoreItems");
             Harmony.CreateAndPatchAll(typeof(MoreMapModes));
@@ -468,7 +470,38 @@ namespace CultivationWay
             //    WorldTools.logSomething($"<color={Toolbox.colorToHex(Toolbox.color_log_warning,true)}>年兽入侵！</color>", "iconKingslayer",tile);
             //}
         }
-
+        //人物动画时停
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Actor),"updateTimers")]
+        public static bool actor_updateTimers_Prefix(Actor __instance)
+        {
+            if (!ExtendedWorldData.instance.chunkTimeStop)
+            {
+                return true;
+            }
+            if (ExtendedWorldData.instance.stoppedZone.contain(__instance.currentTile.chunk)
+                &&!((ExtendedActor)__instance).extendedStats.ignoreTimeStop)
+            {
+                return false;
+            }
+            return true;
+        }
+        //人物行为时停
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Actor), "update")]
+        public static bool actor_update_Prefix(Actor __instance)
+        {
+            if (!ExtendedWorldData.instance.chunkTimeStop)
+            {
+                return true;
+            }
+            if (ExtendedWorldData.instance.stoppedZone.contain(__instance.currentTile.chunk)
+                && !((ExtendedActor)__instance).extendedStats.ignoreTimeStop)
+            {
+                return false;
+            }
+            return true;
+        }
         #endregion
 
         #region 乱七八糟的初始化

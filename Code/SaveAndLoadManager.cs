@@ -130,7 +130,7 @@ namespace Cultivation_Way
         //[HarmonyPatch(typeof(SaveManager), "loadActors")]
         public static bool loadActors_Prefix(SaveManager __instance, int startIndex = 0, int pAmount = 0)
         {
-            ExtendedWorldData.instance.tempMoreData = new Dictionary<string, MoreData>();
+            ExtendedWorldData.instance.tempMoreData = new Dictionary<string, ExtendedActorData>();
             foreach (string id in savedModData.tempMoreData.Keys)
             {
                 ExtendedWorldData.instance.tempMoreData[id] = savedModData.tempMoreData[id];
@@ -144,10 +144,10 @@ namespace Cultivation_Way
             for (int i = startIndex; i < num; i++)
             {
                 ActorData actorData = savedMap.actors[i];
-                MoreData moreActorData = null;
+                ExtendedActorData moreActorData = null;
                 if (savedModData == null)
                 {
-                    moreActorData = new MoreData();
+                    moreActorData = new ExtendedActorData();
                 }
                 else
                 {

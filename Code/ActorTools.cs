@@ -49,7 +49,7 @@ namespace Cultivation_Way
         public static void generateExtendedData(this ExtendedActor pActor,ExtendedActor inheritFrom=null)
         {
             Family family;
-            MoreData res = new MoreData();
+            ExtendedActorData res = new ExtendedActorData();
             ActorStats stats = pActor.stats;
             ExtendedActorStats eStats = Main.instance.extendedActorStatsLibrary[stats.id];
             pActor.extendedData = res;
@@ -177,15 +177,19 @@ namespace Cultivation_Way
             family = pActor.GetFamily();
             //获取修炼功法
             res.status.cultiBook = family.getbook(res.status, CultivationBookType.CULTIVATE);
+            for(int i = 0; i < eStats.raceSpells.Count; i++)
+            {
+                res.status.spells.Add(new ExtendedSpell(eStats.raceSpells[i]));
+            }
             if (res.status.cultiBook == null)
             {
                 UnityEngine.Debug.Log("[ActorTools]:null cultiBook");
             }
         }
-        public static MoreData generateExtendedStatus(this ActorData pData, ExtendedActor inheritFrom = null)
+        public static ExtendedActorData generateExtendedStatus(this ActorData pData, ExtendedActor inheritFrom = null)
         {
             Family family;
-            MoreData res = new MoreData();
+            ExtendedActorData res = new ExtendedActorData();
             ActorStats stats = AssetManager.unitStats.get(pData.status.statsID);
             ExtendedActorStats eStats = Main.instance.extendedActorStatsLibrary[stats.id];
             if (Toolbox.randomChance(eStats.cultivateChance))
@@ -311,7 +315,11 @@ namespace Cultivation_Way
             }
             family = res.status.GetFamily();
             //获取修炼功法
-            res.status.cultiBook = family.getbook(res.status,CultivationBookType.CULTIVATE); 
+            res.status.cultiBook = family.getbook(res.status,CultivationBookType.CULTIVATE);
+            for (int i = 0; i < eStats.raceSpells.Count; i++)
+            {
+                res.status.spells.Add(new ExtendedSpell(eStats.raceSpells[i]));
+            }
             if (res.status.cultiBook == null)
             {
                 UnityEngine.Debug.Log("[ActorTools]:null cultiBook");
@@ -397,7 +405,7 @@ namespace Cultivation_Way
         }
         public static void tryLearnNewSpell(this ExtendedActor pActor)
         {
-            if (Toolbox.randomChance(0.01f))
+            if (Toolbox.randomChance(0.03f))
             {
                 string spellID = AddAssetManager.extensionSpellLibrary.spellList.GetRandom();
                 for (int j = 0; j < pActor.extendedData.status.spells.Count; j++)
@@ -433,6 +441,23 @@ namespace Cultivation_Way
             if (pActor.extendedData.status.spells.Count != 0)
             {
                 pActor.extendedData.status.spells[Toolbox.randomInt(0, pActor.extendedData.status.spells.Count)].might *= 1.05f;
+            }
+        }
+        public static void modifyCultivationBook(this ExtendedActor pActor)
+        {
+            int exp = pActor.easyData.intelligence > 30 ? 30 : pActor.easyData.intelligence;
+            exp *= (pActor.extendedCurStats.talent + 1);
+            if (pActor.easyData.level > pActor.extendedData.status.cultiBook.rank || Toolbox.randomChance(exp / 3000f))
+            {
+                CultivationBook newBook = pActor.extendedData.status.cultiBook.modify(pActor.easyData.intelligence > 30 ? 30 : pActor.easyData.intelligence,
+                    pActor.extendedData.status.chineseElement.baseElementContainer);
+                Family family = pActor.GetFamily();
+                int flag = family.storeCultibook(newBook);
+                if (flag != -1)
+                {
+                    pActor.extendedData.status.cultiBook = family.lofts[1].container[flag];
+                }
+                pActor.tryLearnNewSpell();
             }
         }
         /// <summary>

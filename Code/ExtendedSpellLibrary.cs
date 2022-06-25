@@ -182,6 +182,118 @@ namespace Cultivation_Way
                 spellAction = new SpellAction(ExtendedWorldActions.summonSpell)
             });
             #endregion
+            #region 十二祖巫
+            add(new ExtendedSpellAsset
+            {
+                id = "sunkens",
+                name = "地刺",
+                rarity = 10,
+                might = 3f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 0, 0, 0, 0, 100 }),
+                spellAction = new SpellAction(ExtendedWorldActions.HouTu1)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "HouTuSummon1",
+                name = "六道轮回",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 0, 0, 0, 0, 100 }),
+                spellAction = new SpellAction(ExtendedWorldActions.HouTu2)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "HouTuSummon2",
+                name = "祖巫的呼唤",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 0, 0, 0, 0, 100 }),
+                spellAction = new SpellAction(ExtendedWorldActions.HouTu3)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "timeStop",
+                name = "时停",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
+                spellAction = new SpellAction(ExtendedWorldActions.ZhuJiuYin)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "shield",
+                name = "守护",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.DEFEND,
+                chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
+                spellAction = new SpellAction(ExtendedWorldActions.RuShou)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "rainCloud",
+                name = "雨",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 0, 0, 100, 0, 0 }),
+                spellAction = new SpellAction(ExtendedWorldActions.XuanMing1)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "wind_blade",
+                name = "风刃",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
+                spellAction = new SpellAction(ExtendedWorldActions.projectileLike)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "ice_blade",
+                name = "冰刃",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
+                spellAction = new SpellAction(ExtendedWorldActions.projectileLike)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "swordkee",
+                name = "剑气",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 20, 20, 20, 20, 20 }),
+                spellAction = new SpellAction(ExtendedWorldActions.projectileLike)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "water_orb1",
+                name = "水弹",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 0, 0, 100, 0, 0 }),
+                spellAction = new SpellAction(ExtendedWorldActions.projectileLike)
+            });
+            add(new ExtendedSpellAsset
+            {
+                id = "summonSnake",
+                name = "唤蛇",
+                rarity = 10,
+                might = 1f,
+                type = ExtendedSpellType.ATTACK,
+                chineseElement = new ChineseElement(new int[] { 0, 0, 100, 0, 0 }),
+                spellAction = new SpellAction(ExtendedWorldActions.summonSpell)
+            });
+            #endregion
         }
         public override ExtendedSpellAsset add(ExtendedSpellAsset pAsset)
         {

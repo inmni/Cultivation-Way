@@ -48,6 +48,17 @@ namespace Cultivation_Way
             
         }
     }
+    internal class SimpleZone
+    {
+        public int x1;
+        public int x2;
+        public int y1;
+        public int y2;
+        public bool contain(MapChunk chunk)
+        {
+            return chunk.x >= x1 && chunk.x <= x2 && chunk.y <= y1 && chunk.y >= y2;
+        }
+    }
     internal class ExtendedWorldData
     {
         
@@ -55,15 +66,16 @@ namespace Cultivation_Way
 
         public float worldLevel = 0f;
         public int levelLimit = 110;
+        public bool chunkTimeStop = false;
         public static ExtendedWorldData instance;
         public CultivationBookContainer worldBookContainer = new CultivationBookContainer();
-        
-        public List<MapChunk> chunks = new List<MapChunk>();//区块
+        public SimpleZone stoppedZone = new SimpleZone();
+        public List<MapChunk> chunks = new List<MapChunk>(1024);//区块
         public List<BonusStatsManager> bonusStatsManagers = new List<BonusStatsManager>();
 
         public Dictionary<string, int> creatureLimit = new Dictionary<string, int>();//生物限制
         public Dictionary<string, string> godList = new Dictionary<string, string>();//神明
-        public Dictionary<string, MoreData> tempMoreData = new Dictionary<string, MoreData>();//未生成单位的属性
+        public Dictionary<string, ExtendedActorData> tempMoreData = new Dictionary<string, ExtendedActorData>();//未生成单位的属性
 
         public Dictionary<string, Family> familys = new Dictionary<string, Family>();//家族
        

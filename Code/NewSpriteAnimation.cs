@@ -80,6 +80,10 @@ namespace Cultivation_Way
             stopFrameIndex = stopIndex;
             stopTriggered = true;
         }
+        public WorldTile getCurrentTile()
+        {
+            return MapBox.instance.GetTile((int)(m_gameobject.transform.position.x + 0.5f), (int)(m_gameobject.transform.position.y + 0.5f));
+        }
         public void setFrames(Sprite[] newFrames,Action[] actions=null, bool restart = false)
         {
             frames = newFrames;
@@ -167,16 +171,31 @@ namespace Cultivation_Way
             }
             updateFrame();
         }
+        /// <summary>
+        /// 若frameIndex<0，则为所有帧加上action
+        /// </summary>
+        /// <param name="frameIndex"></param>
+        /// <param name="action"></param>
         public void setFrameAction(int frameIndex,Action action)
         {
-            if (frameActions==null||frameIndex < 0 || frameIndex >= frames.Length)
+            if (frameActions==null|| frameIndex >= frames.Length)
             {
                 return;
             }
             Action[] newActions = new Action[frameActions.Length];
-            frameActions.CopyTo(newActions, 0);
-            newActions[frameIndex] = action;
-            frameActions = newActions;
+            if (frameIndex < 0)
+            {
+                for(int i = 0; i < frameActions.Length; i++)
+                {
+                    newActions[i] = action;
+                }
+            }
+            else
+            {
+                frameActions.CopyTo(newActions, 0);
+                newActions[frameIndex] = action;
+                frameActions = newActions;
+            }
         }
         public void updateFrame()
         {

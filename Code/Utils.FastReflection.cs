@@ -12,9 +12,28 @@ namespace Cultivation_Way.Utils
     /// </summary>
     static class FastReflection
     {
+        
         private static Dictionary<Type,Dictionary<string, Delegate>> methods = new Dictionary<Type, Dictionary<string, Delegate>>();
         private static Dictionary<Type,Dictionary<string, Delegate > > setters = new Dictionary<Type, Dictionary<string, Delegate>>();
         private static Dictionary<Type,Dictionary<string, Func<object, object> > > getters = new Dictionary<Type, Dictionary<string, Func<object, object>>>();
+
+        public static Action<ExtendedActor, float, bool, AttackType, BaseSimObject, bool> actor_getHit =
+            (Action<ExtendedActor, float, bool, AttackType, BaseSimObject, bool>)GetFastMethod(typeof(ExtendedActor),"getHit");
+        public static Func<ExtendedActor, UnitProfession, bool> actor_isProfession =
+            (Func<ExtendedActor, UnitProfession, bool>)GetFastMethod(typeof(ExtendedActor), "isProfession");
+        public static Action<ExtendedBuilding, float, bool, AttackType, BaseSimObject, bool> building_getHit =
+            (Action<ExtendedBuilding, float, bool, AttackType, BaseSimObject, bool>)GetFastMethod(typeof(ExtendedBuilding), "getHit");
+        public static Action<ExtendedBuilding> building_create = 
+            (Action<ExtendedBuilding>)GetFastMethod(typeof(ExtendedBuilding), "create");
+        public static Action<ExtendedBuilding> building_finishScaleTween = 
+            (Action<ExtendedBuilding>)GetFastMethod(typeof(BuildingTweenExtension), "finishScaleTween",true);
+        public static Action<ExtendedBuilding, WorldTile, BuildingAsset, BuildingData> building_setBuilding =
+            (Action<ExtendedBuilding, WorldTile, BuildingAsset, BuildingData>)GetFastMethod(typeof(ExtendedBuilding), "setBuilding");
+        public static Func<MapBox, WorldTile, BuildingAsset, City, BuildPlacingType, bool> mapbox_canBuildFrom =
+            (Func<MapBox, WorldTile, BuildingAsset, City, BuildPlacingType, bool>)GetFastMethod(typeof(MapBox), "canBuildFrom");
+        public static Action<MapBox, WorldTile, int, MapObjectType> mapbox_getObjectsInChunks =
+            (Action<MapBox, WorldTile, int, MapObjectType>)GetFastMethod(typeof(MapBox), "getObjectsInChunks");
+
         public static T GetValue<T>(this object instance,string fieldName,Type instanceType = null)
         {
             if (instanceType == null)
@@ -77,6 +96,14 @@ namespace Cultivation_Way.Utils
             }
             return method;
         }
+        public static Delegate GetFastMethod(Type instanceType, string methodName,bool isStatic = false)
+        {
+            if (isStatic)
+            {
+                return createMethodDelegate(instanceType.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic));
+            }
+            return createMethodDelegate(instanceType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic));
+        }
         private static Func<object, object> createNewGetter(Type instanceType,string fieldName)
         {
             FieldInfo field = instanceType.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -137,8 +164,8 @@ namespace Cultivation_Way.Utils
         }
         private static Delegate createMethodDelegate(MethodInfo methodInfo)
         {
-            try
-            {
+            //try
+            //{
                 List<ParameterExpression> paramExpressions = methodInfo.GetParameters().Select((p, i) =>
                 {
                     return Expression.Parameter(p.ParameterType, p.Name);
@@ -157,12 +184,12 @@ namespace Cultivation_Way.Utils
                 }
                 LambdaExpression lambdaExpression = Expression.Lambda(callExpression, paramExpressions);
                 return lambdaExpression.Compile();
-            }
-            catch (Exception)
-            {
-                UnityEngine.Debug.LogError("Expression Tree-Method");
-                return null;
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    UnityEngine.Debug.LogError("Expression Tree-Method");
+            //    return null;
+            //}
         }
 
         

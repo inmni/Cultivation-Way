@@ -26,11 +26,17 @@ namespace Cultivation_Way
 
         public string fixedName = null;//预设名
 
+        public bool ignoreTimeStop = false;//忽略时间暂停
 
-
-
+        public int forceDeathAge = int.MaxValue;
         private static ExtendedActorStats t;
-
+        public void addSpells(params object[] spells)
+        {
+            for(int i = 0; i < spells.Length; i++)
+            {
+                this.raceSpells.Add((string)spells[i]);
+            }
+        }
 
         internal static void init()
         {
@@ -117,12 +123,15 @@ namespace Cultivation_Way
 
             t = get("DiJiang");
             t.fixedName = "帝江";
+            t.ignoreTimeStop = true;
             t = get("GongGong");
             t.fixedName = "共工";
+            t.addSpells("water_orb1");
             t.preferedElement = new int[] { 0, 0, 100, 0, 0 };
             t.preferedElementScale = 1.0f;
             t = get("HouTu");
             t.fixedName = "后土";
+            t.addSpells("HouTuSummon1", "HouTuSummon2","sunkens");
             t.preferedElement = new int[] { 0, 0, 0, 0, 100 };
             t.preferedElementScale = 1.0f;
             t = get("GouMang");
@@ -133,20 +142,27 @@ namespace Cultivation_Way
             t.fixedName = "强良";
             t = get("ZhuJiuYin");
             t.fixedName = "烛九阴";
+            t.addSpells("timeStop");
+            t.ignoreTimeStop = true;
             t = get("RuShou");
+            t.addSpells("shield");
             t.fixedName = "蓐收";
             t.preferedElement = new int[] { 100, 0, 0, 0, 0 };
             t.preferedElementScale = 1.0f;
             t = get("SheBiShi");
+            t.addSpells("summonSnake");
             t.fixedName = "奢比尸";
             t = get("TianWu");
+            t.addSpells("wind_blade");
             t.fixedName = "天吴";
             t = get("XingTian");
             t.fixedName = "刑天";
+            t.forceDeathAge = 100;
             t = get("XiZi");
             t.fixedName = "翕兹";
             t = get("XuanMing");
             t.fixedName = "玄冥";
+            t.addSpells("rainCloud", "ice_blade");
             t = get("ZhuRong");
             t.fixedName = "祝融";
             t.preferedElement = new int[] { 0, 0, 0, 100, 0 };

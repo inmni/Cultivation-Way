@@ -17,9 +17,15 @@ namespace Cultivation_Way
             {
                 id = "asylum",
                 path_icon = "ui/Icons/iconAsylum",
+                needs_to_be_explored=false,
                 birth = 0f
             });
-
+            AssetManager.traits.add(new ActorTrait
+            {
+                id = "extendedBurning_feet",
+                path_icon = "ui/Icons/iconBurningFeet",
+                birth = 0f
+            });
             AssetManager.traits.add(new ActorTrait
             {
                 id = "realm",

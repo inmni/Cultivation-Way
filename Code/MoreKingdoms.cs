@@ -11,7 +11,7 @@ namespace Cultivation_Way
     internal class MoreKingdoms
     {
         private static ExtendedActor temp_parent;
-        internal static MoreData temp_data;
+        internal static ExtendedActorData temp_data;
         internal void init()
         {
             AssetManager.kingdoms.add(new KingdomAsset
@@ -411,4 +411,5 @@ namespace Cultivation_Way
         //public static bool 
         // #endregion
     }
+
 }

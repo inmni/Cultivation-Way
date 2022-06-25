@@ -332,15 +332,16 @@ namespace Cultivation_Way
                 return false;
             }
             //添加防护罩
+            ((Actor)pUser).CallMethod("addStatusEffect", "shield", 30f);
             return true;
         }
-        public static bool XuanMing1(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        public static bool XuanMing1(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
         {
             if (pUser == null || !pUser.base_data.alive)
             {
                 return false;
             }
-            //召唤雨云
+            //召唤雨云（待强化）
             return true;
         }
         public static bool HouTu1(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
@@ -350,6 +351,36 @@ namespace Cultivation_Way
                 return false;
             }
             //地刺
+            NewSpriteAnimation anim = NewEffectManager.spawnOn("sunkens", pUser.currentTile, 0.5f);
+            WorldTile lastTile = pUser.currentTile;
+            WorldTile currTile;
+            float damage;
+            anim.setFrameAction(-1, new System.Action(() =>
+             {
+                 currTile = anim.getCurrentTile();
+                 if (currTile == null || currTile == lastTile)
+                 {
+                     return;
+                 }
+                 lastTile = currTile;
+                 FastReflection.mapbox_getObjectsInChunks(MapBox.instance, lastTile, 1, MapObjectType.All);
+                 foreach (BaseSimObject o in Main.instance.temp_map_objects)
+                 {
+                     if (o.kingdom != null && pUser.kingdom != null && o.kingdom.isEnemy(pUser.kingdom))
+                     {
+                         continue;
+                     }
+                     damage = OthersHelper.getSpellDamage(spell, pUser, o);
+                     if (o.objectType == MapObjectType.Actor)
+                     {
+                         FastReflection.actor_getHit((ExtendedActor)o, damage, true, AttackType.Other, pUser, false);
+                     }
+                     else if (o.objectType == MapObjectType.Building)
+                     {
+                         FastReflection.building_getHit((ExtendedBuilding)o, damage, true, AttackType.Other, pUser, false);
+                     }
+                 }
+             }));
             return true;
         }
         public static bool HouTu2(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
@@ -359,6 +390,41 @@ namespace Cultivation_Way
                 return false;
             }
             //召唤亡灵
+
+            return true;
+        }
+        public static bool HouTu3(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
+        {
+            if (pUser == null || !pUser.base_data.alive)
+            {
+                return false;
+            }
+            //召唤刑天
+            ExtendedActor user = (ExtendedActor)pUser;
+            WorldTile tile = pUser.currentTile.neighboursAll.GetRandom();
+            NewEffectManager.spawnOn("XingTian", tile.posV3, 0.01f);
+            ExtendedActor summoned = (ExtendedActor)MapBox.instance.createNewUnit(spell.spellAssetID, tile);
+
+            ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setJob("attacker");
+            ((AiSystemActor)Reflection.GetField(typeof(Actor), summoned, "ai")).setTask("warrior_army_follow_leader");
+            summoned.easyData.profession = UnitProfession.Warrior;
+
+            summoned.kingdom = pUser.kingdom;
+            if (pUser.city != null)
+            {
+                pUser.city.addNewUnit(summoned);
+
+            }
+            if (user.easyData.level > 5)
+            {
+                summoned.easyData.level = user.easyData.level - 5;
+            }
+            else
+            {
+                summoned.easyData.level = 1;
+            }
+            summoned.easyData.health = user.easyCurStats.health / 3;
+            summoned.setStatsDirty();
             return true;
         }
         public static bool ZhuJiuYin(ExtendedSpell spell, BaseSimObject pUser = null, BaseSimObject pTarget = null)
@@ -368,6 +434,37 @@ namespace Cultivation_Way
                 return false;
             }
             //时间暂停
+            ExtendedWorldData.instance.chunkTimeStop = true;
+            MapChunk centerChunk = pUser.currentTile.chunk;
+            ExtendedWorldData.instance.stoppedZone.x1 = centerChunk.x - 1;
+            ExtendedWorldData.instance.stoppedZone.x2 = centerChunk.x + 1;
+            ExtendedWorldData.instance.stoppedZone.y1 = centerChunk.y + 1;
+            ExtendedWorldData.instance.stoppedZone.y2 = centerChunk.y - 1;
+            new WorldTimer(9f, new System.Action(()=>
+            {
+                ExtendedWorldData.instance.chunkTimeStop = false;
+            }));
+            return true;
+        }
+        public static bool ZhuRong(BaseSimObject pTarget,WorldTile pTile = null)
+        {
+            BaseSimObject attackTarget = pTarget.GetValue<BaseSimObject>("attackTarget", Types.t_BaseSimObject);
+            if (attackTarget == null)
+            {
+                return false;
+            }
+            System.Action<WorldTile, bool> worldTile_setFire = (System.Action<WorldTile, bool>)pTarget.currentTile.GetFastMethod("setFire", Types.t_WorldTile);
+            MapBox.instance.loopWithBrush(pTarget.currentTile, Brush.get(4, "circ_"), new PowerActionWithID(ActionLibrary.burningFeetEffectTileDraw), "burningFeetEffect");
+            if (!pTarget.currentTile.Type.liquid)
+            {
+                worldTile_setFire(pTarget.currentTile, true);
+            }
+            for (int i = 0; i < pTarget.currentTile.neighbours.Count; i++)
+            {
+                WorldTile worldTile = pTarget.currentTile.neighbours[i];
+                worldTile_setFire(worldTile, false);
+                worldTile.setBurned(-1);
+            }
             return true;
         }
         #endregion
@@ -421,7 +518,10 @@ namespace Cultivation_Way
             ExtendedActor god = (ExtendedActor)MapBox.instance.createNewUnit(godID, pTile);
             ActorTools.copyActor(user, god);
             god.kingdom = pUser.kingdom;
-            god.city = pUser.city;
+            if (pUser.city != null)
+            {
+                pUser.city.addNewUnit(god,true);
+            }
             ExtendedKingdomStats.setStatus(god.kingdom.id, godID, 1f);
             if (ExtendedWorldData.instance.kingdomBindActors.ContainsKey(god.kingdom.id))
             {
@@ -429,6 +529,28 @@ namespace Cultivation_Way
             }
             god.easyData.health = int.MaxValue >> 2;
             god.easyData.level = user.easyData.level;
+            return true;
+        }
+        public static bool aTransformToXingTian(BaseSimObject pUser, WorldTile pTile = null)
+        {
+            ExtendedActor user = (ExtendedActor)pUser;
+            if (!FastReflection.actor_isProfession(user,UnitProfession.Warrior)||Toolbox.randomChance(0.9f))
+            {
+                return false;
+            }
+
+            ExtendedActor xt = (ExtendedActor)MapBox.instance.createNewUnit("XingTian", pTile);
+            ActorTools.copyActor(user, xt);
+            xt.kingdom = pUser.kingdom;
+            if (pUser.city != null)
+            {
+                pUser.city.addNewUnit(xt, true, false);
+            }
+            ((AiSystemActor)Reflection.GetField(typeof(Actor), xt, "ai")).setJob("attacker");
+            ((AiSystemActor)Reflection.GetField(typeof(Actor), xt, "ai")).setTask("warrior_army_follow_leader");
+            xt.easyData.profession = UnitProfession.Warrior;
+            xt.easyData.health = int.MaxValue >> 2;
+            xt.easyData.level = user.easyData.level;
             return true;
         }
         public static bool aSimpleRangeDamage(BaseSimObject pUser, WorldTile pTile = null)
@@ -500,6 +622,55 @@ namespace Cultivation_Way
 
             return true;
         }
+        //public static bool teleportRandom(BaseSimObject pTarget, WorldTile pTile = null)
+        //{
+        //    WorldTile worldTile;
+            
+        //    if (pTile.region == null||pTile.region.island==null)
+        //    {
+        //        IslandsCalculator islandsCalculator = Reflection.GetField(typeof(MapBox), MapBox.instance, "islandsCalculator") as IslandsCalculator;
+        //        worldTile = islandsCalculator.getRandomGround();
+        //    }
+        //    else
+        //    {
+        //        MapRegion random = pTile.region.island.regions.GetRandom();
+        //        worldTile = ((random != null) ? random.tiles.GetRandom<WorldTile>() : null);
+        //    }
+        //    WorldTile worldTile2 = worldTile;
+        //    if (worldTile2 == null)
+        //    {
+        //        return false;
+        //    }
+        //    if (worldTile2.Type.block)
+        //    {
+        //        return false;
+        //    }
+        //    if (!worldTile2.Type.ground)
+        //    {
+        //        return false;
+        //    }
+        //    Actor actor = (Actor)pTarget;
+        //    string text = actor.stats.effect_teleport;
+        //    if (text == string.Empty)
+        //    {
+        //        text = "fx_teleport_blue";
+        //    }
+        //    QualityChanger qualityChanger = Reflection.GetField(typeof(MapBox), MapBox.instance, "qualityChanger") as QualityChanger;
+        //    if (!qualityChanger.isFullLowRes())
+        //    {
+        //        BaseStats curStats = actor.GetCurStats();
+        //        BaseEffectController controller = MapBox.instance.stackEffects.CallMethod("get", text) as BaseEffectController;
+        //        controller.CallMethod("spawnAt",pTarget.currentPosition, curStats.scale);
+        //        BaseEffect baseEffect = controller.CallMethod("spawnAt",worldTile2.posV3, curStats.scale) as BaseEffect;
+        //        if (baseEffect != null)
+        //        {
+        //            baseEffect.GetComponent<SpriteAnimation>().setFrameIndex(9);
+        //        }
+        //    }
+        //    actor.cancelAllBeh(null);
+        //    actor.CallMethod("spawnOn",worldTile2, 0f);
+        //    return true;
+        //}
         #endregion
     }
 }

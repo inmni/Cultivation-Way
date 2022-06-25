@@ -42,7 +42,6 @@ namespace Cultivation_Way.MoreAiBehaviours
         private static Vector2Int[] dirs = new Vector2Int[] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
         private static Vector2Int[] dirAll = new Vector2Int[] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down, new Vector2Int(1, 1), new Vector2Int(1, -1), new Vector2Int(-1, 1), new Vector2Int(-1, -1) };
         internal Dictionary<int, CityWallCondition> conditions = new Dictionary<int, CityWallCondition>();
-
         public override BehResult execute(City pCity)
         {
             if (!pCity.isCapitalCity())
